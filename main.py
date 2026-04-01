@@ -15,8 +15,8 @@ from sklearn.metrics import accuracy_score, confusion_matrix, classification_rep
 # -------------------------------
 # 1. Load Dataset
 # -------------------------------
-fake = pd.read_csv("Fake.csv", on_bad_lines='skip', engine='python').sample(2000, random_state=42)
-real = pd.read_csv("True.csv", on_bad_lines='skip', engine='python').sample(2000, random_state=42)
+fake = pd.read_csv("Small_Fake.csv", on_bad_lines='skip', engine='python').sample(2000, random_state=42)
+real = pd.read_csv("Small_True.csv", on_bad_lines='skip', engine='python').sample(2000, random_state=42)
 
 fake["label"] = 0
 real["label"] = 1
