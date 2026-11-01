@@ -2,6 +2,8 @@
 
 A news-analysis website by **Priti**. Paste an English article, inspect the words influencing a machine-learning prediction, and search related published fact-checks.
 
+**Live website:** https://verity-news-sable.vercel.app · [Vercel project](https://vercel.com/priti-09/verity-news)
+
 Built from the original Fake News Detection notebook, with a Next.js interface, FastAPI backend, reproducible training, and portable model parameters that require no TensorFlow or scikit-learn in production.
 
 > Predictions describe learned writing patterns. They do not establish factual truth. Evidence search is a separate step, and extracted sentences remain unverified.
