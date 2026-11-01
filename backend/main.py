@@ -16,7 +16,7 @@ from backend.security import guard, correlation_id, logger
 from backend.evidence_providers import PROVIDERS
 from backend.language import identify_language
 from backend.schemas import AnalyzeInput, URLInput, ClaimInput, EvidenceInput
-from backend.investigation import select_claims, retrieve_passages
+from backend.investigation import select_claims, retrieve_passages, publication_context
 
 ROOT = Path(__file__).resolve().parents[1]
 app = FastAPI(title="Verity News API", version="2.0.0", docs_url="/api/docs", openapi_url="/api/openapi.json")
@@ -80,7 +80,7 @@ async def evidence_passages(payload: EvidenceInput):
     else:
         source = {"text": payload.text, "title": "Reader-provided source", "url": None, "publisher": "Not independently authenticated", "truncated": False, "published_date": None}
     passages = retrieve_passages(payload.query, source["text"])
-    return {"query": payload.query, "source": {key: value for key, value in source.items() if key != "text"}, "passages": passages, "retrieval_method": "BM25 lexical relevance", "retrieved_at": datetime.now(timezone.utc).isoformat(), "note": "Verbatim source passages ranked by word overlap, not verified facts. Review dates, context, and source independence."}
+    return {"query": payload.query, "source": {key: value for key, value in source.items() if key != "text"}, "passages": passages, "date_context": publication_context(source.get("published_date")), "retrieval_method": "BM25 lexical relevance; repeated passages deduplicated within this source", "retrieved_at": datetime.now(timezone.utc).isoformat(), "note": "Verbatim source passages ranked by word overlap, not verified facts. Review dates, context, and source independence."}
 
 
 @app.get("/api/evaluation")

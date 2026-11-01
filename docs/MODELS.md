@@ -18,3 +18,11 @@ Research commands:
 ```
 
 Experiments pin the resolved model revision, use `trust_remote_code=False`, isolate calibration, record artifact sizes/checksums and library versions, and leave production untouched. Local CPU is supported; `device=auto` can use CUDA when installed. GPU use is optional and not part of the Vercel deployment. See actual JSON files in `reports/` for executed runs and any failures.
+
+## Optional local inference API
+
+`backend.research_api:app` serves `GET /api/research/health` and `POST /api/research/analyze/text` when launched separately. Configure `VERITY_RESEARCH_MODEL_DIR` to a saved benchmark directory; the request cannot choose a path or remote model. Nothing is loaded at startup. The service serializes model load/inference with one nonblocking slot; overload returns 503 with `Retry-After`. Run one process to avoid duplicating model memory.
+
+The loader checks all listed model/tokenizer files' sizes and SHA-256 hashes, requires the local `model.safetensors`, validates calibration parameters/token limits, disables remote code and network loading, and requires two labels. These checks establish agreement with an operator-trusted manifest, not independent provenance or a signed supply chain. An older benchmark rerun bug included the previous `evaluation.json` in its own artifact list. The loader ignores that self-reference while checking all other files; future benchmark reports exclude it. Existing metrics and checkpoints are preserved.
+
+Every response has `verdict: uncertain`, `confidence: null`, `deployment_status: research_only` and `calibration_validated_for_production: false`. A successful English article request adds the dataset-label `research_score`, model, revision and token limit. Short/non-English requests abstain without loading. Missing configuration/checkpoints/dependencies and corrupt artifacts return safe 503 errors. No transformer option appears as a promoted production model in the website.

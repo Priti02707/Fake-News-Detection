@@ -7,6 +7,9 @@ from fastapi.testclient import TestClient
 
 from backend.main import app
 from backend.investigation import retrieve_passages, select_claims
+from backend.investigation import publication_context
+from datetime import datetime, timezone
+import pytest
 from scripts.evaluate import measure, temporal_split
 
 client = TestClient(app)
@@ -52,6 +55,43 @@ def test_passage_retrieval_never_invents_quotes_and_handles_no_matches():
     assert retrieve_passages("spaceships orbit distant planets", source) == []
     decimal = "The public transport budget increased by 3.5 percent in 2020."
     assert retrieve_passages("transport budget", decimal)[0]["text"] == decimal
+
+
+def test_repeated_passages_do_not_fill_the_retrieval_shortlist():
+    repeated = "The city council approved the transport budget on Tuesday. "
+    distinct = "The city council will discuss transport routes at its next meeting."
+    source = repeated * 12 + distinct
+    passages = retrieve_passages("city council transport", source)
+    assert len(passages) == 2
+    assert any(item["text"] == distinct for item in passages)
+    assert all(source[item["start"]:item["end"]] == item["text"] for item in passages)
+
+
+@pytest.mark.parametrize("published,status,age", [
+    (None, "missing", None), ("not a date", "invalid", None),
+    ("9999-12-31T23:59:59-12:00", "invalid", None),
+    ("2025-11-01", "within_review_window", 365),
+    ("2025-10-31", "older_than_review_window", 366),
+    ("2026-11-02", "future", -1),
+    ("2026-11-01T23:30:00-03:00", "future", -1),
+])
+def test_publication_context_uses_dates_without_factual_verdicts(published, status, age):
+    result = publication_context(published, datetime(2026, 11, 1, tzinfo=timezone.utc))
+    assert result["status"] == status
+    assert result["age_days"] == age
+    assert result["review_window_days"] == 365
+    assert "assessment" not in result
+
+
+def test_evidence_api_preserves_date_review_metadata_in_v2_verification():
+    source = {"title": "Historical transport report", "publisher": "example.com", "url": "https://example.com/report", "text": "The city council approved the transport budget on Tuesday.", "published_date": "2000-01-01", "truncated": False}
+    with patch("backend.main.fetch_article", return_value=source):
+        response = client.post("/api/v2/verify/claims", json={"claim": "The city council approved the transport budget.", "urls": [source["url"]]})
+    assert response.status_code == 200
+    result = response.json()
+    assert result["assessment"] == "INSUFFICIENT_EVIDENCE"
+    assert result["evidence"][0]["date_context"]["status"] == "older_than_review_window"
+    assert "historical" in result["evidence"][0]["date_context"]["message"]
 
 
 def test_evidence_requires_exactly_one_source_and_blocks_private_urls():

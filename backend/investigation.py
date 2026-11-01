@@ -3,8 +3,30 @@ import hashlib
 import math
 import re
 from collections import Counter
+from datetime import datetime, timezone
 
 STOP = set("a an the and or to of in on at for from with by is are was were be been this that it as its has have had not".split())
+
+
+def publication_context(published_date, now=None):
+    """A date review aid; age alone does not determine evidence relevance."""
+    now = now or datetime.now(timezone.utc)
+    result = {"review_window_days": 365, "checked_at": now.isoformat(), "age_days": None}
+    if not published_date:
+        return {**result, "status": "missing", "message": "Publication date is unknown. Check the source date and whether it matches the claim's timeframe."}
+    try:
+        published = datetime.fromisoformat(published_date.replace("Z", "+00:00"))
+        published = published.replace(tzinfo=timezone.utc) if published.tzinfo is None else published.astimezone(timezone.utc)
+    except (ValueError, TypeError, AttributeError, OverflowError):
+        return {**result, "status": "invalid", "message": "The source-reported publication date could not be interpreted. Check it in the original source."}
+    age = (now.astimezone(timezone.utc).date() - published.date()).days
+    if age < 0:
+        status, message = "future", "The source-reported publication date is in the future. Check its metadata and the claim's timeframe."
+    elif age > result["review_window_days"]:
+        status, message = "older_than_review_window", "This source is more than one year old. It may be outdated for a current claim or appropriate for a historical claim; check dates and context."
+    else:
+        status, message = "within_review_window", "The source-reported date is within the past year. Recency does not establish reliability or factual support."
+    return {**result, "age_days": age, "status": status, "message": message}
 
 
 def tokens(text):
@@ -62,4 +84,10 @@ def retrieve_passages(query, text, limit=8):
             score += idf * frequency * 2.2 / max(1e-9, denominator)
         if score > 0:
             ranked.append({"id": hashlib.sha256(f"{start}:{value}".encode()).hexdigest()[:16], "text": value, "start": start, "end": start + len(value), "retrieval_score": round(score, 5)})
-    return sorted(ranked, key=lambda item: (-item["retrieval_score"], item["start"]))[:limit]
+    unique, seen = [], set()
+    for item in sorted(ranked, key=lambda item: (-item["retrieval_score"], item["start"])):
+        key = " ".join(item["text"].split())
+        if key not in seen:
+            seen.add(key)
+            unique.append(item)
+    return unique[:limit]

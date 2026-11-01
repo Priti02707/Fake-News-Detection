@@ -32,10 +32,26 @@ test("citations require reader review, export source traces, and reset on claim 
   expect(report.assessment).toBe("Conflicting reader assessments");
   expect(report.citations).toHaveLength(2);
   expect(report.citations[0].source.url).toBeNull();
+  expect(report.citations[0].date_context.status).toBe("missing");
+  await expect(page.locator(".evidence-date-context").first()).toContainText("Publication date is unknown");
   expect(report.citations[0].note).toContain("Illustrative test text");
   await page.getByLabel("Claim to investigate", { exact: true }).fill("A different claim about the transport budget and council.");
   await expect(page.locator(".citation")).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+});
+
+test("old publication dates show review context without implying a factual verdict", async ({ page }) => {
+  await page.route("**/api/evidence", route => route.fulfill({ json: {
+    source: { title: "Historical council report", publisher: "example.com", url: "https://example.com/report", published_date: "2000-01-01", truncated: false },
+    passages: [{ id: "old-passage", text: "The city council approved the transport budget on Tuesday.", start: 0, end: 57, retrieval_score: 1 }],
+    retrieved_at: "2026-11-01T12:00:00Z",
+    date_context: { status: "older_than_review_window", message: "This source is more than one year old. It may be outdated for a current claim or appropriate for a historical claim; check dates and context.", age_days: 9801, review_window_days: 365, checked_at: "2026-11-01T12:00:00Z" }
+  } }));
+  await openNotebook(page);
+  await page.getByLabel("Evidence source URL", { exact: true }).fill("https://example.com/report");
+  await page.getByRole("button", { name: "Find source passages" }).click();
+  await expect(page.locator(".evidence-date-context")).toContainText("appropriate for a historical claim");
+  await expect(page.getByText("Insufficient reviewed evidence", { exact: true })).toBeVisible();
 });
 
 test("recent-news leads can fill a source URL without claiming verification", async ({ page }) => {

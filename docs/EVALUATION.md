@@ -14,6 +14,10 @@ Publisher and independent-corpus evaluation require appropriate new metadata/dat
 
 A functional real-model check shows execution and specific expected examples only.
 
+The continuation's deterministic research API tests use synthetic manifest bytes and stub predictions only to test API contracts, checksum rejection, lazy caching, single-slot concurrency, safe failures and language/length abstention. They are not model evaluation. Run actual local-checkpoint inference separately with `VERITY_TEST_RESEARCH_MODEL_DIR=.artifacts/distilbert-base-uncased .venv/bin/python -m pytest tests/test_research.py -q -k actual_local`; it verifies real tokenizer/model loading and response behavior without downloading or training. No additional accuracy is claimed.
+
+Evidence tests cover exact-quote deduplication, offsets, missing/invalid/future publication dates, timezone conversion and the 365/366-day review boundary. The publication-age rule is not a learned relevance or factual-verification threshold.
+
 ```sh
 .venv/bin/python scripts/evaluate.py
 .venv/bin/python scripts/audit_data.py --semantic --limit 500

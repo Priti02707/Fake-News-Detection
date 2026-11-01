@@ -12,3 +12,7 @@
 - Production model changes require measured comparison and manual review. No public model-promotion endpoint is exposed.
 
 These controls and tests are not a complete independent security audit. No distributed durable job queue or shared evidence database is provisioned by this release.
+
+## Local research checkpoint boundary
+
+The separate research service accepts text only, with a server-configured checkpoint directory. Requests cannot select file paths or model identifiers. Loading is lazy and offline, uses safetensors with remote code disabled, verifies model/tokenizer file hashes against the operator-trusted manifest, and bounds inference to one slot per process. Corrupt/missing artifacts return generic errors without local paths or article text. Manifest checks do not authenticate an untrusted manifest. The service has existing request/body limits and correlation headers but no account authentication; run on localhost with one worker. It is not imported by the production Vercel entry point.

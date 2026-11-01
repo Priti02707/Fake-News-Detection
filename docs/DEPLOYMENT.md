@@ -26,3 +26,14 @@ npx vercel --prod --scope priti-09
 After deployment, check `/api/health`, `/api/v2/capabilities`, `/api/v2/models/metrics`, article analysis, citations and real opt-in media flows. A successful build alone does not establish that remote model assets load in production. News-provider outages, missing Google keys and device memory limits must remain visible unavailable states.
 
 Docker Compose configuration was validated locally. A container image build/run was not verified because the installed Docker daemon was stopped (its socket was absent). This does not block the separately verified Vercel deployment.
+
+## Separate local research service
+
+After installing `requirements-ml.txt` and producing a benchmark checkpoint:
+
+```sh
+VERITY_RESEARCH_MODEL_DIR=.artifacts/distilbert-base-uncased \
+  .venv/bin/python -m uvicorn backend.research_api:app --host 127.0.0.1 --port 8010 --workers 1
+```
+
+Visit `/api/research/docs` on that port. Health exposes `configured` and `model_loaded`; configuration alone does not prove checkpoint validity. The first eligible request verifies and loads the local checkpoint. No model is downloaded. Restart the process to switch checkpoints. Keep this unauthenticated research service bound to localhost; no public dedicated inference host, authentication layer or GPU service is provisioned. The existing Vercel app and Docker web/API configuration continue to use production linear models. This local research service is not deployed through `api/index.py`.

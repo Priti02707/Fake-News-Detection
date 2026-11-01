@@ -86,6 +86,8 @@ Open **Investigate claims** in the navigation, or select **Open evidence noteboo
 
 An entailment model compares statements; it does not authenticate the publisher, establish factual truth, or verify that a source is independent. Similarity measures relevance, not credibility. Conflicting reader assessments are shown explicitly. Neither retrieval nor reader annotations change the article classifier's score.
 
+Repeated passages within a source are deduplicated before shortlisting. Citation cards and JSON exports include publication-date review notes for unknown, invalid, future or older dates. A one-year review window is a context aid: old evidence can be appropriate for historical claims, and recent evidence can still be unreliable. Publication metadata remains source-reported.
+
 GDELT recent-news search needs no API key, sends the chosen query to GDELT, and searches a recent coverage window. News leads are not fact-check verdicts. Provider outages and no matches are separate states. The optional Google Fact Check API still requires `GOOGLE_FACT_CHECK_API_KEY`; manual evidence review remains available without it.
 
 ## Media context and provenance
@@ -229,5 +231,21 @@ Optional CPU/CUDA research, excluded from Vercel:
 ```
 
 The larger `configs/transformer-benchmark.json` supports full fine-tuning configurations. Large checkpoints stay under ignored `.artifacts/` and `.cache/`. The deployed linear models are preserved. Public evidence does not become a calibrated truth probability through fusion.
+
+After creating a local checkpoint, optionally start the separate research API:
+
+```sh
+VERITY_RESEARCH_MODEL_DIR=.artifacts/distilbert-base-uncased \
+  .venv/bin/python -m uvicorn backend.research_api:app --host 127.0.0.1 --port 8010 --workers 1
+```
+
+Its docs are at **http://127.0.0.1:8010/api/research/docs**. `POST /api/research/analyze/text` accepts `{"text":"an English article of at least 40 words"}`. It lazily verifies and loads local safetensors, with one model request at a time and no downloads. Unconfigured, invalid and busy states return 503; short or non-English inputs receive no score. Outputs always remain `research_only`, with `confidence: null`; the research score describes a dataset label, never factual certainty. Existing tiny pilots remain unsuitable for promotion. This service is separate from the website's production classifier selector and Vercel API.
+
+Run the actual saved-checkpoint integration check separately:
+
+```sh
+VERITY_TEST_RESEARCH_MODEL_DIR=.artifacts/distilbert-base-uncased \
+  .venv/bin/python -m pytest tests/test_research.py -q -k actual_local
+```
 
 See [baseline audit](docs/BASELINE_AUDIT.md), [dataset contracts](docs/DATASETS.md), [multimodal pipelines](docs/MULTIMODAL_PIPELINES.md), [security](docs/SECURITY.md), [deployment and Docker](docs/DEPLOYMENT.md), and [implementation record](docs/CHANGELOG_IMPLEMENTATION.md). Docker Compose configuration is provided; image-build verification depends on a running Docker daemon.
