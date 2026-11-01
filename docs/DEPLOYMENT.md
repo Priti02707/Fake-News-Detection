@@ -37,3 +37,9 @@ VERITY_RESEARCH_MODEL_DIR=.artifacts/distilbert-base-uncased \
 ```
 
 Visit `/api/research/docs` on that port. Health exposes `configured` and `model_loaded`; configuration alone does not prove checkpoint validity. The first eligible request verifies and loads the local checkpoint. No model is downloaded. Restart the process to switch checkpoints. Keep this unauthenticated research service bound to localhost; no public dedicated inference host, authentication layer or GPU service is provisioned. The existing Vercel app and Docker web/API configuration continue to use production linear models. This local research service is not deployed through `api/index.py`.
+
+## Production browser verification
+
+`playwright.config.ts` accepts `PLAYWRIGHT_BASE_URL`; its default remains the local server. After deploying, run `PLAYWRIGHT_BASE_URL=https://verity-news-sable.vercel.app npm run test:e2e -- --workers=1`. This checks the actual public site, including new media/evidence flows. Optional model integrations remain opt-in.
+
+The manually triggered **Production smoke checks** GitHub workflow runs public desktop/mobile workflows plus actual image OCR and original local-video frame/timeline checks from a separate network. Trigger with `gh workflow run production-smoke.yml --ref main`. It needs no new application secrets and does not upload raw user media. A successful Vercel build, authenticated health check and public browser smoke run are distinct results; report any failed/unavailable stage explicitly.

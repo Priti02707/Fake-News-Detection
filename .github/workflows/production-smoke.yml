@@ -1,0 +1,28 @@
+name: Production smoke checks
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: verity-production-smoke
+  cancel-in-progress: false
+jobs:
+  production:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PLAYWRIGHT_BASE_URL: https://verity-news-sable.vercel.app
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Production desktop and mobile workflows
+        run: npm run test:e2e -- --workers=1
+      - name: Real local-file OCR and video timeline
+        env:
+          MEDIA_INTEGRATION: '1'
+        run: npm run test:e2e -- --workers=1 --grep 'video frames create a real|image extraction requires'

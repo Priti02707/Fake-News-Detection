@@ -199,6 +199,8 @@ These optional checks download third-party recognition models and public test fi
 
 GitHub Actions runs API, build, type, and browser checks. Browser tests use the unconfigured-key state; leave `GOOGLE_FACT_CHECK_API_KEY` unset for that suite.
 
+After production deployment, the **Production smoke checks** GitHub workflow verifies the public site from a cloud runner, including desktop/mobile workflows and real image/video-frame OCR. It can be triggered with `gh workflow run production-smoke.yml --ref main`. Locally, set `PLAYWRIGHT_BASE_URL` to test a deployed URL instead of localhost. See [the multimodal release record](docs/MULTIMODAL_RELEASE.md) for executed results and unavailable checks.
+
 ## Deploy to Vercel
 
 The root `vercel.json` builds Next.js and routes `/api/*` to `api/index.py`, which exports FastAPI. Training libraries and datasets are excluded from deployment.
