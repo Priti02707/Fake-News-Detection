@@ -1,5 +1,9 @@
 import type { NextConfig } from "next";
 const config: NextConfig = {
+  webpack(config) {
+    config.resolve.alias = { ...config.resolve.alias, "sharp$": false, "onnxruntime-node$": false };
+    return config;
+  },
   async headers() {
     return [{ source: "/:path*", headers: [
       { key: "X-Content-Type-Options", value: "nosniff" },

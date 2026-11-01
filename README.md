@@ -15,6 +15,7 @@ Built from the original Fake News Detection notebook, with a Next.js interface, 
 - Signed word/phrase contributions and highlighted words in context.
 - **Uncertain** results for short text, low scores, low vocabulary overlap, unsupported scripts, or classifier disagreement.
 - Public article extraction with a review step before analysis.
+- Browser-local English OCR for news screenshots/photos and speech transcription for short video clips, with editable review before analysis.
 - Related published fact-checks through the optional Google Fact Check Tools API, preserving publisher ratings and source links.
 - Evaluation dashboard, confusion matrices, and downloadable JSON reports.
 - Opt-in browser-local history, limited to 30 analyses; no article database.
@@ -49,6 +50,23 @@ Open **http://localhost:3000**. Next.js proxies `/api/*` to FastAPI locally. API
 Enable the Google Fact Check Tools API in a Google Cloud project. Export `GOOGLE_FACT_CHECK_API_KEY` in the API process environment before starting Uvicorn. In Vercel, add it to the project's environment variables and redeploy. Never use a `NEXT_PUBLIC_` variable for this key.
 
 `.env.example` documents the name; Python does not automatically load Next.js `.env.local` files. Without a key, analysis and extraction still work. The evidence panel reports that search is unconfigured and provides a manual Google Fact Check Explorer link. This is distinct from a successful search returning **No matching fact-check found**.
+
+## Analyze images and videos
+
+Select **Image** or **Video** beside Paste text. Choose a file, select **Extract image text** or **Transcribe video**, correct the extracted words, then select **Use reviewed text**. This fills the article editor; **Analyze article** starts the existing text analysis.
+
+| Input | Limits | What is extracted |
+|---|---|---|
+| PNG, JPEG, WebP | 10 MB, 20 megapixels | English written text with Tesseract.js |
+| MP4, WebM, MOV | 25 MB, 60 seconds | English speech with Whisper tiny.en through Transformers.js |
+
+Files remain in the browser. Recognition runs in a worker and can be cancelled. First use downloads recognition software/models from jsDelivr, Hugging Face, and their delivery hosts; these hosts receive normal connection metadata. The browser may cache models for later use. No additional API key is required. Only reviewed text is sent to the analysis server when requested.
+
+Video playback and audio decoding depend on the browser's codec support. MP4 with AAC audio or WebM with Opus audio are recommended. Clear audio, readable screenshots, an internet connection for model downloads, and sufficient device memory are required. First-time video transcription can take several minutes, particularly on phones. Text is limited to 20,000 characters; longer extractions are shortened with a notice. A stalled extraction stops after ten minutes.
+
+These features analyze extracted words, not visual authenticity, deepfakes, video scenes, or factual truth. Recognition can omit or invent words, especially with noise, silence, or unsupported languages. Review the transcript and its context. The existing evaluation scores apply to the article classifiers, not OCR or speech accuracy.
+
+References: [Tesseract.js](https://github.com/naptha/tesseract.js), [Transformers.js browser workers](https://huggingface.co/docs/transformers.js/en/tutorials/next), [Whisper tiny.en ONNX model](https://huggingface.co/onnx-community/whisper-tiny.en).
 
 ## Evaluation
 
@@ -99,6 +117,12 @@ With both local development servers running:
 npm run test:e2e
 ```
 
+To additionally run real OCR and video transcription checks (downloads recognition models and a public-domain speech sample):
+
+```sh
+MEDIA_INTEGRATION=1 npm run test:e2e -- --project=desktop tests/browser/media.spec.ts
+```
+
 GitHub Actions runs API, build, type, and browser checks. Browser tests use the unconfigured-key state; leave `GOOGLE_FACT_CHECK_API_KEY` unset for that suite.
 
 ## Deploy to Vercel
@@ -129,4 +153,4 @@ tests/                  API and browser tests
 
 Article text is processed without database storage. Optional history stays in the browser. Hosting providers can retain standard request metadata. Fact-check search sends the chosen query to Google. URL extraction checks resolved addresses and redirect targets, pins connections to public IPs, verifies HTTPS certificates, and limits response size. It cannot bypass paywalls or publisher restrictions.
 
-Planned research: evaluated Hindi support, screenshot OCR, DistilBERT comparisons, and claim-to-evidence verification. These are not implemented capabilities in this release.
+Planned research: evaluated Hindi support, DistilBERT comparisons, and claim-to-evidence verification. These are not implemented capabilities in this release.
