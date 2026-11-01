@@ -1,0 +1,22 @@
+{
+  "semantic": {
+    "id": "Xenova/all-MiniLM-L6-v2",
+    "revision": "751bff37182d3f1213fa05d7196b954e230abad9"
+  },
+  "nli": {
+    "id": "Xenova/nli-deberta-v3-xsmall",
+    "revision": "2a4f614a701367a02d51389039afc998faeda637"
+  },
+  "visual": {
+    "id": "Xenova/clip-vit-base-patch32",
+    "revision": "6b7c523703ae26e39be4b03774966f8571c7f523"
+  },
+  "speech_en": {
+    "id": "onnx-community/whisper-tiny.en",
+    "revision": "2575352d61be1bf7225cf8f8b268a4678025fc58"
+  },
+  "speech_hi": {
+    "id": "onnx-community/whisper-tiny",
+    "revision": "ff4177021cc41f7db950912b73ea4fdf7d01d8e7"
+  }
+}

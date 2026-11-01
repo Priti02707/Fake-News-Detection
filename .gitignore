@@ -11,3 +11,6 @@ test-results/
 playwright-report/
 *.tsbuildinfo
 .DS_Store
+.cache/
+.artifacts/
+reports/checkpoints/

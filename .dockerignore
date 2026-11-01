@@ -1,0 +1,14 @@
+.git
+.next
+node_modules
+.venv
+.cache
+.artifacts
+.vercel
+.env*
+data/*.csv
+test-results
+playwright-report
+reports/checkpoints
+*.ipynb
+__pycache__

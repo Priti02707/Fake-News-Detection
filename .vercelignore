@@ -4,6 +4,13 @@ tests
 test-results
 playwright-report
 *.ipynb
+.cache
+.artifacts
+reports
+configs
+requirements-ml.txt
+.env*
+!.env.example
 __pycache__
 .pytest_cache
 scripts

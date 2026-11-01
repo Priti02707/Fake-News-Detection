@@ -3,8 +3,16 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, ImagePlus, LoaderCircle, ShieldCheck, Video, X } from "lucide-react";
 
+import { fileSignatureMatches } from "./file-format";
+import { reserveBrowserModel } from "./worker-budget";
+import { sampleVideoFrames } from "./video-frames";
+import type { FrameObservation } from "./media-types";
+import ImageContext from "./image-context";
+import ContentCredentials from "./content-credentials";
+import type { MediaSegment, MediaTrace, MediaPreviewFiles } from "./media-types";
+
 type Kind = "image" | "video";
-type WorkerResult = { status: "progress" | "complete" | "error"; message?: string; text?: string; truncated?: boolean };
+type WorkerResult = { status: "progress" | "complete" | "error"; message?: string; text?: string; truncated?: boolean; segments?: MediaSegment[]; width?: number; height?: number };
 const imageTypes = ["image/png", "image/jpeg", "image/webp"];
 const videoTypes = ["video/mp4", "video/webm", "video/quicktime"];
 
@@ -60,7 +68,7 @@ async function decodeVideo(file: File, signal: AbortSignal): Promise<Float32Arra
   }
 }
 
-export default function MediaInput({ kind, onReviewed }: { kind: Kind; onReviewed: (text: string, filename: string) => void }) {
+export default function MediaInput({ kind, onReviewed }: { kind: Kind; onReviewed: (text: string, filename: string, trace: MediaTrace, files: MediaPreviewFiles) => void }) {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState("");
   const [busy, setBusy] = useState(false);
@@ -68,19 +76,31 @@ export default function MediaInput({ kind, onReviewed }: { kind: Kind; onReviewe
   const [error, setError] = useState("");
   const [draft, setDraft] = useState<string | null>(null);
   const [truncated, setTruncated] = useState(false);
+  const [language, setLanguage] = useState<"en" | "hi">("en");
+  const [trace, setTrace] = useState<MediaTrace | null>(null);
+  const [selectedSegment, setSelectedSegment] = useState<number | null>(null);
+  const [frameBusy, setFrameBusy] = useState(false);
+  const [frameInterval, setFrameInterval] = useState(5);
+  const [maxFrames, setMaxFrames] = useState(6);
+  const [frames, setFrames] = useState<(FrameObservation & { preview: string; file: File })[]>([]);
+  const selectionRef = useRef(0);
+  const frameUrls = useRef<string[]>([]);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const releaseRef = useRef<(() => void) | null>(null);
   const workerRef = useRef<Worker | null>(null);
   const controllerRef = useRef<AbortController | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reviewRef = useRef<HTMLTextAreaElement>(null);
 
   function cleanup() {
+    releaseRef.current?.(); releaseRef.current = null;
     controllerRef.current?.abort();
     workerRef.current?.terminate();
     workerRef.current = null;
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = null;
   }
-  useEffect(() => () => cleanup(), []);
+  useEffect(() => () => { selectionRef.current++; cleanup(); frameUrls.current.forEach(url => URL.revokeObjectURL(url)); }, []);
   useEffect(() => {
     if (!file) { setPreview(""); return; }
     const url = URL.createObjectURL(file);
@@ -89,20 +109,30 @@ export default function MediaInput({ kind, onReviewed }: { kind: Kind; onReviewe
   }, [file]);
   useEffect(() => { if (draft !== null) reviewRef.current?.focus(); }, [draft === null]);
 
-  function chooseFile(next?: File) {
-    cleanup(); setBusy(false); setError(""); setDraft(null); setTruncated(false); setProgress(""); setFile(null);
+  async function chooseFile(next?: File) {
+    const selection = ++selectionRef.current;
+    frameUrls.current.forEach(url => URL.revokeObjectURL(url)); frameUrls.current = []; setFrames([]); setFrameBusy(false);
+    cleanup(); setBusy(false); setError(""); setDraft(null); setTrace(null); setSelectedSegment(null); setTruncated(false); setProgress(""); setFile(null);
     if (!next) return;
     if (!(kind === "image" ? imageTypes : videoTypes).includes(next.type)) {
       setError(kind === "image" ? "Choose a PNG, JPEG, or WebP image." : "Choose an MP4, WebM, or MOV video."); return;
     }
     const limit = kind === "image" ? 10 : 25;
     if (!next.size || next.size > limit * 1024 * 1024) { setError(`Choose a non-empty file smaller than ${limit} MB.`); return; }
-    setFile(next);
+    try {
+      const matches = await fileSignatureMatches(next);
+      if (selection !== selectionRef.current) return;
+      if (!matches) { setError("The file contents do not match its declared format. Export a valid supported image or video and try again."); return; }
+      setFile(next);
+    } catch { if (selection === selectionRef.current) setError("This file could not be read. Choose it again and retry."); }
   }
 
   async function extract() {
     if (!file || busy) return;
     cleanup();
+    const release = reserveBrowserModel();
+    if (!release) { setError("Another model is processing on this page. Wait or cancel that job first."); return; }
+    releaseRef.current = release;
     const controller = new AbortController(); controllerRef.current = controller;
     setBusy(true); setError(""); setDraft(null); setProgress("Checking your file…");
     const fail = (message: string) => { cleanup(); setBusy(false); setProgress(""); setError(message); };
@@ -118,28 +148,65 @@ export default function MediaInput({ kind, onReviewed }: { kind: Kind; onReviewe
       worker.onmessage = ({ data }: MessageEvent<WorkerResult>) => {
         if (controller.signal.aborted) return;
         if (data.status === "progress") setProgress(data.message || "Extracting…");
-        else if (data.status === "complete") { setDraft(data.text || ""); setTruncated(Boolean(data.truncated)); setBusy(false); setProgress(""); cleanup(); }
+        else if (data.status === "complete") { setDraft(data.text || ""); setTrace(current => ({ ...current, filename: file.name, kind, language, original_text: data.text || "", segments: data.segments || [], width: data.width, height: data.height })); setSelectedSegment(null); setTruncated(Boolean(data.truncated)); setBusy(false); setProgress(""); cleanup(); }
         else fail(`Could not extract text. ${data.message || "Try again."} If a model download failed, check your connection or paste the text manually.`);
       };
       worker.onerror = (event) => { event.preventDefault(); fail("The browser text reader could not start. Check your connection and try again, or paste the text manually."); };
-      if (audio) worker.postMessage({ kind: "video", audio }, [audio.buffer]);
-      else worker.postMessage({ kind: "image", file });
+      if (audio) worker.postMessage({ kind: "video", audio, language }, [audio.buffer]);
+      else worker.postMessage({ kind: "image", file, language });
     } catch (error) {
       if (!controller.signal.aborted) fail(error instanceof Error ? error.message : "This file could not be read.");
     }
   }
 
+  async function inspectFrames() {
+    if (!file || busy || frameBusy) return;
+    cleanup();
+    const release = reserveBrowserModel();
+    if (!release) { setError("Another model is processing on this page. Wait or cancel that job first."); return; }
+    releaseRef.current = release;
+    setFrameBusy(true); setError(""); setProgress("Reading the visual track…");
+    const controller = new AbortController(); controllerRef.current = controller;
+    const fail = (message: string) => { cleanup(); setFrameBusy(false); setProgress(""); setError(message); };
+    timerRef.current = setTimeout(() => fail("Frame inspection timed out. Try a smaller clip or fewer samples."), 5 * 60 * 1000);
+    try {
+      const samples = await sampleVideoFrames(file, controller.signal, { interval: frameInterval, maxFrames }, setProgress);
+      controller.signal.throwIfAborted();
+      const worker = new Worker(new URL("./media.worker.ts", import.meta.url), { type: "module" }); workerRef.current = worker;
+      worker.onmessage = ({ data }) => {
+        if (controller.signal.aborted) return;
+        if (data.status === "progress") setProgress(data.message);
+        else if (data.status === "frames_complete") {
+          frameUrls.current.forEach(url => URL.revokeObjectURL(url)); frameUrls.current = [];
+          const rows = (data.frames as FrameObservation[]).map(frame => {
+            const sample = samples.find(value => value.id === frame.id)!;
+            const preview = URL.createObjectURL(sample.blob); frameUrls.current.push(preview);
+            return { ...frame, preview, file: new File([sample.blob], `${frame.id}.jpg`, { type: "image/jpeg" }) };
+          });
+          setFrames(rows);
+          setTrace(current => ({ filename: file.name, kind, language, original_text: "", segments: [], ...current, frames: data.frames, frame_sampling: { interval: frameInterval, max_frames: maxFrames, method: "Bounded temporal sampling with pixel scene-change selection" }, warnings: ["Sampled frames can miss scenes, subtitles, and claims between samples. OCR and scene-change scores do not verify authenticity."] }));
+          setFrameBusy(false); setProgress(""); cleanup();
+        } else fail("Frame OCR could not finish. Try again or inspect the selected frames manually.");
+      };
+      worker.onerror = event => { event.preventDefault(); fail("Frame OCR could not start. Check your connection and retry."); };
+      worker.postMessage({ kind: "frames", language, frames: samples.map(sample => ({ ...sample, blob: undefined, file: new File([sample.blob], `${sample.id}.jpg`, { type: "image/jpeg" }) })) });
+    } catch (error) { if (!controller.signal.aborted) fail(error instanceof Error ? error.message : "Video frames could not be read."); }
+  }
   return <div className="media-input">
     <div className="media-intro"><span className="media-icon">{kind === "image" ? <ImagePlus size={24} /> : <Video size={24} />}</span><div><h3>{kind === "image" ? "Read the words in an image" : "Listen to the words in a video"}</h3><p>{kind === "image" ? "Choose a clear screenshot or photo of English news text." : "Choose a short clip with clear English speech. Transcription can take several minutes on slower devices."}</p></div></div>
+    <label className="media-file-label" htmlFor={`language-${kind}`}>Extraction language</label><select id={`language-${kind}`} value={language} disabled={busy || frameBusy} onChange={event => { setLanguage(event.target.value as "en" | "hi"); setDraft(null); setTrace(null); setFrames([]); frameUrls.current.forEach(url => URL.revokeObjectURL(url)); frameUrls.current = []; setSelectedSegment(null); }}><option value="en">English</option><option value="hi">Hindi + English (experimental)</option></select>{language === "hi" && <p className="field-help">Hindi extraction is experimental. The article classifier is evaluated on English only and abstains on Hindi-script input. Review Hindi evidence manually.</p>}
     <label className="media-file-label" htmlFor={`media-${kind}`}>Choose {kind}</label>
     <input id={`media-${kind}`} type="file" accept={(kind === "image" ? imageTypes : videoTypes).join(",")} onChange={event => chooseFile(event.target.files?.[0])} />
     <p className="field-help">{kind === "image" ? "PNG, JPEG, WebP · up to 10 MB and 20 megapixels" : "MP4, WebM, MOV · up to 25 MB and 60 seconds · audio codec support varies by browser"}</p>
-    {file && preview && <div className="media-preview">{kind === "image" ? <img src={preview} alt={`Selected image: ${file.name}`} /> : <video src={preview} controls preload="metadata" playsInline aria-label={`Selected video: ${file.name}`} />}<span>{file.name}</span></div>}
+    {file && preview && <div className="media-preview">{kind === "image" ? trace?.width && trace.height ? <svg viewBox={`0 0 ${trace.width} ${trace.height}`} role="img" aria-label={`Selected image with OCR regions: ${file.name}`}><image href={preview} width={trace.width} height={trace.height} />{trace.segments.map((segment, index) => segment.bbox && <rect key={index} x={segment.bbox.x0} y={segment.bbox.y0} width={segment.bbox.x1 - segment.bbox.x0} height={segment.bbox.y1 - segment.bbox.y0} className={selectedSegment === index ? "ocr-region selected-region" : "ocr-region"} />)}</svg> : <img src={preview} alt={`Selected image: ${file.name}`} /> : <video ref={videoRef} src={preview} controls preload="metadata" playsInline aria-label={`Selected video: ${file.name}`} />}<span>{file.name}</span></div>}
+    {trace && trace.segments.length > 0 && <div className="media-segments" aria-label={kind === "image" ? "OCR regions" : "Transcript timestamps"}><p className="field-help">{kind === "image" ? "Select an extracted line to highlight its original image region." : "Select a timestamp to seek to that part of the original video."} These locations refer to the original extraction, even after you edit the text.</p>{trace.segments.map((segment, index) => <button key={index} aria-pressed={selectedSegment === index} onClick={() => { setSelectedSegment(index); if (videoRef.current && segment.start !== undefined) videoRef.current.currentTime = segment.start; }}><span>{kind === "image" ? `Line ${index + 1}` : `${Math.floor((segment.start || 0) / 60)}:${Math.floor((segment.start || 0) % 60).toString().padStart(2, "0")}`}</span>{segment.text}</button>)}</div>}
+    {kind === "video" && file && <section className="video-frame-panel"><h4>Inspect the visual track</h4><p className="field-help">Capture representative keyframes and read on-screen text locally, including clips without narration. Samples can miss intervening scenes and subtitles.</p><div className="frame-controls"><label>Sample interval<select aria-label="Frame sample interval" disabled={busy || frameBusy} value={frameInterval} onChange={event => setFrameInterval(Number(event.target.value))}><option value={2}>2 seconds</option><option value={5}>5 seconds</option><option value={10}>10 seconds</option></select></label><label>Maximum keyframes<select aria-label="Maximum keyframes" disabled={busy || frameBusy} value={maxFrames} onChange={event => setMaxFrames(Number(event.target.value))}><option value={3}>3 frames</option><option value={6}>6 frames</option></select></label></div><button className="secondary-button" disabled={busy || frameBusy} onClick={() => void inspectFrames()}>{frameBusy ? <LoaderCircle className="spin" size={16} /> : <Video size={16} />}Inspect video frames</button>{frameBusy && <button className="text-link" onClick={() => { cleanup(); setFrameBusy(false); setProgress(""); }}>Cancel frame inspection</button>}{frames.length > 0 && <><div className="video-frame-grid">{frames.map(frame => <article className="video-keyframe" key={frame.id}><button className="frame-seek" aria-label={`Seek to frame at ${frame.timestamp.toFixed(1)} seconds`} onClick={() => { if (videoRef.current) videoRef.current.currentTime = frame.timestamp; }}><img src={frame.preview} alt={`Video keyframe at ${frame.timestamp.toFixed(1)} seconds`} /><strong>{frame.timestamp.toFixed(1)} seconds</strong></button><p className="field-help">{frame.ocr_status === "text_found" ? frame.text : frame.ocr_status === "no_text" ? "No readable on-screen text found." : "OCR unavailable for this frame."}</p><ImageContext file={frame.file} onObserved={observation => { setFrames(current => current.map(value => value.id === frame.id ? { ...value, visual_consistency: observation || undefined } : value)); setTrace(current => current ? { ...current, frames: current.frames?.map(value => value.id === frame.id ? { ...value, visual_consistency: observation || undefined } : value) } : current); }} /></article>)}</div><button className="secondary-button" disabled={!frames.some(frame => frame.text)} onClick={() => { const words = frames.filter(frame => frame.text).map(frame => frame.text).join("\n\n"); setDraft(current => `${current || ""}\n\n${words}`.trim().slice(0, 20000)); }}>Add on-screen text to review</button><p className="field-help">This adds frame text to the editable review. Review context before classifying these words. Frame locations are included in the report.</p></>}</section>}
+    {file && <><ContentCredentials file={file} onObserved={observation => setTrace(current => ({ filename: file.name, kind, language, original_text: "", segments: [], ...current, provenance: observation }))} />{kind === "image" && <ImageContext file={file} onObserved={observation => setTrace(current => ({ filename: file.name, kind, language, original_text: "", segments: [], ...current, visual_consistency: observation || undefined }))} />}</>}
     <p className="media-privacy"><ShieldCheck size={16} /><span>Extraction happens in this browser. First use downloads recognition models from external hosts. Your file stays on this device; only text you choose to analyze goes to our server.</span></p>
     <p className="field-help">{kind === "image" ? "We extract written words; we do not detect image manipulation." : "We transcribe speech; we do not detect deepfakes or verify video scenes."} Review errors, missing context, and names before analysis.</p>
-    {file && draft === null && <div className="media-actions"><button className="primary-button" disabled={busy} onClick={() => void extract()}>{busy ? <LoaderCircle size={17} className="spin" /> : <ArrowRight size={17} />}{kind === "image" ? "Extract image text" : "Transcribe video"}</button>{busy && <button className="secondary-button" onClick={() => { cleanup(); setBusy(false); setProgress(""); }}><X size={15} />Cancel extraction</button>}</div>}
-    {busy && <p role="status" className="media-progress">{progress}</p>}
+    {file && (draft === null || kind === "video") && <div className="media-actions"><button className="primary-button" disabled={busy || frameBusy} onClick={() => void extract()}>{busy ? <LoaderCircle size={17} className="spin" /> : <ArrowRight size={17} />}{kind === "image" ? "Extract image text" : "Transcribe video"}</button>{busy && <button className="secondary-button" onClick={() => { cleanup(); setBusy(false); setProgress(""); }}><X size={15} />Cancel extraction</button>}</div>}
+    {(busy || frameBusy) && <p role="status" className="media-progress">{progress}</p>}
     {error && <p role="alert" className="error-message">{error}</p>}
-    {draft !== null && <div className="media-review"><label htmlFor={`review-${kind}`}>Review {kind === "image" ? "extracted text" : "video transcript"}</label><p className="field-help">Correct the words below, then move them into the article editor. Analysis starts only when you select Analyze article.</p>{truncated && <p role="status" className="field-help">The extracted text was shortened to the first 20,000 characters.</p>}<textarea ref={reviewRef} id={`review-${kind}`} maxLength={20000} value={draft} onChange={event => setDraft(event.target.value)} /><p className="field-help">{draft.length.toLocaleString()} / 20,000 characters</p><div className="media-actions"><button className="primary-button" disabled={!draft.trim()} onClick={() => { if (file) onReviewed(draft.trim(), file.name); }}>Use reviewed text <ArrowRight size={16} /></button><button className="secondary-button" onClick={() => { setDraft(null); setError(""); }}>Extract again</button></div></div>}
+    {draft !== null && <div className="media-review"><label htmlFor={`review-${kind}`}>Review {kind === "image" ? "extracted text" : "video transcript"}</label><p className="field-help">Correct the words below, then move them into the article editor. Analysis starts only when you select Analyze article.</p>{truncated && <p role="status" className="field-help">The extracted text was shortened to the first 20,000 characters.</p>}<textarea ref={reviewRef} id={`review-${kind}`} maxLength={20000} value={draft} onChange={event => setDraft(event.target.value)} /><p className="field-help">{draft.length.toLocaleString()} / 20,000 characters</p><div className="media-actions"><button className="primary-button" disabled={!draft.trim()} onClick={() => { if (file && trace) onReviewed(draft.trim(), file.name, trace, { source: file, frames: frames.map(frame => ({ id: frame.id, file: frame.file })) }); }}>Use reviewed text <ArrowRight size={16} /></button><button className="secondary-button" onClick={() => { setDraft(null); setError(""); }}>Extract again</button></div></div>}
   </div>;
 }

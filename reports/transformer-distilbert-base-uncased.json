@@ -1,0 +1,1707 @@
+{
+  "schema_version": 1,
+  "model": "distilbert/distilbert-base-uncased",
+  "revision": "12040accade4e8a0f71eabdb258fecc2e7e948be",
+  "trained_at": "2026-11-01T17:20:58.985380+00:00",
+  "config": {
+    "candidates": [
+      "distilbert/distilbert-base-uncased",
+      "FacebookAI/roberta-base",
+      "microsoft/deberta-v3-base"
+    ],
+    "revision": null,
+    "epochs": 1,
+    "batch_size": 8,
+    "max_length": 96,
+    "learning_rate": 0.0005,
+    "freeze_encoder": true,
+    "max_train": 64,
+    "max_calibration": 32,
+    "max_test": 32,
+    "seed": 42,
+    "device": "cpu",
+    "purpose": "Small head-training pilots on matched partitions; not full fine-tuning, independent-source evaluation, or production model selection",
+    "model": "distilbert/distilbert-base-uncased"
+  },
+  "device": "cpu",
+  "training_seconds": 2.584081125096418,
+  "splits": {
+    "train": 64,
+    "calibration": 32,
+    "test": 32
+  },
+  "partition_hashes": {
+    "train": "afc51b5f6fffc63364c7ead92bd91ca225d2b471cddd02de202a971960ed124d",
+    "calibration": "95a163d7c929fbe0e1048d2510af88335c8df9eb890d8d2732e7492071b229fe",
+    "test": "68c9a929056b3923f41a26d1f4e517ce19913327e34e0be7f7a83a8900fbf66b"
+  },
+  "versions": {
+    "python": "3.12.7",
+    "torch": "2.15.0",
+    "transformers": "4.57.6"
+  },
+  "source_sha256": {
+    "Fake.csv": "32d2aa9e85a52d2a98c6e9fe0cacd2af2cba8dbe1718cc5045c7fced2f4fc925",
+    "True.csv": "fc90d682ad8fa7be7d6f34b2e147a7ccbc1c9ecb58a6286944f895dfffb5ebe6"
+  },
+  "calibration": {
+    "method": "Sigmoid fitted on the separate calibration partition",
+    "coefficient": 2.583970201026807,
+    "intercept": -1.3953451721655807,
+    "production_validated": false
+  },
+  "metrics": {
+    "accuracy_wilson_95": [
+      0.8425573617998744,
+      0.9944621398359969
+    ],
+    "per_class": {
+      "fake": {
+        "precision": 1.0,
+        "recall": 0.9375,
+        "f1": 0.967741935483871,
+        "support": 16
+      },
+      "real": {
+        "precision": 0.9411764705882353,
+        "recall": 1.0,
+        "f1": 0.9696969696969697,
+        "support": 16
+      }
+    },
+    "roc_auc": 0.98828125,
+    "pr_auc_real": 0.9882506127450981,
+    "bootstrap_95": {
+      "accuracy": [
+        0.90625,
+        1.0
+      ],
+      "macro_f1": [
+        0.9015384615384616,
+        1.0
+      ],
+      "resamples": 200,
+      "seed": 42,
+      "note": "Article bootstrap within this fixed split; source/event dependence is not accounted for."
+    },
+    "n": 32,
+    "accuracy": 0.96875,
+    "balanced_accuracy": 0.96875,
+    "macro_f1": 0.9687194525904204,
+    "brier_score": 0.09480579712781145,
+    "ece": 0.24623243190485222,
+    "reliability_bins": [
+      {
+        "lower": 0.5,
+        "upper": 0.55,
+        "count": 4,
+        "accuracy": 1.0,
+        "confidence": 0.5274545566857233
+      },
+      {
+        "lower": 0.55,
+        "upper": 0.6,
+        "count": 3,
+        "accuracy": 0.6666666666666666,
+        "confidence": 0.5771098763407316
+      },
+      {
+        "lower": 0.6,
+        "upper": 0.65,
+        "count": 2,
+        "accuracy": 1.0,
+        "confidence": 0.6370508815169269
+      },
+      {
+        "lower": 0.65,
+        "upper": 0.7,
+        "count": 3,
+        "accuracy": 1.0,
+        "confidence": 0.6806296765324383
+      },
+      {
+        "lower": 0.7,
+        "upper": 0.75,
+        "count": 7,
+        "accuracy": 1.0,
+        "confidence": 0.7243085331283078
+      },
+      {
+        "lower": 0.75,
+        "upper": 0.8,
+        "count": 3,
+        "accuracy": 1.0,
+        "confidence": 0.7767487791373883
+      },
+      {
+        "lower": 0.8,
+        "upper": 0.85,
+        "count": 4,
+        "accuracy": 1.0,
+        "confidence": 0.825642148444788
+      },
+      {
+        "lower": 0.85,
+        "upper": 0.9,
+        "count": 5,
+        "accuracy": 1.0,
+        "confidence": 0.8718633642762027
+      },
+      {
+        "lower": 0.9,
+        "upper": 0.95,
+        "count": 1,
+        "accuracy": 1.0,
+        "confidence": 0.9011320461779876
+      }
+    ],
+    "confusion_matrix": [
+      [
+        15,
+        1
+      ],
+      [
+        0,
+        16
+      ]
+    ],
+    "errors": 1,
+    "score_threshold_coverage": 0.3125,
+    "selective_accuracy": 1.0
+  },
+  "latency": {
+    "single_request_samples": 32,
+    "mean_single_request_ms": 27.43583337360178,
+    "p95_single_request_ms": 30.508522782474756,
+    "mean_ms_per_article_in_batch": 17.827954408858204,
+    "p95_ms_per_article_in_batch": 19.918501008214662,
+    "includes_tokenization": true,
+    "excludes_download_and_cold_start": true
+  },
+  "artifact_bytes": 268822611,
+  "artifacts": {
+    "model.safetensors": {
+      "sha256": "0617d53119c1f89552b9294394674c576fe8ccd08f02fadfa1e33a91a183df9b",
+      "bytes": 267832560
+    },
+    "tokenizer_config.json": {
+      "sha256": "a3c9410f27554c6e26af779fd147e536c6c5f9e5cb0e6b8f38ddaa25e1b0f6af",
+      "bytes": 1227
+    },
+    "special_tokens_map.json": {
+      "sha256": "b6d346be366a7d1d48332dbc9fdf3bf8960b5d879522b7799ddba59e76237ee3",
+      "bytes": 125
+    },
+    "config.json": {
+      "sha256": "8554cda389f3d616018cfe4e110cd2e937fbdcc560324e7d0ddaa17fa1839c8c",
+      "bytes": 563
+    },
+    "tokenizer.json": {
+      "sha256": "d542861653d0d204783c94395fdf32eef9e800d5fa565a2892c3f1375aa835e9",
+      "bytes": 711493
+    },
+    "vocab.txt": {
+      "sha256": "07eced375cec144d27c900241f3e339478dec958f92fddbc551f295c992038a3",
+      "bytes": 231508
+    },
+    "evaluation.json": {
+      "sha256": "6d37695ee3e9a22258f9ac1f56571aa2581e55c83daad9530be136d6990d3a5a",
+      "bytes": 45135
+    }
+  },
+  "same_partition_baselines": {
+    "name": "Same transformer benchmark partitions",
+    "splits": {
+      "train": 64,
+      "calibration": 32,
+      "test": 32
+    },
+    "class_counts": {
+      "train": {
+        "0": 32,
+        "1": 32
+      },
+      "calibration": {
+        "0": 16,
+        "1": 16
+      },
+      "test": {
+        "0": 16,
+        "1": 16
+      }
+    },
+    "test_examples_with_training_cosine_at_least_085": 0,
+    "models": [
+      {
+        "id": "logistic",
+        "full_text": {
+          "accuracy_wilson_95": [
+            0.8425573617998744,
+            0.9944621398359969
+          ],
+          "per_class": {
+            "fake": {
+              "precision": 0.9411764705882353,
+              "recall": 1.0,
+              "f1": 0.9696969696969697,
+              "support": 16
+            },
+            "real": {
+              "precision": 1.0,
+              "recall": 0.9375,
+              "f1": 0.967741935483871,
+              "support": 16
+            }
+          },
+          "roc_auc": 0.99609375,
+          "pr_auc_real": 0.9963235294117647,
+          "bootstrap_95": {
+            "accuracy": [
+              0.90625,
+              1.0
+            ],
+            "macro_f1": [
+              0.9053808488291246,
+              1.0
+            ],
+            "resamples": 200,
+            "seed": 42,
+            "note": "Article bootstrap within this fixed split; source/event dependence is not accounted for."
+          },
+          "n": 32,
+          "accuracy": 0.96875,
+          "balanced_accuracy": 0.96875,
+          "macro_f1": 0.9687194525904204,
+          "brier_score": 0.024691235596270126,
+          "ece": 0.06475165177005342,
+          "reliability_bins": [
+            {
+              "lower": 0.6,
+              "upper": 0.65,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.6008117549706662
+            },
+            {
+              "lower": 0.7,
+              "upper": 0.75,
+              "count": 1,
+              "accuracy": 0.0,
+              "confidence": 0.7355651831961483
+            },
+            {
+              "lower": 0.85,
+              "upper": 0.9,
+              "count": 4,
+              "accuracy": 1.0,
+              "confidence": 0.8687679708397753
+            },
+            {
+              "lower": 0.9,
+              "upper": 0.95,
+              "count": 3,
+              "accuracy": 1.0,
+              "confidence": 0.9261790477287039
+            },
+            {
+              "lower": 0.95,
+              "upper": 1.0,
+              "count": 23,
+              "accuracy": 1.0,
+              "confidence": 0.9916996323929809
+            }
+          ],
+          "confusion_matrix": [
+            [
+              16,
+              0
+            ],
+            [
+              1,
+              15
+            ]
+          ],
+          "errors": 1,
+          "score_threshold_coverage": 0.9375,
+          "selective_accuracy": 1.0
+        },
+        "headline_only": {
+          "accuracy_wilson_95": [
+            0.5143332169904459,
+            0.8204745836639026
+          ],
+          "per_class": {
+            "fake": {
+              "precision": 0.65,
+              "recall": 0.8125,
+              "f1": 0.7222222222222222,
+              "support": 16
+            },
+            "real": {
+              "precision": 0.75,
+              "recall": 0.5625,
+              "f1": 0.6428571428571429,
+              "support": 16
+            }
+          },
+          "roc_auc": 0.7578125,
+          "pr_auc_real": 0.8304812488236402,
+          "bootstrap_95": {
+            "accuracy": [
+              0.53125,
+              0.84375
+            ],
+            "macro_f1": [
+              0.5075,
+              0.8398398398398399
+            ],
+            "resamples": 200,
+            "seed": 42,
+            "note": "Article bootstrap within this fixed split; source/event dependence is not accounted for."
+          },
+          "n": 32,
+          "accuracy": 0.6875,
+          "balanced_accuracy": 0.6875,
+          "macro_f1": 0.6825396825396826,
+          "brier_score": 0.2183566305390416,
+          "ece": 0.257264341207008,
+          "reliability_bins": [
+            {
+              "lower": 0.5,
+              "upper": 0.55,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.5308030987980812
+            },
+            {
+              "lower": 0.55,
+              "upper": 0.6,
+              "count": 2,
+              "accuracy": 0.0,
+              "confidence": 0.5820404521549971
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.65,
+              "count": 1,
+              "accuracy": 0.0,
+              "confidence": 0.6175120680637589
+            },
+            {
+              "lower": 0.65,
+              "upper": 0.7,
+              "count": 1,
+              "accuracy": 0.0,
+              "confidence": 0.6500162658130093
+            },
+            {
+              "lower": 0.7,
+              "upper": 0.75,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.7395243191765237
+            },
+            {
+              "lower": 0.75,
+              "upper": 0.8,
+              "count": 2,
+              "accuracy": 0.5,
+              "confidence": 0.7766060628561617
+            },
+            {
+              "lower": 0.8,
+              "upper": 0.85,
+              "count": 4,
+              "accuracy": 1.0,
+              "confidence": 0.822374205742687
+            },
+            {
+              "lower": 0.85,
+              "upper": 0.9,
+              "count": 4,
+              "accuracy": 0.75,
+              "confidence": 0.8748765327137189
+            },
+            {
+              "lower": 0.9,
+              "upper": 0.95,
+              "count": 6,
+              "accuracy": 0.6666666666666666,
+              "confidence": 0.9249532677090749
+            },
+            {
+              "lower": 0.95,
+              "upper": 1.0,
+              "count": 10,
+              "accuracy": 0.8,
+              "confidence": 0.9758236058561197
+            }
+          ],
+          "confusion_matrix": [
+            [
+              13,
+              3
+            ],
+            [
+              7,
+              9
+            ]
+          ],
+          "errors": 10,
+          "score_threshold_coverage": 0.75,
+          "selective_accuracy": 0.7916666666666666
+        },
+        "selected_source_cues_removed": {
+          "accuracy_wilson_95": [
+            0.8425573617998744,
+            0.9944621398359969
+          ],
+          "per_class": {
+            "fake": {
+              "precision": 0.9411764705882353,
+              "recall": 1.0,
+              "f1": 0.9696969696969697,
+              "support": 16
+            },
+            "real": {
+              "precision": 1.0,
+              "recall": 0.9375,
+              "f1": 0.967741935483871,
+              "support": 16
+            }
+          },
+          "roc_auc": 0.99609375,
+          "pr_auc_real": 0.9963235294117647,
+          "bootstrap_95": {
+            "accuracy": [
+              0.90625,
+              1.0
+            ],
+            "macro_f1": [
+              0.9053808488291246,
+              1.0
+            ],
+            "resamples": 200,
+            "seed": 42,
+            "note": "Article bootstrap within this fixed split; source/event dependence is not accounted for."
+          },
+          "n": 32,
+          "accuracy": 0.96875,
+          "balanced_accuracy": 0.96875,
+          "macro_f1": 0.9687194525904204,
+          "brier_score": 0.03187348412253664,
+          "ece": 0.07730663275759275,
+          "reliability_bins": [
+            {
+              "lower": 0.6,
+              "upper": 0.65,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.6008117549706662
+            },
+            {
+              "lower": 0.65,
+              "upper": 0.7,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.6660613240716402
+            },
+            {
+              "lower": 0.75,
+              "upper": 0.8,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.7977339514799696
+            },
+            {
+              "lower": 0.8,
+              "upper": 0.85,
+              "count": 1,
+              "accuracy": 0.0,
+              "confidence": 0.8100032457857961
+            },
+            {
+              "lower": 0.85,
+              "upper": 0.9,
+              "count": 3,
+              "accuracy": 1.0,
+              "confidence": 0.8872452456611963
+            },
+            {
+              "lower": 0.9,
+              "upper": 0.95,
+              "count": 2,
+              "accuracy": 1.0,
+              "confidence": 0.9444703872725684
+            },
+            {
+              "lower": 0.95,
+              "upper": 1.0,
+              "count": 23,
+              "accuracy": 1.0,
+              "confidence": 0.9878655415431229
+            }
+          ],
+          "confusion_matrix": [
+            [
+              16,
+              0
+            ],
+            [
+              1,
+              15
+            ]
+          ],
+          "errors": 1,
+          "score_threshold_coverage": 0.90625,
+          "selective_accuracy": 0.9655172413793104
+        },
+        "lower_lexical_overlap": {
+          "accuracy_wilson_95": [
+            0.8425573617998744,
+            0.9944621398359969
+          ],
+          "per_class": {
+            "fake": {
+              "precision": 0.9411764705882353,
+              "recall": 1.0,
+              "f1": 0.9696969696969697,
+              "support": 16
+            },
+            "real": {
+              "precision": 1.0,
+              "recall": 0.9375,
+              "f1": 0.967741935483871,
+              "support": 16
+            }
+          },
+          "roc_auc": 0.99609375,
+          "pr_auc_real": 0.9963235294117647,
+          "bootstrap_95": {
+            "accuracy": [
+              0.90625,
+              1.0
+            ],
+            "macro_f1": [
+              0.9053808488291246,
+              1.0
+            ],
+            "resamples": 200,
+            "seed": 42,
+            "note": "Article bootstrap within this fixed split; source/event dependence is not accounted for."
+          },
+          "n": 32,
+          "accuracy": 0.96875,
+          "balanced_accuracy": 0.96875,
+          "macro_f1": 0.9687194525904204,
+          "brier_score": 0.024691235596270126,
+          "ece": 0.06475165177005342,
+          "reliability_bins": [
+            {
+              "lower": 0.6,
+              "upper": 0.65,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.6008117549706662
+            },
+            {
+              "lower": 0.7,
+              "upper": 0.75,
+              "count": 1,
+              "accuracy": 0.0,
+              "confidence": 0.7355651831961483
+            },
+            {
+              "lower": 0.85,
+              "upper": 0.9,
+              "count": 4,
+              "accuracy": 1.0,
+              "confidence": 0.8687679708397753
+            },
+            {
+              "lower": 0.9,
+              "upper": 0.95,
+              "count": 3,
+              "accuracy": 1.0,
+              "confidence": 0.9261790477287039
+            },
+            {
+              "lower": 0.95,
+              "upper": 1.0,
+              "count": 23,
+              "accuracy": 1.0,
+              "confidence": 0.9916996323929809
+            }
+          ],
+          "confusion_matrix": [
+            [
+              16,
+              0
+            ],
+            [
+              1,
+              15
+            ]
+          ],
+          "errors": 1,
+          "score_threshold_coverage": 0.9375,
+          "selective_accuracy": 1.0
+        },
+        "wording_substitutions": {
+          "accuracy_wilson_95": [
+            0.8425573617998744,
+            0.9944621398359969
+          ],
+          "per_class": {
+            "fake": {
+              "precision": 0.9411764705882353,
+              "recall": 1.0,
+              "f1": 0.9696969696969697,
+              "support": 16
+            },
+            "real": {
+              "precision": 1.0,
+              "recall": 0.9375,
+              "f1": 0.967741935483871,
+              "support": 16
+            }
+          },
+          "roc_auc": 0.99609375,
+          "pr_auc_real": 0.9963235294117647,
+          "bootstrap_95": {
+            "accuracy": [
+              0.90625,
+              1.0
+            ],
+            "macro_f1": [
+              0.9053808488291246,
+              1.0
+            ],
+            "resamples": 200,
+            "seed": 42,
+            "note": "Article bootstrap within this fixed split; source/event dependence is not accounted for."
+          },
+          "n": 32,
+          "accuracy": 0.96875,
+          "balanced_accuracy": 0.96875,
+          "macro_f1": 0.9687194525904204,
+          "brier_score": 0.03651502582548345,
+          "ece": 0.07590257749174156,
+          "reliability_bins": [
+            {
+              "lower": 0.5,
+              "upper": 0.55,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.5106872094879618
+            },
+            {
+              "lower": 0.7,
+              "upper": 0.75,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.7279337087877507
+            },
+            {
+              "lower": 0.75,
+              "upper": 0.8,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.7870624566487524
+            },
+            {
+              "lower": 0.8,
+              "upper": 0.85,
+              "count": 2,
+              "accuracy": 0.5,
+              "confidence": 0.8326783267154119
+            },
+            {
+              "lower": 0.85,
+              "upper": 0.9,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.8555461139780635
+            },
+            {
+              "lower": 0.9,
+              "upper": 0.95,
+              "count": 6,
+              "accuracy": 1.0,
+              "confidence": 0.927593181436691
+            },
+            {
+              "lower": 0.95,
+              "upper": 1.0,
+              "count": 20,
+              "accuracy": 1.0,
+              "confidence": 0.989484279808621
+            }
+          ],
+          "confusion_matrix": [
+            [
+              16,
+              0
+            ],
+            [
+              1,
+              15
+            ]
+          ],
+          "errors": 1,
+          "score_threshold_coverage": 0.90625,
+          "selective_accuracy": 0.9655172413793104
+        },
+        "sensational_prefix": {
+          "accuracy_wilson_95": [
+            0.8425573617998744,
+            0.9944621398359969
+          ],
+          "per_class": {
+            "fake": {
+              "precision": 0.9411764705882353,
+              "recall": 1.0,
+              "f1": 0.9696969696969697,
+              "support": 16
+            },
+            "real": {
+              "precision": 1.0,
+              "recall": 0.9375,
+              "f1": 0.967741935483871,
+              "support": 16
+            }
+          },
+          "roc_auc": 0.99609375,
+          "pr_auc_real": 0.9963235294117647,
+          "bootstrap_95": {
+            "accuracy": [
+              0.90625,
+              1.0
+            ],
+            "macro_f1": [
+              0.9053808488291246,
+              1.0
+            ],
+            "resamples": 200,
+            "seed": 42,
+            "note": "Article bootstrap within this fixed split; source/event dependence is not accounted for."
+          },
+          "n": 32,
+          "accuracy": 0.96875,
+          "balanced_accuracy": 0.96875,
+          "macro_f1": 0.9687194525904204,
+          "brier_score": 0.025036946579305278,
+          "ece": 0.06579657797718685,
+          "reliability_bins": [
+            {
+              "lower": 0.6,
+              "upper": 0.65,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.6267325671036277
+            },
+            {
+              "lower": 0.7,
+              "upper": 0.75,
+              "count": 1,
+              "accuracy": 0.0,
+              "confidence": 0.749249178442748
+            },
+            {
+              "lower": 0.8,
+              "upper": 0.85,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.816668679662616
+            },
+            {
+              "lower": 0.85,
+              "upper": 0.9,
+              "count": 3,
+              "accuracy": 1.0,
+              "confidence": 0.8776816889708926
+            },
+            {
+              "lower": 0.9,
+              "upper": 0.95,
+              "count": 3,
+              "accuracy": 1.0,
+              "confidence": 0.9254205458498426
+            },
+            {
+              "lower": 0.95,
+              "upper": 1.0,
+              "count": 23,
+              "accuracy": 1.0,
+              "confidence": 0.9909152492149704
+            }
+          ],
+          "confusion_matrix": [
+            [
+              16,
+              0
+            ],
+            [
+              1,
+              15
+            ]
+          ],
+          "errors": 1,
+          "score_threshold_coverage": 0.9375,
+          "selective_accuracy": 1.0
+        },
+        "irrelevant_source_markers": {
+          "accuracy_wilson_95": [
+            0.8425573617998744,
+            0.9944621398359969
+          ],
+          "per_class": {
+            "fake": {
+              "precision": 0.9411764705882353,
+              "recall": 1.0,
+              "f1": 0.9696969696969697,
+              "support": 16
+            },
+            "real": {
+              "precision": 1.0,
+              "recall": 0.9375,
+              "f1": 0.967741935483871,
+              "support": 16
+            }
+          },
+          "roc_auc": 0.99609375,
+          "pr_auc_real": 0.9963235294117647,
+          "bootstrap_95": {
+            "accuracy": [
+              0.90625,
+              1.0
+            ],
+            "macro_f1": [
+              0.9053808488291246,
+              1.0
+            ],
+            "resamples": 200,
+            "seed": 42,
+            "note": "Article bootstrap within this fixed split; source/event dependence is not accounted for."
+          },
+          "n": 32,
+          "accuracy": 0.96875,
+          "balanced_accuracy": 0.96875,
+          "macro_f1": 0.9687194525904204,
+          "brier_score": 0.024854600866232063,
+          "ece": 0.06565756122374283,
+          "reliability_bins": [
+            {
+              "lower": 0.55,
+              "upper": 0.6,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.5689986635859441
+            },
+            {
+              "lower": 0.7,
+              "upper": 0.75,
+              "count": 1,
+              "accuracy": 0.0,
+              "confidence": 0.7177687289613184
+            },
+            {
+              "lower": 0.8,
+              "upper": 0.85,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.8325159968793443
+            },
+            {
+              "lower": 0.85,
+              "upper": 0.9,
+              "count": 3,
+              "accuracy": 1.0,
+              "confidence": 0.8796378556023948
+            },
+            {
+              "lower": 0.9,
+              "upper": 0.95,
+              "count": 3,
+              "accuracy": 1.0,
+              "confidence": 0.9220291672567663
+            },
+            {
+              "lower": 0.95,
+              "upper": 1.0,
+              "count": 23,
+              "accuracy": 1.0,
+              "confidence": 0.9917483061199468
+            }
+          ],
+          "confusion_matrix": [
+            [
+              16,
+              0
+            ],
+            [
+              1,
+              15
+            ]
+          ],
+          "errors": 1,
+          "score_threshold_coverage": 0.9375,
+          "selective_accuracy": 1.0
+        },
+        "scoring_ms_per_article_in_batch": 0.008309903932968155,
+        "serialized_estimator_bundle_bytes": 89576
+      },
+      {
+        "id": "svm",
+        "full_text": {
+          "accuracy_wilson_95": [
+            0.8425573617998744,
+            0.9944621398359969
+          ],
+          "per_class": {
+            "fake": {
+              "precision": 0.9411764705882353,
+              "recall": 1.0,
+              "f1": 0.9696969696969697,
+              "support": 16
+            },
+            "real": {
+              "precision": 1.0,
+              "recall": 0.9375,
+              "f1": 0.967741935483871,
+              "support": 16
+            }
+          },
+          "roc_auc": 0.99609375,
+          "pr_auc_real": 0.9963235294117647,
+          "bootstrap_95": {
+            "accuracy": [
+              0.90625,
+              1.0
+            ],
+            "macro_f1": [
+              0.9053808488291246,
+              1.0
+            ],
+            "resamples": 200,
+            "seed": 42,
+            "note": "Article bootstrap within this fixed split; source/event dependence is not accounted for."
+          },
+          "n": 32,
+          "accuracy": 0.96875,
+          "balanced_accuracy": 0.96875,
+          "macro_f1": 0.9687194525904204,
+          "brier_score": 0.02041238320578979,
+          "ece": 0.05185398733613653,
+          "reliability_bins": [
+            {
+              "lower": 0.6,
+              "upper": 0.65,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.631245542534643
+            },
+            {
+              "lower": 0.65,
+              "upper": 0.7,
+              "count": 1,
+              "accuracy": 0.0,
+              "confidence": 0.6786998477979866
+            },
+            {
+              "lower": 0.8,
+              "upper": 0.85,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.8346350686383316
+            },
+            {
+              "lower": 0.85,
+              "upper": 0.9,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.8863362781878099
+            },
+            {
+              "lower": 0.9,
+              "upper": 0.95,
+              "count": 2,
+              "accuracy": 1.0,
+              "confidence": 0.9204989776292934
+            },
+            {
+              "lower": 0.95,
+              "upper": 1.0,
+              "count": 26,
+              "accuracy": 1.0,
+              "confidence": 0.9933137464777787
+            }
+          ],
+          "confusion_matrix": [
+            [
+              16,
+              0
+            ],
+            [
+              1,
+              15
+            ]
+          ],
+          "errors": 1,
+          "score_threshold_coverage": 0.9375,
+          "selective_accuracy": 1.0
+        },
+        "headline_only": {
+          "accuracy_wilson_95": [
+            0.5789344100575552,
+            0.8674759908149096
+          ],
+          "per_class": {
+            "fake": {
+              "precision": 0.6818181818181818,
+              "recall": 0.9375,
+              "f1": 0.7894736842105263,
+              "support": 16
+            },
+            "real": {
+              "precision": 0.9,
+              "recall": 0.5625,
+              "f1": 0.6923076923076923,
+              "support": 16
+            }
+          },
+          "roc_auc": 0.7734375,
+          "pr_auc_real": 0.8282647907647906,
+          "bootstrap_95": {
+            "accuracy": [
+              0.59375,
+              0.90625
+            ],
+            "macro_f1": [
+              0.5607843137254902,
+              0.8748400412796699
+            ],
+            "resamples": 200,
+            "seed": 42,
+            "note": "Article bootstrap within this fixed split; source/event dependence is not accounted for."
+          },
+          "n": 32,
+          "accuracy": 0.75,
+          "balanced_accuracy": 0.75,
+          "macro_f1": 0.7408906882591093,
+          "brier_score": 0.22255332934355743,
+          "ece": 0.23239668021662363,
+          "reliability_bins": [
+            {
+              "lower": 0.5,
+              "upper": 0.55,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.5076004836832835
+            },
+            {
+              "lower": 0.55,
+              "upper": 0.6,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.5823374111740535
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.65,
+              "count": 3,
+              "accuracy": 0.6666666666666666,
+              "confidence": 0.6214285152154946
+            },
+            {
+              "lower": 0.65,
+              "upper": 0.7,
+              "count": 1,
+              "accuracy": 0.0,
+              "confidence": 0.677391347805511
+            },
+            {
+              "lower": 0.7,
+              "upper": 0.75,
+              "count": 2,
+              "accuracy": 1.0,
+              "confidence": 0.7305614772400697
+            },
+            {
+              "lower": 0.75,
+              "upper": 0.8,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.7714236035240621
+            },
+            {
+              "lower": 0.8,
+              "upper": 0.85,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.8300401891297272
+            },
+            {
+              "lower": 0.85,
+              "upper": 0.9,
+              "count": 5,
+              "accuracy": 0.8,
+              "confidence": 0.8782295719170706
+            },
+            {
+              "lower": 0.9,
+              "upper": 0.95,
+              "count": 6,
+              "accuracy": 0.5,
+              "confidence": 0.9276307629999835
+            },
+            {
+              "lower": 0.95,
+              "upper": 1.0,
+              "count": 11,
+              "accuracy": 0.8181818181818182,
+              "confidence": 0.9835618335617219
+            }
+          ],
+          "confusion_matrix": [
+            [
+              15,
+              1
+            ],
+            [
+              7,
+              9
+            ]
+          ],
+          "errors": 8,
+          "score_threshold_coverage": 0.71875,
+          "selective_accuracy": 0.7391304347826086
+        },
+        "selected_source_cues_removed": {
+          "accuracy_wilson_95": [
+            0.8425573617998744,
+            0.9944621398359969
+          ],
+          "per_class": {
+            "fake": {
+              "precision": 0.9411764705882353,
+              "recall": 1.0,
+              "f1": 0.9696969696969697,
+              "support": 16
+            },
+            "real": {
+              "precision": 1.0,
+              "recall": 0.9375,
+              "f1": 0.967741935483871,
+              "support": 16
+            }
+          },
+          "roc_auc": 0.99609375,
+          "pr_auc_real": 0.9963235294117647,
+          "bootstrap_95": {
+            "accuracy": [
+              0.90625,
+              1.0
+            ],
+            "macro_f1": [
+              0.9053808488291246,
+              1.0
+            ],
+            "resamples": 200,
+            "seed": 42,
+            "note": "Article bootstrap within this fixed split; source/event dependence is not accounted for."
+          },
+          "n": 32,
+          "accuracy": 0.96875,
+          "balanced_accuracy": 0.96875,
+          "macro_f1": 0.9687194525904204,
+          "brier_score": 0.028174964315230557,
+          "ece": 0.05091274895071349,
+          "reliability_bins": [
+            {
+              "lower": 0.6,
+              "upper": 0.65,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.631245542534643
+            },
+            {
+              "lower": 0.7,
+              "upper": 0.75,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.7288102863463627
+            },
+            {
+              "lower": 0.75,
+              "upper": 0.8,
+              "count": 2,
+              "accuracy": 0.5,
+              "confidence": 0.7738025813642986
+            },
+            {
+              "lower": 0.85,
+              "upper": 0.9,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.8803094027840096
+            },
+            {
+              "lower": 0.9,
+              "upper": 0.95,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.9089291710920778
+            },
+            {
+              "lower": 0.95,
+              "upper": 1.0,
+              "count": 26,
+              "accuracy": 1.0,
+              "confidence": 0.9911193382134105
+            }
+          ],
+          "confusion_matrix": [
+            [
+              16,
+              0
+            ],
+            [
+              1,
+              15
+            ]
+          ],
+          "errors": 1,
+          "score_threshold_coverage": 0.875,
+          "selective_accuracy": 1.0
+        },
+        "lower_lexical_overlap": {
+          "accuracy_wilson_95": [
+            0.8425573617998744,
+            0.9944621398359969
+          ],
+          "per_class": {
+            "fake": {
+              "precision": 0.9411764705882353,
+              "recall": 1.0,
+              "f1": 0.9696969696969697,
+              "support": 16
+            },
+            "real": {
+              "precision": 1.0,
+              "recall": 0.9375,
+              "f1": 0.967741935483871,
+              "support": 16
+            }
+          },
+          "roc_auc": 0.99609375,
+          "pr_auc_real": 0.9963235294117647,
+          "bootstrap_95": {
+            "accuracy": [
+              0.90625,
+              1.0
+            ],
+            "macro_f1": [
+              0.9053808488291246,
+              1.0
+            ],
+            "resamples": 200,
+            "seed": 42,
+            "note": "Article bootstrap within this fixed split; source/event dependence is not accounted for."
+          },
+          "n": 32,
+          "accuracy": 0.96875,
+          "balanced_accuracy": 0.96875,
+          "macro_f1": 0.9687194525904204,
+          "brier_score": 0.02041238320578979,
+          "ece": 0.05185398733613653,
+          "reliability_bins": [
+            {
+              "lower": 0.6,
+              "upper": 0.65,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.631245542534643
+            },
+            {
+              "lower": 0.65,
+              "upper": 0.7,
+              "count": 1,
+              "accuracy": 0.0,
+              "confidence": 0.6786998477979866
+            },
+            {
+              "lower": 0.8,
+              "upper": 0.85,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.8346350686383316
+            },
+            {
+              "lower": 0.85,
+              "upper": 0.9,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.8863362781878099
+            },
+            {
+              "lower": 0.9,
+              "upper": 0.95,
+              "count": 2,
+              "accuracy": 1.0,
+              "confidence": 0.9204989776292934
+            },
+            {
+              "lower": 0.95,
+              "upper": 1.0,
+              "count": 26,
+              "accuracy": 1.0,
+              "confidence": 0.9933137464777787
+            }
+          ],
+          "confusion_matrix": [
+            [
+              16,
+              0
+            ],
+            [
+              1,
+              15
+            ]
+          ],
+          "errors": 1,
+          "score_threshold_coverage": 0.9375,
+          "selective_accuracy": 1.0
+        },
+        "wording_substitutions": {
+          "accuracy_wilson_95": [
+            0.7985287685584542,
+            0.982689432968359
+          ],
+          "per_class": {
+            "fake": {
+              "precision": 0.8888888888888888,
+              "recall": 1.0,
+              "f1": 0.9411764705882353,
+              "support": 16
+            },
+            "real": {
+              "precision": 1.0,
+              "recall": 0.875,
+              "f1": 0.9333333333333333,
+              "support": 16
+            }
+          },
+          "roc_auc": 0.99609375,
+          "pr_auc_real": 0.9963235294117647,
+          "bootstrap_95": {
+            "accuracy": [
+              0.84375,
+              1.0
+            ],
+            "macro_f1": [
+              0.8422028546166477,
+              1.0
+            ],
+            "resamples": 200,
+            "seed": 42,
+            "note": "Article bootstrap within this fixed split; source/event dependence is not accounted for."
+          },
+          "n": 32,
+          "accuracy": 0.9375,
+          "balanced_accuracy": 0.9375,
+          "macro_f1": 0.9372549019607843,
+          "brier_score": 0.03653522575151252,
+          "ece": 0.06775999931005317,
+          "reliability_bins": [
+            {
+              "lower": 0.55,
+              "upper": 0.6,
+              "count": 1,
+              "accuracy": 0.0,
+              "confidence": 0.5758624119944975
+            },
+            {
+              "lower": 0.75,
+              "upper": 0.8,
+              "count": 2,
+              "accuracy": 1.0,
+              "confidence": 0.7881134844824333
+            },
+            {
+              "lower": 0.8,
+              "upper": 0.85,
+              "count": 2,
+              "accuracy": 0.5,
+              "confidence": 0.8388039335134544
+            },
+            {
+              "lower": 0.9,
+              "upper": 0.95,
+              "count": 4,
+              "accuracy": 1.0,
+              "confidence": 0.9235111241911537
+            },
+            {
+              "lower": 0.95,
+              "upper": 1.0,
+              "count": 23,
+              "accuracy": 1.0,
+              "confidence": 0.9919512537117489
+            }
+          ],
+          "confusion_matrix": [
+            [
+              16,
+              0
+            ],
+            [
+              2,
+              14
+            ]
+          ],
+          "errors": 2,
+          "score_threshold_coverage": 0.90625,
+          "selective_accuracy": 0.9655172413793104
+        },
+        "sensational_prefix": {
+          "accuracy_wilson_95": [
+            0.8425573617998744,
+            0.9944621398359969
+          ],
+          "per_class": {
+            "fake": {
+              "precision": 0.9411764705882353,
+              "recall": 1.0,
+              "f1": 0.9696969696969697,
+              "support": 16
+            },
+            "real": {
+              "precision": 1.0,
+              "recall": 0.9375,
+              "f1": 0.967741935483871,
+              "support": 16
+            }
+          },
+          "roc_auc": 0.99609375,
+          "pr_auc_real": 0.9963235294117647,
+          "bootstrap_95": {
+            "accuracy": [
+              0.90625,
+              1.0
+            ],
+            "macro_f1": [
+              0.9053808488291246,
+              1.0
+            ],
+            "resamples": 200,
+            "seed": 42,
+            "note": "Article bootstrap within this fixed split; source/event dependence is not accounted for."
+          },
+          "n": 32,
+          "accuracy": 0.96875,
+          "balanced_accuracy": 0.96875,
+          "macro_f1": 0.9687194525904204,
+          "brier_score": 0.020902680776052368,
+          "ece": 0.05336639389933043,
+          "reliability_bins": [
+            {
+              "lower": 0.65,
+              "upper": 0.7,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.6669213717571014
+            },
+            {
+              "lower": 0.7,
+              "upper": 0.75,
+              "count": 1,
+              "accuracy": 0.0,
+              "confidence": 0.7010433159283839
+            },
+            {
+              "lower": 0.85,
+              "upper": 0.9,
+              "count": 3,
+              "accuracy": 1.0,
+              "confidence": 0.864023863423102
+            },
+            {
+              "lower": 0.9,
+              "upper": 0.95,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.9108639801424994
+            },
+            {
+              "lower": 0.95,
+              "upper": 1.0,
+              "count": 26,
+              "accuracy": 1.0,
+              "confidence": 0.993210068037727
+            }
+          ],
+          "confusion_matrix": [
+            [
+              16,
+              0
+            ],
+            [
+              1,
+              15
+            ]
+          ],
+          "errors": 1,
+          "score_threshold_coverage": 0.9375,
+          "selective_accuracy": 1.0
+        },
+        "irrelevant_source_markers": {
+          "accuracy_wilson_95": [
+            0.8425573617998744,
+            0.9944621398359969
+          ],
+          "per_class": {
+            "fake": {
+              "precision": 0.9411764705882353,
+              "recall": 1.0,
+              "f1": 0.9696969696969697,
+              "support": 16
+            },
+            "real": {
+              "precision": 1.0,
+              "recall": 0.9375,
+              "f1": 0.967741935483871,
+              "support": 16
+            }
+          },
+          "roc_auc": 0.99609375,
+          "pr_auc_real": 0.9963235294117647,
+          "bootstrap_95": {
+            "accuracy": [
+              0.90625,
+              1.0
+            ],
+            "macro_f1": [
+              0.9053808488291246,
+              1.0
+            ],
+            "resamples": 200,
+            "seed": 42,
+            "note": "Article bootstrap within this fixed split; source/event dependence is not accounted for."
+          },
+          "n": 32,
+          "accuracy": 0.96875,
+          "balanced_accuracy": 0.96875,
+          "macro_f1": 0.9687194525904204,
+          "brier_score": 0.020448792341471515,
+          "ece": 0.052207563683498846,
+          "reliability_bins": [
+            {
+              "lower": 0.55,
+              "upper": 0.6,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.5877859293413372
+            },
+            {
+              "lower": 0.65,
+              "upper": 0.7,
+              "count": 1,
+              "accuracy": 0.0,
+              "confidence": 0.6513729427784407
+            },
+            {
+              "lower": 0.8,
+              "upper": 0.85,
+              "count": 1,
+              "accuracy": 1.0,
+              "confidence": 0.8045897959117567
+            },
+            {
+              "lower": 0.9,
+              "upper": 0.95,
+              "count": 3,
+              "accuracy": 1.0,
+              "confidence": 0.9270521766751653
+            },
+            {
+              "lower": 0.95,
+              "upper": 1.0,
+              "count": 26,
+              "accuracy": 1.0,
+              "confidence": 0.9925845634472265
+            }
+          ],
+          "confusion_matrix": [
+            [
+              16,
+              0
+            ],
+            [
+              1,
+              15
+            ]
+          ],
+          "errors": 1,
+          "score_threshold_coverage": 0.9375,
+          "selective_accuracy": 1.0
+        },
+        "scoring_ms_per_article_in_batch": 0.004828125383937731,
+        "serialized_estimator_bundle_bytes": 89588
+      }
+    ]
+  },
+  "deployment_status": "research_only",
+  "limitations": [
+    "A small smoke configuration only verifies pipeline execution; it is not a defensible model-selection benchmark.",
+    "Historical corpus with unresolved source provenance; no claim-level FEVER/LIAR labels were merged into article labels.",
+    "Grouped splits do not guarantee independent publishers or semantic deduplication.",
+    "No automatic model promotion. Production calibration and external-source performance are not validated."
+  ],
+  "promotion": {
+    "eligible": false,
+    "reasons": [
+      "At least 500 independent held-out test examples are required.",
+      "An independent-source evaluation is required.",
+      "A comparison on the same held-out examples is required.",
+      "Macro F1 must meet the baseline.",
+      "Calibration must not regress against the baseline."
+    ],
+    "automatic_promotion": false
+  },
+  "data_audit": {
+    "sources": [
+      {
+        "file": "Fake.csv",
+        "sha256": "32d2aa9e85a52d2a98c6e9fe0cacd2af2cba8dbe1718cc5045c7fced2f4fc925",
+        "rows": 5000,
+        "label": 0
+      },
+      {
+        "file": "True.csv",
+        "sha256": "fc90d682ad8fa7be7d6f34b2e147a7ccbc1c9ecb58a6286944f895dfffb5ebe6",
+        "rows": 5000,
+        "label": 1
+      }
+    ],
+    "missing_values": {
+      "Fake.csv": {
+        "title": 0,
+        "text": 0
+      },
+      "True.csv": {
+        "title": 0,
+        "text": 0
+      }
+    },
+    "preprocessing": "NFKC normalization, HTML entity/tag/script/style removal, whitespace normalization; no test-fitted transformations",
+    "short_or_empty": 0,
+    "conflicting_content_groups": 0,
+    "conflicting_rows_removed": 0,
+    "exact_normalized_duplicates_removed": 36,
+    "usable_rows": 9964,
+    "publisher_field": null,
+    "publisher_leakage_analysis": "Unavailable: original files have no authenticated publisher/source column. Reuters-style text cues are not treated as publisher IDs.",
+    "language_detection": "Not sampled yet"
+  }
+}

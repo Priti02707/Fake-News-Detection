@@ -1,0 +1,12 @@
+{
+  "candidates": ["distilbert/distilbert-base-uncased", "FacebookAI/roberta-base", "microsoft/deberta-v3-base"],
+  "revision": null,
+  "epochs": 3,
+  "batch_size": 8,
+  "max_length": 256,
+  "learning_rate": 0.00002,
+  "freeze_encoder": false,
+  "seed": 42,
+  "device": "auto",
+  "purpose": "Research benchmark; each candidate is evaluated separately before any manual production decision"
+}

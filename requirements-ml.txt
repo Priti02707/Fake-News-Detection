@@ -1,0 +1,9 @@
+# Optional research environment. Never installed by the lightweight Vercel API.
+-r requirements-dev.txt
+torch>=2.5,<3
+transformers>=4.46,<5
+sentence-transformers>=3,<6
+safetensors>=0.5,<1
+Pillow>=11,<13
+protobuf>=5,<7
+sentencepiece>=0.2,<1

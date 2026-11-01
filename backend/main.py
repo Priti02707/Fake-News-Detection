@@ -2,36 +2,52 @@ import json
 import os
 import re
 import time
+from datetime import datetime, timezone
 from functools import lru_cache
 from pathlib import Path
-from typing import Literal
-from urllib.parse import quote
 
-import httpx
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
 from starlette.concurrency import run_in_threadpool
 
-from backend.extraction import fetch_article
+from backend.extraction import fetch_article, SourceBusyError
 from backend.inference import Classifier
+from backend.security import guard, correlation_id, logger
+from backend.evidence_providers import PROVIDERS
+from backend.language import identify_language
+from backend.schemas import AnalyzeInput, URLInput, ClaimInput, EvidenceInput
+from backend.investigation import select_claims, retrieve_passages
 
 ROOT = Path(__file__).resolve().parents[1]
-app = FastAPI(title="Verity News API", version="1.0.0", docs_url="/api/docs", openapi_url="/api/openapi.json")
+app = FastAPI(title="Verity News API", version="2.0.0", docs_url="/api/docs", openapi_url="/api/openapi.json")
 
 
 @app.middleware("http")
 async def limit_body(request: Request, call_next):
+    started = time.perf_counter()
+    request_id = correlation_id(request.headers.get("X-Request-ID"))
+    response = None
     if request.method == "POST":
-        content = bytearray()
-        async for chunk in request.stream():
-            content.extend(chunk)
-            if len(content) > 100_000:
-                return JSONResponse(status_code=413, content={"detail": "Request is too large."})
-        request._body = bytes(content)
-    response = await call_next(request)
+        if not guard.allowed(request.client.host if request.client else "unknown"):
+            response = JSONResponse(status_code=429, content={"detail": "Too many requests. Please try again in a minute."}, headers={"Retry-After": "60"})
+        else:
+            content = bytearray()
+            maximum = 500_000 if request.url.path.startswith("/api/v2/") else 100_000
+            async for chunk in request.stream():
+                content.extend(chunk)
+                if len(content) > maximum:
+                    response = JSONResponse(status_code=413, content={"detail": "Request is too large."})
+                    break
+            request._body = bytes(content)
+    if response is None:
+        try: response = await call_next(request)
+        except Exception:
+            logger.error(json.dumps({"event": "request_error", "request_id": request_id, "path": request.url.path}))
+            response = JSONResponse(status_code=500, content={"detail": "The service could not complete this request.", "request_id": request_id})
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["Cache-Control"] = "no-store"
+    response.headers["X-Request-ID"] = request_id
+    logger.info(json.dumps({"event": "request", "request_id": request_id, "method": request.method, "path": request.url.path, "status": response.status_code, "elapsed_ms": round((time.perf_counter() - started) * 1000, 2)}))
     return response
 
 
@@ -43,17 +59,41 @@ def classifier():
     return Classifier(path)
 
 
-class AnalyzeInput(BaseModel):
-    text: str = Field(min_length=40, max_length=20000)
-    model: Literal["logistic", "svm"] = "logistic"
+@app.post("/api/claims")
+def claims(payload: AnalyzeInput):
+    return {"claims": select_claims(payload.text), "method": "Heuristic prioritization across the input, not a trained check-worthiness model."}
 
 
-class URLInput(BaseModel):
-    url: str = Field(min_length=8, max_length=2048)
+@app.post("/api/evidence")
+async def evidence_passages(payload: EvidenceInput):
+    if bool(payload.text) == bool(payload.url):
+        raise HTTPException(422, "Provide either a public source URL or pasted source text.")
+    if payload.url:
+        try:
+            source = await run_in_threadpool(fetch_article, payload.url)
+        except SourceBusyError as error:
+            raise HTTPException(503, str(error)) from error
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from error
+        except Exception as error:
+            raise HTTPException(502, "The source could not be read. Paste its text instead.") from error
+    else:
+        source = {"text": payload.text, "title": "Reader-provided source", "url": None, "publisher": "Not independently authenticated", "truncated": False, "published_date": None}
+    passages = retrieve_passages(payload.query, source["text"])
+    return {"query": payload.query, "source": {key: value for key, value in source.items() if key != "text"}, "passages": passages, "retrieval_method": "BM25 lexical relevance", "retrieved_at": datetime.now(timezone.utc).isoformat(), "note": "Verbatim source passages ranked by word overlap, not verified facts. Review dates, context, and source independence."}
 
 
-class ClaimInput(BaseModel):
-    query: str = Field(min_length=8, max_length=300)
+@app.get("/api/evaluation")
+def evaluation():
+    path = ROOT / "models/robustness.json"
+    if not path.exists():
+        raise HTTPException(503, "Additional evaluation is not available.")
+    return json.loads(path.read_text())
+
+
+@app.post("/api/coverage")
+async def coverage(payload: ClaimInput):
+    return await PROVIDERS["gdelt"].search(payload)
 
 
 @app.get("/api/health")
@@ -75,14 +115,15 @@ def analyze(payload: AnalyzeInput):
         raise HTTPException(422, "Please provide at least 8 words of article text.")
     letters = [char for char in text if char.isalpha()]
     non_latin_ratio = sum(ord(char) > 591 for char in letters) / max(1, len(letters))
-    supported = non_latin_ratio < .1
+    language = identify_language(text)
+    supported = non_latin_ratio < .1 and language["code"] == "en"
     selected = classifier().predict(text, payload.model)
     other = classifier().predict(text, "svm" if payload.model == "logistic" else "logistic")
     probability = selected["real_probability"]
     confidence = max(probability, 1 - probability)
     reasons = []
     if not supported:
-        reasons.append("This model was evaluated on English articles only. This text appears to include an unsupported script.")
+        reasons.append("This model was evaluated on English articles only. The language detector or script check identified unsupported or uncertain language.")
     if len(words) < 40:
         reasons.append("Short text: this model was evaluated on full articles, so a headline alone is insufficient.")
     if selected["known_feature_ratio"] < .08:
@@ -92,15 +133,15 @@ def analyze(payload: AnalyzeInput):
     if (probability >= .5) != (other["real_probability"] >= .5):
         reasons.append("The two classifiers disagree on this article.")
     verdict = "uncertain" if reasons else ("real" if probability >= .5 else "fake")
-    sentences = re.split(r"(?<=[.!?।])\s+", text)
-    claims = [sentence.strip()[:300] for sentence in sentences if len(sentence.split()) >= 8][:3]
-    return {"verdict": verdict, "model": payload.model, "model_name": classifier().bundle["models"][payload.model]["name"], "confidence": round(confidence, 5) if supported else None, "real_probability": round(probability, 5) if supported else None, "explanations": selected["explanations"] if supported else [], "reasons": reasons, "word_count": len(words), "elapsed_ms": round((time.perf_counter() - start) * 1000, 2), "claims": [{"text": claim, "status": "unverified"} for claim in claims], "note": "This is a learned writing-pattern classification, not a verification of factual truth. Extracted sentences are search candidates, not verified claims."}
+    return {"verdict": verdict, "language": language, "model": payload.model, "model_name": classifier().bundle["models"][payload.model]["name"], "confidence": round(confidence, 5) if supported else None, "real_probability": round(probability, 5) if supported else None, "explanations": selected["explanations"] if supported else [], "reasons": reasons, "word_count": len(words), "elapsed_ms": round((time.perf_counter() - start) * 1000, 2), "claims": select_claims(payload.text), "note": "This is a learned writing-pattern classification, not a verification of factual truth. Candidate statements are selected heuristically across the article and remain unverified."}
 
 
 @app.post("/api/extract")
 async def extract(payload: URLInput):
     try:
         return await run_in_threadpool(fetch_article, payload.url)
+    except SourceBusyError as error:
+        raise HTTPException(503, str(error)) from error
     except ValueError as error:
         raise HTTPException(422, str(error)) from error
     except Exception as error:
@@ -109,22 +150,8 @@ async def extract(payload: URLInput):
 
 @app.post("/api/fact-check")
 async def fact_check(payload: ClaimInput):
-    manual_url = "https://toolbox.google.com/factcheck/explorer/search/" + quote(payload.query, safe="")
-    key = os.getenv("GOOGLE_FACT_CHECK_API_KEY")
-    if not key:
-        return {"status": "unavailable", "message": "Published fact-check search is not configured for this deployment. You can search manually using the link below.", "results": [], "search_url": manual_url}
-    try:
-        async with httpx.AsyncClient(timeout=12) as client:
-            response = await client.get("https://factchecktools.googleapis.com/v1alpha1/claims:search", params={"key": key, "query": payload.query, "languageCode": "en", "pageSize": 5})
-            response.raise_for_status()
-            data = response.json()
-    except (httpx.HTTPError, ValueError):
-        return {"status": "unavailable", "message": "Fact-check search is temporarily unavailable. Try again later or search manually.", "results": [], "search_url": manual_url}
-    results = []
-    for claim in data.get("claims", []):
-        for review in claim.get("claimReview", []):
-            url = review.get("url", "")
-            if not url.startswith(("https://", "http://")):
-                continue
-            results.append({"claim": claim.get("text", ""), "publisher": review.get("publisher", {}).get("name", "Fact-check publisher"), "title": review.get("title", "Read fact-check"), "url": url, "rating": review.get("textualRating", "No rating supplied"), "date": review.get("reviewDate", "")})
-    return {"status": "matches" if results else "no_matches", "message": "Related published fact-checks. Check that each source addresses the same claim and date." if results else "No matching fact-check found.", "results": results[:8], "search_url": manual_url}
+    return await PROVIDERS["google_fact_check"].search(payload)
+
+
+from backend.v2 import build_router
+app.include_router(build_router(analyze, extract, evidence_passages, metrics, evaluation))

@@ -1,6 +1,6 @@
 {
   "name": "verity-news",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
@@ -10,6 +10,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@contentauth/c2pa-web": "^0.15.5",
     "@huggingface/transformers": "^4.3.2",
     "@tailwindcss/postcss": "^4.1.0",
     "lucide-react": "^0.468.0",

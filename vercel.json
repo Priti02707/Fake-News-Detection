@@ -5,7 +5,7 @@
   "functions": {
     "api/index.py": {
       "maxDuration": 30,
-      "excludeFiles": "{data/**,tests/**,scripts/**,*.ipynb,.venv/**,node_modules/**}"
+      "excludeFiles": "{data/**,tests/**,scripts/**,reports/**,configs/**,.artifacts/**,.cache/**,*.ipynb,.venv/**,node_modules/**}"
     }
   }
 }

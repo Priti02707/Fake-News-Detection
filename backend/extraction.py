@@ -1,3 +1,5 @@
+import threading
+
 """Bounded public-web fetching with IP-pinned connections and redirect checks."""
 import http.client
 import ipaddress
@@ -39,7 +41,7 @@ class PinnedHTTPSConnection(http.client.HTTPSConnection):
             raise
 
 
-def fetch_article(url):
+def _fetch_article(url):
     for _ in range(4):
         parsed, host, port, address = resolve_public(url)
         if parsed.scheme == "https":
@@ -71,5 +73,21 @@ def fetch_article(url):
         text = document.text if document else ""
         if not text or len(text.strip()) < 80:
             raise ValueError("We could not extract enough article text. Paste it manually; paywalls are not bypassed.")
-        return {"title": document.title or "Untitled article", "text": text[:20000], "url": url, "publisher": host, "truncated": len(text) > 20000}
+        return {"title": document.title or "Untitled article", "text": text[:20000], "url": url, "publisher": host, "published_date": document.date or None, "truncated": len(text) > 20000}
     raise ValueError("The page redirected too many times. Paste the article text instead.")
+
+
+_source_slots = threading.BoundedSemaphore(4)
+
+
+class SourceBusyError(RuntimeError):
+    pass
+
+
+def fetch_article(url):
+    if not _source_slots.acquire(blocking=False):
+        raise SourceBusyError("Source reading is busy. Try again shortly.")
+    try:
+        return _fetch_article(url)
+    finally:
+        _source_slots.release()

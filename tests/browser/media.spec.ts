@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { readFile } from "node:fs/promises";
 
 test("media uploads validate files without losing the current article", async ({ page }) => {
   await page.goto("/");
@@ -9,8 +10,12 @@ test("media uploads validate files without losing the current article", async ({
   await expect(page.locator(".media-input [role=alert]")).toContainText("Choose a PNG, JPEG, or WebP");
   await page.getByLabel("Choose image", { exact: true }).setInputFiles({ name: "empty.png", mimeType: "image/png", buffer: Buffer.alloc(0) });
   await expect(page.locator(".media-input [role=alert]")).toContainText("non-empty");
+  await page.getByLabel("Choose image", { exact: true }).setInputFiles({ name: "too-large.png", mimeType: "image/png", buffer: Buffer.alloc(10 * 1024 * 1024 + 1) });
+  await expect(page.locator(".media-input [role=alert]")).toContainText("10 MB");
   await page.getByRole("tab", { name: "Video", exact: true }).click();
   await page.getByLabel("Choose video", { exact: true }).setInputFiles({ name: "broken.mp4", mimeType: "video/mp4", buffer: Buffer.from("Not a video") });
+  await expect(page.locator(".media-input [role=alert]")).toContainText("file contents do not match");
+  await page.getByLabel("Choose video", { exact: true }).setInputFiles({ name: "undecodable.mp4", mimeType: "video/mp4", buffer: Buffer.from([0,0,0,20,102,116,121,112,105,115,111,109,0,0,0,0,105,115,111,109]) });
   await page.getByRole("button", { name: "Transcribe video" }).click();
   await expect(page.locator(".media-input [role=alert]")).toContainText("cannot open this video");
   await page.getByRole("tab", { name: "Paste text" }).click();
@@ -22,7 +27,7 @@ test("image extraction requires review before sending text for analysis", async 
   test.setTimeout(180000);
   test.skip(process.env.MEDIA_INTEGRATION !== "1", "Downloads OCR models; run MEDIA_INTEGRATION=1 for real extraction checks.");
   let analyses = 0;
-  page.on("request", request => { if (request.url().endsWith("/api/analyze")) analyses++; });
+  page.on("request", request => { if ((request.url().endsWith("/api/analyze") || request.url().includes("/api/v2/analyze/"))) analyses++; });
   await page.goto("/");
   const image = await page.evaluate(() => {
     const canvas = document.createElement("canvas"); canvas.width = 1200; canvas.height = 500;
@@ -39,6 +44,9 @@ test("image extraction requires review before sending text for analysis", async 
   await page.locator(".media-review, .media-input [role=alert]").waitFor({ state: "visible", timeout: 150000 });
   await expect(review).toHaveValue(/city council/);
   expect(analyses).toBe(0);
+  await expect(page.locator(".media-segments button").first()).toBeVisible();
+  await page.locator(".media-segments button").first().click();
+  await expect(page.locator(".selected-region")).toHaveCount(1);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.screenshot({ path: testInfo.outputPath("image-review.png"), fullPage: true });
   await review.fill((await review.inputValue()) + " The funding remains subject to approval.");
@@ -48,6 +56,13 @@ test("image extraction requires review before sending text for analysis", async 
   await page.getByRole("button", { name: "Analyze article", exact: true }).click();
   await expect(page.getByRole("heading", { name: "A little more perspective." })).toBeVisible();
   expect(analyses).toBe(1);
+  const downloaded = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download report", exact: true }).click();
+  const report = JSON.parse(await readFile((await (await downloaded).path())!, "utf8"));
+  expect(report.media_trace.kind).toBe("image");
+  expect(report.media_trace.segments.length).toBeGreaterThan(0);
+  expect(report.media_trace.original_text).not.toContain("funding remains subject to approval");
+  expect(report.text).toContain("funding remains subject to approval");
 });
 
 test("video speech is extracted and reviewed before analysis", async ({ page, request }) => {
@@ -64,9 +79,9 @@ test("video speech is extracted and reviewed before analysis", async ({ page, re
     const audio = await context.decodeAudioData(bytes.buffer);
     const source = context.createBufferSource(); source.buffer = audio;
     const destination = context.createMediaStreamDestination(); source.connect(destination);
-    const canvas = document.createElement("canvas"); canvas.width = 320; canvas.height = 180;
+    const canvas = document.createElement("canvas"); canvas.width = 640; canvas.height = 360;
     const ctx = canvas.getContext("2d")!;
-    ctx.fillStyle = "#285b43"; ctx.fillRect(0, 0, 320, 180);
+    ctx.fillStyle = "white"; ctx.fillRect(0, 0, 640, 360); ctx.fillStyle = "black"; ctx.font = "28px Arial"; ctx.fillText("CITY COUNCIL APPROVED", 35, 100); ctx.fillText("NEW PUBLIC BUS ROUTES", 35, 160);
     const stream = canvas.captureStream(5);
     destination.stream.getAudioTracks().forEach(track => stream.addTrack(track));
     const recorder = new MediaRecorder(stream, { mimeType: "video/webm;codecs=vp8,opus" });
@@ -91,9 +106,39 @@ test("video speech is extracted and reviewed before analysis", async ({ page, re
   const review = page.getByLabel("Review video transcript", { exact: true });
   await page.locator(".media-review, .media-input [role=alert]").waitFor({ state: "visible", timeout: 500000 });
   await expect(review).toHaveValue(/country/i);
+  await page.getByRole("button", { name: "Inspect video frames", exact: true }).click();
+  await expect(page.locator(".video-keyframe").first()).toBeVisible({ timeout: 150000 });
+  await expect(page.locator(".video-keyframe").first()).toContainText(/COUNCIL/i);
+  await page.locator(".frame-seek").first().click();
+  await expect(page.locator(".media-segments button").first()).toBeVisible();
+  await page.locator(".media-segments button").first().click();
+  expect(await page.locator("video").evaluate(element => (element as HTMLVideoElement).currentTime)).toBeLessThan(1);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.getByRole("button", { name: "Use reviewed text" }).click();
   await expect(page.getByLabel("News article text")).toHaveValue(/country/i);
   await page.getByRole("button", { name: "Analyze article", exact: true }).click();
   await expect(page.getByRole("heading", { name: "More context needed" })).toBeVisible();
+});
+
+test("experimental Hindi OCR is reviewable and never receives an English truth score", async ({ page }) => {
+  test.skip(process.env.RESEARCH_INTEGRATION !== "1", "Downloads Hindi OCR language data.");
+  test.setTimeout(180000);
+  await page.goto("/");
+  const image = await page.evaluate(() => {
+    const canvas = document.createElement("canvas"); canvas.width = 1600; canvas.height = 300;
+    const ctx = canvas.getContext("2d")!; ctx.fillStyle = "white"; ctx.fillRect(0, 0, 1600, 300); ctx.fillStyle = "black"; ctx.font = "48px sans-serif";
+    ctx.fillText("भारत की सरकार ने नई परिवहन योजना की घोषणा की।", 35, 100);
+    ctx.fillText("यह समाचार एक उदाहरण है और इसकी स्वतंत्र जांच बाकी है।", 35, 200);
+    return canvas.toDataURL("image/png").split(",")[1];
+  });
+  await page.getByRole("tab", { name: "Image", exact: true }).click();
+  await page.getByLabel("Extraction language", { exact: true }).selectOption("hi");
+  await page.getByLabel("Choose image", { exact: true }).setInputFiles({ name: "hindi.png", mimeType: "image/png", buffer: Buffer.from(image, "base64") });
+  await page.getByRole("button", { name: "Extract image text" }).click();
+  await page.locator(".media-review, .media-input [role=alert]").waitFor({ state: "visible", timeout: 150000 });
+  await expect(page.getByLabel("Review extracted text", { exact: true })).toHaveValue(/[\u0900-\u097f]/);
+  await page.getByRole("button", { name: "Use reviewed text" }).click();
+  await page.getByRole("button", { name: "Analyze article", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "More context needed" })).toBeVisible();
+  await expect(page.locator(".confidence strong")).toHaveText("—");
 });

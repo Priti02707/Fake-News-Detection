@@ -1,0 +1,54 @@
+{
+  "sources": [
+    {
+      "file": "Fake.csv",
+      "sha256": "32d2aa9e85a52d2a98c6e9fe0cacd2af2cba8dbe1718cc5045c7fced2f4fc925",
+      "rows": 5000,
+      "label": 0
+    },
+    {
+      "file": "True.csv",
+      "sha256": "fc90d682ad8fa7be7d6f34b2e147a7ccbc1c9ecb58a6286944f895dfffb5ebe6",
+      "rows": 5000,
+      "label": 1
+    }
+  ],
+  "missing_values": {
+    "Fake.csv": {
+      "title": 0,
+      "text": 0
+    },
+    "True.csv": {
+      "title": 0,
+      "text": 0
+    }
+  },
+  "preprocessing": "NFKC normalization, HTML entity/tag/script/style removal, whitespace normalization; no test-fitted transformations",
+  "short_or_empty": 0,
+  "conflicting_content_groups": 0,
+  "conflicting_rows_removed": 0,
+  "exact_normalized_duplicates_removed": 36,
+  "usable_rows": 9964,
+  "publisher_field": null,
+  "publisher_leakage_analysis": "Unavailable: original files have no authenticated publisher/source column. Reuters-style text cues are not treated as publisher IDs.",
+  "language_detection": {
+    "sample_size": 100,
+    "codes": {
+      "en": 100
+    },
+    "method": "Seeded sample; heuristic language detection, not a language benchmark"
+  },
+  "generated_at": "2026-11-01T17:16:14.971192+00:00",
+  "dataset_task": "article-level labels: 0 fake-labeled, 1 real-labeled",
+  "license_status": "Original repository sample provenance/redistribution terms remain unverified. Raw article content is not redistributed.",
+  "semantic_diagnostic": {
+    "model": "sentence-transformers/all-MiniLM-L6-v2",
+    "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+    "cosine_threshold": 0.95,
+    "sampled_articles": 500,
+    "nearest_neighbors_per_article": 8,
+    "candidate_pairs": 0,
+    "maximum_tokens": 256,
+    "note": "This is a sampled diagnostic, not full-corpus semantic deduplication. Similarity clusters can include different articles about the same event."
+  }
+}

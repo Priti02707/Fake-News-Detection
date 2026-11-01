@@ -1,0 +1,15 @@
+{
+  "candidates": ["distilbert/distilbert-base-uncased", "FacebookAI/roberta-base", "microsoft/deberta-v3-base"],
+  "revision": null,
+  "epochs": 1,
+  "batch_size": 8,
+  "max_length": 96,
+  "learning_rate": 0.0005,
+  "freeze_encoder": true,
+  "max_train": 64,
+  "max_calibration": 32,
+  "max_test": 32,
+  "seed": 42,
+  "device": "cpu",
+  "purpose": "Small head-training pilots on matched partitions; not full fine-tuning, independent-source evaluation, or production model selection"
+}
