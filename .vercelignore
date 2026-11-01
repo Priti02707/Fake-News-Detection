@@ -1,0 +1,9 @@
+.venv
+data/*.csv
+tests
+test-results
+playwright-report
+*.ipynb
+__pycache__
+.pytest_cache
+scripts

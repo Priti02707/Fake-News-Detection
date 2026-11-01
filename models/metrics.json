@@ -1,0 +1,82 @@
+{
+  "dataset": "Recovered original project samples",
+  "source_commit": "afe1eb8",
+  "input_rows": 10000,
+  "usable_rows": 9964,
+  "removed_rows": 36,
+  "splits": {
+    "train": 5977,
+    "calibration": 1994,
+    "test": 1993
+  },
+  "test_class_counts": {
+    "fake": 980,
+    "real": 1013
+  },
+  "protocol": "Normalized content deduplication; conflicting labels removed; normalized headline groups held together; 60/20/20 group split; vectorizer fitted on training only; sigmoid calibration fitted on validation only. No publisher or temporal holdout.",
+  "seed": [
+    42,
+    43
+  ],
+  "versions": {
+    "python": "3.12.7",
+    "sklearn": "1.9.1",
+    "numpy": "2.5.4",
+    "pandas": "3.1.0"
+  },
+  "data_sha256": {
+    "Fake.csv": "32d2aa9e85a52d2a98c6e9fe0cacd2af2cba8dbe1718cc5045c7fced2f4fc925",
+    "True.csv": "fc90d682ad8fa7be7d6f34b2e147a7ccbc1c9ecb58a6286944f895dfffb5ebe6"
+  },
+  "models": [
+    {
+      "id": "logistic",
+      "name": "Logistic Regression",
+      "accuracy": 0.9904666332162569,
+      "macro_f1": 0.9904638578778124,
+      "brier_score": 0.006221110320962225,
+      "errors": 19,
+      "confusion_matrix": [
+        [
+          970,
+          10
+        ],
+        [
+          9,
+          1004
+        ]
+      ],
+      "scoring_ms_per_article": 0.001,
+      "coverage": 0.9834420471650778,
+      "selective_accuracy": 0.9979591836734694
+    },
+    {
+      "id": "svm",
+      "name": "Linear SVM",
+      "accuracy": 0.9989964877069744,
+      "macro_f1": 0.9989961781232308,
+      "brier_score": 0.0013159968581433273,
+      "errors": 2,
+      "confusion_matrix": [
+        [
+          978,
+          2
+        ],
+        [
+          0,
+          1013
+        ]
+      ],
+      "scoring_ms_per_article": 0.0003,
+      "coverage": 0.9934771700953337,
+      "selective_accuracy": 0.9994949494949495
+    }
+  ],
+  "limits": [
+    "Historical English articles; not evaluated on Hindi, short claims, or current events.",
+    "Publisher and writing-style cues may inflate in-domain scores.",
+    "Grouped holdout does not remove all semantic near-duplicates.",
+    "Classifier probabilities describe dataset labels, not verified factual truth.",
+    "Latency measures sparse matrix scoring plus calibration, excluding text processing and network time."
+  ]
+}
