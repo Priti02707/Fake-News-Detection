@@ -10,6 +10,20 @@ Starting revision: `697181f`, with a clean working tree. The existing Python bas
 - `tests/test_v2.py`: add regression cases for short URL content, punctuation padding across URL/text inputs, and full-article URL/text prediction parity. URL retrieval is mocked; these tests make no external-source availability claim.
 - Validation: `.venv/bin/python -m pytest tests -q` — **42 passed**; `npm run build`, `npm run typecheck`, and `git diff --check` — **passed**. The existing Starlette TestClient deprecation warning remains. Browser/model integration checks and deployment were not rerun for this backend correction. Production weights and recorded benchmark metrics were not changed.
 
+### Production publication and checks
+
+Code commit `d611efff013805b2202f4f43265a35eff9182c45` was pushed to `Priti02707/Fake-News-Detection` on `main` and deployed to the existing Vercel project `priti-09/verity-news`. Deployment `dpl_E44YXhWcMcVv9KBP4Qi87pJLBJwL` reached **READY** and was assigned to https://verity-news-sable.vercel.app.
+
+Live checks supersede the local-only validation status above:
+
+- Health/model readiness, v2 capabilities and model metrics/registry: passed.
+- Punctuation-padding abstention and full-article classification: passed against the production API.
+- Claim passage retrieval: passed; factual assessment remains insufficient evidence.
+- Existing `tests/browser/app.spec.ts` against production with a temporary configuration: **4 passed**, covering desktop/mobile analysis, explanations, saved history, JSON download, evaluation, short-input abstention and private-URL rejection.
+- Google Fact Check remains unconfigured; the production browser checks verified its explicit unavailable message. Heavy optional model integrations were not rerun.
+
+The production smoke script initially encountered the local Python installation's missing CA bundle; rerunning with the installed `certifi` trust bundle passed with TLS verification enabled.
+
 ## Implemented in this working release
 
 - Preserved baseline weights, routes, training script, explanations, history, article/URL/OCR/ASR flows and existing Vercel project.
