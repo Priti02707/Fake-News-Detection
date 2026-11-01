@@ -1,4 +1,5 @@
 export type LocalFrame = { id: string; timestamp: number; width: number; height: number; blob: Blob; scene_change: number };
+import { frameSampleTimes } from "./multimodal";
 
 export async function sampleVideoFrames(file: File, signal: AbortSignal, options: { interval: number; maxFrames: number }, progress: (text: string) => void): Promise<LocalFrame[]> {
   const video = document.createElement("video");
@@ -29,7 +30,7 @@ export async function sampleVideoFrames(file: File, signal: AbortSignal, options
     if (!context || !small) throw new Error("Canvas video decoding is unavailable in this browser.");
     const frames: LocalFrame[] = [];
     let previous: Uint8ClampedArray | null = null;
-    const times = Array.from({ length: Math.max(1, Math.ceil(video.duration / options.interval)) }, (_, index) => Math.min(video.duration - .05, index * options.interval + .05));
+    const times = frameSampleTimes(video.duration, options.interval, options.maxFrames);
     for (const [index, timestamp] of times.entries()) {
       signal.throwIfAborted();
       progress(`Inspecting visual sample ${index + 1} of ${times.length}…`);
@@ -42,7 +43,6 @@ export async function sampleVideoFrames(file: File, signal: AbortSignal, options
         const blob = await new Promise<Blob>((resolve, reject) => canvas.toBlob(value => value ? resolve(value) : reject(new Error("A video frame could not be captured.")), "image/jpeg", .85));
         frames.push({ id: `frame-${index}`, timestamp, width, height, blob, scene_change: delta });
       }
-      if (frames.length >= options.maxFrames) break;
     }
     return frames;
   } finally { video.removeAttribute("src"); video.load(); URL.revokeObjectURL(url); }

@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
+import { createTimelineVideo } from "./video-fixture";
 
 test("media uploads validate files without losing the current article", async ({ page }) => {
   await page.goto("/");
@@ -109,6 +110,8 @@ test("video speech is extracted and reviewed before analysis", async ({ page, re
   await page.getByRole("button", { name: "Inspect video frames", exact: true }).click();
   await expect(page.locator(".video-keyframe").first()).toBeVisible({ timeout: 150000 });
   await expect(page.locator(".video-keyframe").first()).toContainText(/COUNCIL/i);
+  await expect(page.getByRole("heading", { name: "Video investigation timeline" })).toBeVisible();
+  await expect(page.locator(".timeline-entry")).not.toHaveCount(0);
   await page.locator(".frame-seek").first().click();
   await expect(page.locator(".media-segments button").first()).toBeVisible();
   await page.locator(".media-segments button").first().click();
@@ -141,4 +144,29 @@ test("experimental Hindi OCR is reviewable and never receives an English truth s
   await page.getByRole("button", { name: "Analyze article", exact: true }).click();
   await expect(page.getByRole("heading", { name: "More context needed" })).toBeVisible();
   await expect(page.locator(".confidence strong")).toHaveText("—");
+});
+
+test("video frames create a real OCR timeline with seeking and contextual evidence", async ({ page }) => {
+  test.skip(process.env.MEDIA_INTEGRATION !== "1", "Runs actual frame decoding and OCR; may download Tesseract assets.");
+  test.setTimeout(180000);
+  await page.route("**/api/coverage", route => route.fulfill({ json: { status: "no_matches", message: "Synthetic local video fixture has no external news claim.", results: [] } }));
+  await page.goto("/");
+  const video = await createTimelineVideo(page);
+  await page.getByRole("tab", { name: "Video", exact: true }).click();
+  await page.getByLabel("Choose video", { exact: true }).setInputFiles({ name: "original-synthetic-timeline.webm", mimeType: "video/webm", buffer: video });
+  await page.getByLabel("Frame sample interval").selectOption("2");
+  await page.getByRole("button", { name: "Inspect video frames", exact: true }).click();
+  await expect(page.locator(".video-keyframe")).toHaveCount(2, { timeout: 150000 });
+  await expect(page.locator(".timeline-entry").first()).toContainText(/APPROVED/i);
+  await expect(page.locator(".timeline-entry").last()).toContainText(/DID NOT APPROVE/i);
+  await page.locator(".timeline-entry").last().getByRole("button", { name: /Seek to/ }).click();
+  await expect.poll(() => page.locator("video").evaluate(element => (element as HTMLVideoElement).currentTime)).toBeGreaterThan(3.8);
+  const downloaded = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download timeline JSON" }).click();
+  const report = JSON.parse(await readFile((await (await downloaded).path())!, "utf8"));
+  expect(report.timeline).toHaveLength(2);
+  expect(report.factual_assessment).toBe("INSUFFICIENT_EVIDENCE");
+  await page.getByRole("button", { name: "Investigate this moment with sources" }).last().click();
+  await expect(page.locator(".media-evidence-origin")).toContainText("3.9 seconds");
+  await expect(page.locator(".media-evidence-case").getByText("Insufficient reviewed evidence", { exact: true })).toBeVisible();
 });

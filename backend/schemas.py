@@ -45,6 +45,8 @@ class VisualObservation(BaseModel):
     revision: str = Field(max_length=64)
     matches: list[VisualMatch] = Field(min_length=2, max_length=2)
     scope: str = Field(max_length=300)
+    claim: str | None = Field(default=None, max_length=200)
+    alternative: str | None = Field(default=None, max_length=200)
 
 
 class ProvenanceObservation(BaseModel):

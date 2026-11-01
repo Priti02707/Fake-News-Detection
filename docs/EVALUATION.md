@@ -18,6 +18,8 @@ The continuation's deterministic research API tests use synthetic manifest bytes
 
 Evidence tests cover exact-quote deduplication, offsets, missing/invalid/future publication dates, timezone conversion and the 365/366-day review boundary. The publication-age rule is not a learned relevance or factual-verification threshold.
 
+Connected media rules have deterministic Node unit tests (`npm run test:unit`) for paired-description matching, unvalidated margin boundaries, invalid scores, time alignment, negation/topic flags, missing modalities, excerpt limits and full-clip sampling. They validate rule execution, not detection accuracy. `tests/browser/multimodal.spec.ts` explicitly uses synthetic worker/source fixtures and saved metadata to verify discovery/retrieval, failure states, contradictions, media-context exports, print visibility and timeline navigation. The opt-in existing CLIP/NLI/OCR/Whisper checks use actual downloaded models separately. None establishes population-level visual mismatch, OCR/ASR, factual verification or deepfake accuracy. Production model parameters and evaluation artifacts remain unchanged.
+
 ```sh
 .venv/bin/python scripts/evaluate.py
 .venv/bin/python scripts/audit_data.py --semantic --limit 500

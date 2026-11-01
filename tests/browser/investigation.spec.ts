@@ -107,11 +107,12 @@ test("visual-language comparison exposes relative matches without authenticity v
   expect(response.ok()).toBe(true);
   await page.getByLabel("Choose image", { exact: true }).setInputFiles({ name: "tiger.jpg", mimeType: "image/jpeg", buffer: await response.body() });
   await page.getByText("Explore image context (experimental)", { exact: true }).click();
-  await page.getByLabel("Description to investigate", { exact: true }).fill("a photograph of a tiger");
-  await page.getByLabel("Alternative description", { exact: true }).fill("a photograph of a horse");
+  await page.getByLabel("Description to investigate", { exact: true }).fill("a photograph of a horse");
+  await page.getByLabel("Alternative description", { exact: true }).fill("a photograph of a tiger");
   await page.getByRole("button", { name: "Compare image descriptions" }).click();
   await page.locator(".visual-match, .image-context [role=status]").filter({ hasText: /relative match|could not finish/ }).first().waitFor({ state: "visible", timeout: 500000 });
   await expect(page.locator(".visual-match")).toHaveCount(2);
   await expect(page.locator(".visual-match").first()).toContainText("tiger");
   await expect(page.getByText(/These scores are not probabilities of truth/)).toBeVisible();
+  await expect(page.getByText("Potential image–caption mismatch to investigate", { exact: true })).toBeVisible();
 });

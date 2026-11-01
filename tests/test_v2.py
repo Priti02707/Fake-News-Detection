@@ -184,3 +184,15 @@ def test_capabilities_do_not_advertise_raw_uploads_or_fake_server_jobs():
     assert result["raw_media_uploads"] is False
     assert result["server_media_jobs"] is False
     assert result["deepfake_detection"] == "unavailable"
+
+
+def test_image_caption_comparison_remains_separate_from_factual_verification():
+    visual = {"model": "synthetic-visual-fixture", "revision": "fixture", "claim": "A city flood today", "alternative": "A dry city street", "matches": [{"label": "A dry city street", "score": .9}, {"label": "A city flood today", "score": .1}], "scope": "Relative comparison fixture only"}
+    payload = {"text": TEXT, "media": {"kind": "image", "filename": "synthetic.png", "visual_consistency": visual}}
+    response = client.post("/api/v2/analyze/image", json=payload)
+    assert response.status_code == 200
+    report = response.json()["report"]
+    assert report["modalities"]["image_visual"] == "client_relative_visual_comparison_supplied"
+    assert report["claim_verification"]["assessment"] == "INSUFFICIENT_EVIDENCE"
+    payload["media"]["visual_consistency"]["claim"] = "x" * 201
+    assert client.post("/api/v2/analyze/image", json=payload).status_code == 422

@@ -1,6 +1,6 @@
-# Verity · Explainable News Analysis
+# Verity AI 2.0 · Explainable Multimodal Evidence Verification
 
-A news-analysis website by **Priti**. Paste an English article, inspect the words influencing a machine-learning prediction, and search related published fact-checks.
+A misinformation investigation platform by **Priti**. Inspect article-model explanations, investigate image–news mismatches, follow video speech and frame text on a timeline, and gather cited evidence with explicit uncertainty.
 
 **Live website:** https://verity-news-sable.vercel.app · [Vercel project](https://vercel.com/priti-09/verity-news)
 
@@ -10,6 +10,9 @@ Built from the original Fake News Detection notebook, with a Next.js interface, 
 
 ## Features
 
+- **Image–news mismatch review:** compare a headline/caption with an alternative image description, flag relative visual mismatch for investigation, and gather cited source passages. Image identity, event date and location remain unverified until supported by evidence.
+- **Video investigation timeline:** chronological speech and sampled frame/subtitle observations, clickable playback locations, nearby wording/negation review flags, and timestamp-linked evidence notebooks.
+- **Explainable fact verification:** bounded source discovery/retrieval, verbatim quotations, publication dates, optional NLI suggestions, reader-authored support/contradiction findings, and contextual JSON/print-to-PDF reports.
 - Responsive editorial interface with keyboard-accessible navigation.
 - English text analysis with Logistic Regression and calibrated Linear SVM.
 - Signed word/phrase contributions and highlighted words in context.
@@ -90,6 +93,15 @@ Repeated passages within a source are deduplicated before shortlisting. Citation
 
 GDELT recent-news search needs no API key, sends the chosen query to GDELT, and searches a recent coverage window. News leads are not fact-check verdicts. Provider outages and no matches are separate states. The optional Google Fact Check API still requires `GOOGLE_FACT_CHECK_API_KEY`; manual evidence review remains available without it.
 
+### Connected image and video investigations
+
+1. Select **Image** and upload a photo. Open **Explore image context**, enter its associated headline/caption under **Description to investigate**, and supply an alternative visual description. Optional CLIP comparison reports a potential relative mismatch when the alternative's score exceeds the caption's by at least 0.2. This is a review heuristic, not a validated misinformation detector. A match cannot establish the event, date or location.
+2. Select **Investigate this image claim** to search GDELT and retrieve passages from up to two distinct source URLs through the existing SSRF-protected server. Only selected words are sent; the image stays local. Sources are leads until reviewed, and separate domains do not prove independence. If providers fail or no passages match, the notebook remains insufficient evidence and accepts manual sources.
+3. For **Video**, transcribe speech and/or inspect frames. The **Video investigation timeline** combines timestamped speech, sampled frame text and optional visual comparisons. Nearby topic differences or aligned wording with different negation are marked for review. These English lexical heuristics do not establish contradictions or deepfakes. Sampling spans the full clip, up to six frames, with scene-change selection; intermediate scenes and subtitles may be missed.
+4. Select **Investigate this moment with sources** to gather evidence for that excerpt. Correct the selected claim, inspect citations and dates, optionally run English NLI, and record your assessment. Image/video notebooks export the original media context or timestamp with citations and reader findings. **Download timeline JSON** exports the chronological observations separately. **Print evidence / save PDF** uses the browser print dialog.
+
+Claim edits clear prior citations and cancel active retrieval. Changing files clears the associated notebook; export before moving to article analysis. Saved text-analysis reports also derive timeline observations from retained media metadata, but raw original files/previews are not persisted. The deployed classifier and model metrics are unchanged. Deepfake detection remains an optional research extension without a simulated detector.
+
 ## Media context and provenance
 
 Image extraction now retains OCR line rectangles. Select a line to highlight its image region. Video transcripts retain approximate timestamps; select one to seek in the original clip. **Inspect video frames** samples bounded representative keyframes with simple scene-change selection and runs OCR on their on-screen text. Sampling interval and frame count are configurable, up to six frames and 4K input dimensions. Sampled scenes can be missed; no complete visual or authenticity verification is claimed. Silent clips can use frame inspection independently. Each keyframe also offers optional description comparison. Choose **Add on-screen text to review** to include frame text in the editable analysis input. These traces describe the original extraction, even after text corrections, and are included in article-report exports and opt-in saved history. JSON reports do not contain the media file itself.
@@ -161,6 +173,7 @@ The preserved [original notebook](Fake_News_Detection_Complete.ipynb) contains o
 .venv/bin/python -m pytest tests -q
 npm run build
 npm run typecheck
+npm run test:unit
 npx playwright install chromium
 ```
 
@@ -215,6 +228,8 @@ tests/                  API and browser tests
 Article text is processed without database storage. Optional history stays in the browser. Hosting providers can retain standard request metadata. Fact-check search sends the chosen query to Google. URL extraction checks resolved addresses and redirect targets, pins connections to public IPs, verifies HTTPS certificates, and limits response size. It cannot bypass paywalls or publisher restrictions.
 
 Planned research: independently evaluated Hindi classifiers, domain-validated claim verification, independent-publisher/corpus evaluation, and deepfake detection. No deepfake detector or factual-truth probability is claimed by this release. Full independent-source transformer benchmarking is not completed; the recorded 64/32/32 pilots are execution checks, not production selection. See [UPGRADE_REPORT.md](UPGRADE_REPORT.md).
+
+Resume description: **Verity AI 2.0 — Explainable Multimodal Misinformation Detection and Evidence Verification Platform**. Describe the implemented evidence/review workflows and measured tests alongside the limitations; no independently validated multimodal factual accuracy or deepfake performance is claimed.
 
 
 ## API v2 and local research

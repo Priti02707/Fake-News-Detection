@@ -1,4 +1,4 @@
-export type VisualComparison = { model: string; revision: string; matches: { label: string; score: number }[]; scope: string };
+export type VisualComparison = { model: string; revision: string; matches: { label: string; score: number }[]; scope: string; claim?: string; alternative?: string };
 export type ProvenanceObservation = { status: "found" | "not_found" | "unavailable"; validation_state?: string; signer_trust: "not_checked" };
 export type MediaPreviewFiles = { source: File; frames: { id: string; file: File }[] };
 export type MediaSegment = { text: string; start?: number; end?: number | null; confidence?: number; bbox?: { x0: number; y0: number; x1: number; y1: number } };

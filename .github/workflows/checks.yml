@@ -20,6 +20,7 @@ jobs:
       - run: npm ci
       - run: pip install -r requirements-dev.txt
       - run: python -m pytest tests -q
+      - run: npm run test:unit
       - run: npm run build
       - run: npm run typecheck
       - run: npx playwright install --with-deps chromium

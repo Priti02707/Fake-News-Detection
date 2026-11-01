@@ -2,6 +2,10 @@
 
 Baseline and file-by-file plan: [BASELINE_AUDIT.md](BASELINE_AUDIT.md). Baseline commit: `24110fc395de5581ac52eaa0a0a8130451349d5f`.
 
+## Connected multimodal verification
+
+Connected image-caption review, chronological video investigation, bounded automatic evidence gathering, contradiction/uncertainty presentation and contextual JSON/print reports. Added full-clip sampling, unique notebook/frame IDs and earlier image decoder checks. No production model weights, metrics or registry were changed. See [release record and changed files](MULTIMODAL_RELEASE.md) for tests, real-model availability limits and production publication status.
+
 ## Phase 1 continuation
 
 Continued from `0bc7a38` on `feature/phase1-research-inference`: added a separate optional local transformer research API, lazy single-slot loading, artifact verification, safe configuration/failure states, and real saved-DistilBERT inference validation. Fixed the benchmark report self-hash bug without changing model weights or metrics. Added within-source evidence passage deduplication and publication-date review metadata displayed/exported by the notebook. Production linear inference and legacy routes remain intact.
