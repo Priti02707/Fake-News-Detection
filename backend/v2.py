@@ -1,4 +1,5 @@
 import asyncio
+import re
 import time
 from fastapi import APIRouter, HTTPException
 from starlette.concurrency import run_in_threadpool
@@ -14,7 +15,7 @@ def build_router(analyze, extract, retrieve, metrics, evaluation):
 
     def classify(payload):
         started = time.perf_counter()
-        words = payload.text.split()
+        words = re.findall(r"\b\w+\b", payload.text)
         if len(payload.text.strip()) < 40 or len(words) < 40:
             return {"verdict": "uncertain", "model": payload.model, "model_name": "Linear SVM" if payload.model == "svm" else "Logistic Regression", "confidence": None, "real_probability": None, "explanations": [], "reasons": ["Headline or short text: the article classifiers were evaluated on full articles. Provide more context or investigate this claim with sources."], "word_count": len(words), "elapsed_ms": round((time.perf_counter() - started) * 1000, 2), "language": identify_language(payload.text), "claims": [{"text": payload.text.strip()[:300], "status": "unverified", "selection_method": "short_input_for_reader_review"}], "note": "No factual or calibrated classification score is established for this short input."}
         return analyze(AnalyzeInput(text=payload.text, model=payload.model))
@@ -27,7 +28,7 @@ def build_router(analyze, extract, retrieve, metrics, evaluation):
     @router.post("/analyze/url", response_model=AnalysisEnvelope)
     async def url_analysis(payload: URLInput):
         source = await extract(payload)
-        result = await run_in_threadpool(analyze, AnalyzeInput(text=source["text"], model="logistic"))
+        result = await run_in_threadpool(classify, TextV2Input(text=source["text"], model="logistic"))
         return {"source": source, "analysis": result, "report": fuse(result)}
 
     def reviewed_media(payload, expected):

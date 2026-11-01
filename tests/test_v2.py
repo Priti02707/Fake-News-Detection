@@ -5,6 +5,9 @@ from backend.registry import promotion_decision
 from backend.security import RequestGuard, correlation_id
 from scripts.data_pipeline import clean_text, prepare_articles
 from pathlib import Path
+import pytest
+from fastapi import FastAPI
+from backend.v2 import build_router
 
 client = TestClient(app)
 TEXT = "The city council announced a new public transport proposal on Tuesday. Officials said that the proposal would be open for public comment for thirty days before a final vote. Residents can submit feedback at a public meeting next month."
@@ -27,6 +30,50 @@ def test_v2_headline_is_accepted_but_never_given_a_full_article_score():
     assert response.status_code == 200
     assert response.json()["analysis"]["confidence"] is None
     assert response.json()["analysis"]["verdict"] == "uncertain"
+
+
+@pytest.mark.parametrize("text", [
+    "City council approves a new public transport budget today.",
+    "City council approves a new public transport budget today. " + "! " * 40,
+])
+def test_v2_short_url_content_abstains_without_calling_classifier(text):
+    source = {"text": text, "url": "https://example.com/news", "title": "Council budget"}
+
+    async def extract(_payload):
+        return source
+
+    def unexpected_classification(_payload):
+        raise AssertionError("Short extracted content must not reach the article classifier")
+
+    application = FastAPI()
+    application.include_router(build_router(unexpected_classification, extract, None, None, None))
+    with TestClient(application) as isolated:
+        response = isolated.post("/api/v2/analyze/url", json={"url": source["url"]})
+        assert response.status_code == 200
+        result = response.json()
+        assert result["source"] == source
+        assert result["analysis"]["verdict"] == "uncertain"
+        assert result["analysis"]["confidence"] is None
+        assert result["analysis"]["real_probability"] is None
+        assert result["report"]["content_classification"] == result["analysis"]
+        # The same word-count guard must apply when this content is pasted.
+        response = isolated.post("/api/v2/analyze/text", json={"text": text})
+        assert response.status_code == 200
+        assert response.json()["analysis"]["confidence"] is None
+
+
+def test_v2_full_url_article_preserves_classification_and_source(monkeypatch):
+    import backend.main as main
+    article = TEXT + " The council will publish further details after the meeting."
+    source = {"text": article, "url": "https://example.com/news", "title": "Council proposal"}
+    monkeypatch.setattr(main, "fetch_article", lambda _url: source)
+    response = client.post("/api/v2/analyze/url", json={"url": source["url"]})
+    assert response.status_code == 200
+    result = response.json()
+    pasted = client.post("/api/v2/analyze/text", json={"text": article}).json()
+    assert result["source"] == source
+    for field in ("verdict", "confidence", "real_probability", "model", "word_count"):
+        assert result["analysis"][field] == pasted["analysis"][field]
 
 
 def test_external_evaluation_rejects_claim_tasks_and_unreviewed_licenses():
