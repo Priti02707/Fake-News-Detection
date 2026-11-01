@@ -1,6 +1,11 @@
 name: Production smoke checks
 on:
   workflow_dispatch:
+    inputs:
+      research_models:
+        description: Run real CLIP, NLI and Whisper checks with model downloads
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -9,7 +14,7 @@ concurrency:
 jobs:
   production:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     env:
       PLAYWRIGHT_BASE_URL: https://verity-news-sable.vercel.app
     steps:
@@ -26,3 +31,9 @@ jobs:
         env:
           MEDIA_INTEGRATION: '1'
         run: npm run test:e2e -- --workers=1 --grep 'video frames create a real|image extraction requires'
+      - name: Optional real CLIP, NLI and Whisper
+        if: inputs.research_models
+        env:
+          MEDIA_INTEGRATION: '1'
+          RESEARCH_INTEGRATION: '1'
+        run: npm run test:e2e -- --workers=1 --project=desktop --grep 'local semantic ranking|visual-language comparison|video speech is extracted'
