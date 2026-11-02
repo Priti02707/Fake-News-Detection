@@ -1,6 +1,6 @@
 # Actual application screenshots
 
-Captured on **2026-11-02** from the local production build of `feature/reference-workspace-refinement`, at http://127.0.0.1:3200 with the current FastAPI backend on port 8100. Public application: https://fake-news-detection-priti.vercel.app/; alternate production address: https://verity-news-sable.vercel.app/.
+Captured on **2026-11-02** from the local production build of `feature/multimodal-workspace-introduction`, at http://127.0.0.1:3200 with the current FastAPI backend on port 8100. Public application: https://fake-news-detection-priti.vercel.app/; alternate production address: https://verity-news-sable.vercel.app/.
 
 - Chromium through installed Playwright; desktop viewport **1440 × 1320**, device scale factor 1; the app's default dark theme.
 - Build: `API_ORIGIN=http://127.0.0.1:8100 npm run build`, followed by the matching production frontend/backend servers.
@@ -9,7 +9,7 @@ Captured on **2026-11-02** from the local production build of `feature/reference
 
 | File | Actual workflow |
 | --- | --- |
-| [dashboard.png](dashboard.png) | Empty two-column workspace with combined assessment mode selected; action disabled until input is supplied. |
+| [dashboard.png](dashboard.png) | Multimodal workspace introduction, actual model-readiness indicator and empty two-column workspace with combined assessment mode selected; action disabled until input is supplied. |
 | [detect-verify.png](detect-verify.png) | The actual input card, text import, source-notes disclosure, mode selector and action. |
 | [workspace-report.png](workspace-report.png) | Built-in practice text sent to the real classifier; the report is manually saved with a Needs closer review reader annotation. |
 | [text-analysis.png](text-analysis.png) | Full actual model result, coverage/uncertainty, signed feature contributions and highlighted words. |
