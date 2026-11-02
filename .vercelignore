@@ -7,7 +7,7 @@ playwright-report
 .cache
 .artifacts
 reports
-configs
+configs/transformer*.json
 requirements-ml.txt
 requirements-tracking.txt
 .env*
