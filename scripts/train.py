@@ -48,6 +48,11 @@ def train(fake_path, real_path):
     train_rel, val_rel = next(GroupShuffleSplit(n_splits=1, test_size=.25, random_state=43).split(data.iloc[rest], groups=data.iloc[rest].group))
     train_idx, val_idx = rest[train_rel], rest[val_rel]
     assert not (set(data.iloc[train_idx].group) & set(data.iloc[test].group))
+    import sys
+    sys.path.insert(0, str(ROOT))
+    from scripts.model_selection import select_candidates
+    selection = select_candidates(data.iloc[train_idx].reset_index(drop=True))
+    selection['data_sha256'] = hashes
     vector = TfidfVectorizer(stop_words="english", ngram_range=(1, 2), min_df=2, max_df=.9, max_features=20000)
     Xtrain = vector.fit_transform(data.iloc[train_idx].content)
     Xval = vector.transform(data.iloc[val_idx].content)
@@ -72,6 +77,8 @@ def train(fake_path, real_path):
     destination.mkdir(exist_ok=True)
     (destination / "classifier.json").write_text(json.dumps(bundle, separators=(",", ":")))
     (destination / "metrics.json").write_text(json.dumps(metadata, indent=2))
+    selection['artifact_sha256'] = hashlib.sha256((destination / 'classifier.json').read_bytes()).hexdigest()
+    (destination / 'selection.json').write_text(json.dumps(selection, indent=2) + '\n')
     # Verify the deployed, dependency-light implementation against sklearn.
     import sys
     sys.path.insert(0, str(ROOT))

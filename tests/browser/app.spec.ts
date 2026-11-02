@@ -5,6 +5,7 @@ test("analyze, explain, save, download, and evaluate", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Enter the news", exact: true })).toBeVisible();
   await page.getByRole("button", { name: /Try an example/ }).click();
   await page.getByLabel("Save this analysis in this browser").check();
+  await page.getByLabel("Assessment mode", { exact: true }).selectOption("detect");
   await page.getByRole("button", { name: "Analyze article", exact: true }).click();
   await expect(page.getByRole("heading", { name: "A little more perspective." })).toBeVisible();
   await expect(page.getByRole("heading", { name: "What influenced this prediction?" })).toBeVisible();
@@ -33,6 +34,7 @@ test("analyze, explain, save, download, and evaluate", async ({ page }) => {
 test("short inputs abstain and private URLs show useful errors", async ({ page }) => {
   await page.goto("/");
   await page.getByLabel("News article text").fill("The city council announced a new public transport proposal on Tuesday.");
+  await page.getByLabel("Assessment mode", { exact: true }).selectOption("detect");
   await page.getByRole("button", { name: "Analyze article", exact: true }).click();
   await expect(page.getByRole("heading", { name: "More context needed" })).toBeVisible();
   await page.getByRole("tab", { name: "Article URL" }).click();

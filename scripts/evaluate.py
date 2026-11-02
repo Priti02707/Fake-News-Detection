@@ -1,4 +1,8 @@
-"""Reproducible holdout/stress evaluation. Never overwrites production weights."""
+"""Reproducible holdout/stress evaluation. Never overwrites production weights.
+
+Held-out results in this script MUST NOT choose the production model.
+Run scripts/train.py for nested training-only CV selection and release manifest.
+"""
 import argparse
 import hashlib
 import json

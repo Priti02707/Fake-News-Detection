@@ -156,3 +156,15 @@ footer a{text-decoration:underline;text-underline-offset:3px}
 
 .analysis-card>.input-dropzone{margin:16px 24px}.analysis-card .input-dropzone textarea{width:100%;margin:0;padding:12px;overflow-wrap:anywhere}
 @media(max-width:600px){.analysis-card>.input-dropzone{margin:14px 16px}}
+
+/* Evidence assessment additions preserve the existing workspace layout. */
+.assessment-scores { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 22px 0; }
+.assessment-scores > div { display: flex; flex-direction: column; gap: 8px; padding: 14px; border: 1px solid var(--border, #333); border-radius: 12px; min-width: 0; }
+.assessment-scores strong { font-size: 1.2rem; }
+.assessment-scores span { font-size: .78rem; line-height: 1.5; }
+.assessment-scores > p { grid-column: 1 / -1; margin: 0; }
+.claim-finding { margin: 20px 0; padding: 18px; border: 1px solid var(--border, #333); border-radius: 12px; overflow-wrap: anywhere; }
+.assessment-primary-finding { margin-bottom: 22px; }
+.model-control { display: flex; flex-direction: column; gap: 6px; }
+.model-control small { font-size: .72rem; color: var(--muted, #aaa); }
+@media (max-width: 640px) { .assessment-scores { grid-template-columns: 1fr; } }

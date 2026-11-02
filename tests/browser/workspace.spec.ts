@@ -76,6 +76,7 @@ test("research workspace provides a dark empty state, manual save, review, resto
   await expect(assessment.getByRole("heading", { name: "Every claim deserves a closer look." })).toBeVisible();
   await expect(saved.getByRole("button", { name: "Save current report" })).toBeDisabled();
   await page.getByRole("button", { name: "Try an example" }).click();
+  await page.getByLabel("Assessment mode", { exact: true }).selectOption("detect");
   await page.getByRole("button", { name: "Analyze article", exact: true }).click();
   await expect(assessment.getByRole("button", { name: "View full report" })).toBeVisible();
   await saved.getByLabel("Your review (not a verified label)").selectOption("needs_review");
@@ -117,7 +118,7 @@ test("verification-only reports retain their claim, notes and source after savin
   await expect(page.getByLabel("Assessment mode", { exact: true })).toHaveValue("verify");
   await page.getByText("Source & verification notes (optional)", { exact: true }).click();
   await expect(page.getByLabel("Your context and verification notes")).toHaveValue("Check the original meeting date.");
-  await expect(page.getByRole("region", { name: "Source verification report" }).getByText(claim, { exact: true })).toHaveCount(2);
+  await expect(page.getByRole("region", { name: "Source verification report" }).getByText(claim, { exact: true })).toHaveCount(3);
   await saved.getByRole("button", { name: "Clear all", exact: true }).click();
   await expect(saved.getByText("No saved assessments yet.")).toBeVisible();
 });

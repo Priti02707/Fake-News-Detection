@@ -69,3 +69,37 @@ test("unexpected client rendering failures show a recovery screen", async ({ pag
   await expect(page.getByRole("button", { name: "Reload application" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Open alternate public address" })).toHaveAttribute("href", "https://verity-news-sable.vercel.app/");
 });
+
+test("automatic combined analysis leads with cited evidence and restores the new report", async ({ page }) => {
+  await page.route("**/api/v2/assess", async route => {
+    const payload = route.request().postDataJSON();
+    expect(payload.model).toBe("auto");
+    expect(payload.mode).toBe("detect_verify");
+    const detection = await page.request.post("/api/v2/analyze/text", { data: { text: payload.text } });
+    const classified = await detection.json();
+    await route.fulfill({ json: { ...classified, mode: "detect_verify", classification_error: null, verification: {
+      status: "assessed", assessment: "SUPPORTED", confidence: null, claim, claim_selection: "heuristic_candidate", checked_at: "2026-11-02T10:00:00Z",
+      explanation: "Synthetic provider fixture verifies presentation only.", reader_notes: "", warnings: [], provisional: true,
+      news: { status: "matches", message: "Fixture coverage.", results: [] }, fact_checks: { status: "no_matches", message: "No reviews.", results: [] }, evidence: [],
+      claims: [{ claim, assessment: "SUPPORTED", explanation: "The fixture passage directly describes the claim.", assessor_status: "assessed", citations: [{ passage_id: "p1", quote: sourceText, source_url: "https://example.org/report", stance: "supports", publisher: "Fixture source" }] }],
+      scores: { evidence_relevance: 92, evidence_coverage: 100, assessed_claims: 1, scope: "Selected claim only.", source_credibility: { status: "recognized", score: 90, publisher: "Fixture publisher", rationale: "Synthetic policy fixture." } }
+    } } });
+  });
+  await page.goto("/");
+  await expect(page.getByLabel("Assessment mode", { exact: true })).toHaveValue("detect_verify");
+  await expect(page.getByText("Automatic model selection", { exact: true })).toBeVisible();
+  await expect(page.locator("select#model")).toHaveCount(0);
+  await page.getByRole("button", { name: "Try an example" }).click();
+  await page.getByRole("button", { name: "Detect & verify news", exact: true }).click();
+  const overview = page.getByRole("region", { name: "News assessment", exact: true });
+  await expect(overview.getByRole("heading", { name: "Supported", exact: true })).toBeVisible();
+  const report = page.getByRole("region", { name: "Source verification report" });
+  await expect(report.getByText("Factual assessment: Supported", { exact: true })).toBeVisible();
+  await expect(report.getByRole("link", { name: /Fixture source/ })).toHaveAttribute("href", "https://example.org/report");
+  await expect(report.getByText("90/100", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Save current report", exact: true }).click();
+  await page.reload();
+  await page.locator(".saved-assessment-open").first().click();
+  await expect(page.getByRole("region", { name: "News assessment", exact: true }).getByRole("heading", { name: "Supported", exact: true })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});

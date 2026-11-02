@@ -54,6 +54,7 @@ test("image extraction requires review before sending text for analysis", async 
   await page.getByRole("button", { name: "Use reviewed text" }).click();
   await expect(page.getByLabel("News article text")).toHaveValue(/funding remains subject to approval/);
   expect(analyses).toBe(0);
+  await page.getByLabel("Assessment mode", { exact: true }).selectOption("detect");
   await page.getByRole("button", { name: "Analyze article", exact: true }).click();
   await expect(page.getByRole("heading", { name: "A little more perspective." })).toBeVisible();
   expect(analyses).toBe(1);
@@ -119,6 +120,7 @@ test("video speech is extracted and reviewed before analysis", async ({ page, re
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.getByRole("button", { name: "Use reviewed text" }).click();
   await expect(page.getByLabel("News article text")).toHaveValue(/country/i);
+  await page.getByLabel("Assessment mode", { exact: true }).selectOption("detect");
   await page.getByRole("button", { name: "Analyze article", exact: true }).click();
   await expect(page.getByRole("heading", { name: "More context needed" })).toBeVisible();
 });
@@ -141,6 +143,7 @@ test("experimental Hindi OCR is reviewable and never receives an English truth s
   await page.locator(".media-review, .media-input [role=alert]").waitFor({ state: "visible", timeout: 150000 });
   await expect(page.getByLabel("Review extracted text", { exact: true })).toHaveValue(/[\u0900-\u097f]/);
   await page.getByRole("button", { name: "Use reviewed text" }).click();
+  await page.getByLabel("Assessment mode", { exact: true }).selectOption("detect");
   await page.getByRole("button", { name: "Analyze article", exact: true }).click();
   await expect(page.getByRole("heading", { name: "More context needed" })).toBeVisible();
   await expect(page.locator(".confidence strong")).toHaveText("—");

@@ -3,7 +3,7 @@
 import { ArrowDown, Diamond, Download, FileText, ImagePlus, LoaderCircle, Save, ShieldCheck, Trash2, Video } from "lucide-react";
 import type { Analysis, ReaderReview, Saved } from "./news-types";
 import { reviewLabels } from "./news-types";
-import type { SourceVerification } from "./assessment";
+import { assessmentLabels, type SourceVerification } from "./assessment";
 
 export function AssessmentPreview({ analysis, verification, busy, error, onDetails, onChoose }: { analysis: Analysis | null; verification: SourceVerification | null; busy: boolean; error: string; onDetails: () => void; onChoose: (kind: "text" | "image" | "video") => void }) {
   return <section className="card assessment-overview" aria-label="News assessment">
@@ -14,8 +14,9 @@ export function AssessmentPreview({ analysis, verification, busy, error, onDetai
       <p>{error ? "Check the input message and try again." : "Enter a specific news claim or article."}<br />See model scores, source evidence and clear limitations.</p>
       <div className="empty-input-shortcuts"><button onClick={() => onChoose("text")}><FileText size={14} />Text</button><button onClick={() => onChoose("image")}><ImagePlus size={14} />Image</button><button onClick={() => onChoose("video")}><Video size={14} />Video</button></div>
     </div> : <div className="assessment-preview-body" aria-live="polite">
+      {verification && <div className="assessment-primary-finding"><span className="eyebrow">CLAIM ASSESSMENT · PROVISIONAL</span><h3>{assessmentLabels[verification.assessment]}</h3><p>{verification.claims?.[0]?.explanation || verification.explanation}</p>{verification.scores && <p className="field-help">Credibility: {verification.scores.source_credibility.score === null ? "unassessed" : `${verification.scores.source_credibility.score}/100`} · Evidence coverage: {verification.scores.evidence_coverage}%</p>}</div>}
       {analysis && <><span className="eyebrow">{analysis.model_name} · WRITING PATTERNS</span><h3>{analysis.verdict === "uncertain" ? "The model needs more context" : analysis.verdict === "fake" ? "Fake-like writing pattern" : "Real-like writing pattern"}</h3><div className="assessment-model-score"><strong>{analysis.confidence === null ? "—" : `${(analysis.confidence * 100).toFixed(1)}%`}</strong><span>Calibrated model score<br />Not a probability of truth</span></div>{analysis.reasons.slice(0, 2).map(reason => <p className="field-help" key={reason}>{reason}</p>)}</>}
-      <div className="assessment-factual-status"><ShieldCheck size={20} /><div><strong>{verification ? "Source review: insufficient evidence" : "Sources have not been checked"}</strong><p>{verification ? verification.status === "unavailable" ? "Live verification is unavailable. The model result remains separate." : `${verification.evidence.reduce((total, item) => total + item.passages.length, 0)} exact passages · ${verification.fact_checks.results.length} related published reviews. Review context and dates.` : "Choose detection + source verification to gather evidence alongside the model."}</p></div></div>
+      <div className="assessment-factual-status"><ShieldCheck size={20} /><div><strong>{verification ? `Source review: ${assessmentLabels[verification.assessment].toLowerCase()}` : "Sources have not been checked"}</strong><p>{verification ? verification.status === "unavailable" ? "Live verification is unavailable. The model result remains separate." : `${verification.evidence.reduce((total, item) => total + item.passages.length, 0)} exact passages · ${verification.fact_checks.results.length} related published reviews. Review context and dates.` : "Choose detection + source verification to gather evidence alongside the model."}</p></div></div>
       <button className="secondary-button" onClick={onDetails}>View full report <ArrowDown size={16} /></button>
     </div>}
   </section>;

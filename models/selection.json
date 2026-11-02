@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "selection_version": "2026-11-02.1",
+  "selected_model": "logistic",
+  "status": "baseline_pending_cv",
+  "artifact_sha256": "8f04cfd47add08d339e7189d687bbd19a662397c59e01abbf31e34e74117d79c",
+  "reason": "Existing production baseline retained. Original training CSVs are absent; group-aware selection has not been rerun. Historical held-out test metrics were not used to pick a winner.",
+  "evaluation_protocol": "Run scripts/train.py with reviewed original CSVs: nested group-aware CV within training partition, separate final calibration and untouched test partition.",
+  "candidates": [
+    "logistic",
+    "svm"
+  ],
+  "cv_results": null
+}
