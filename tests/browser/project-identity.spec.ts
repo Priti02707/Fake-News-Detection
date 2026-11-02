@@ -2,6 +2,9 @@ import { expect, test } from "@playwright/test";
 
 test("project identity and developer attribution remain accessible on desktop and mobile", async ({ page }) => {
   await page.goto("/", { waitUntil: "domcontentloaded" });
+  // The theme effect runs after hydration; static metadata alone does not mean
+  // React navigation is ready to receive clicks on a remote production load.
+  await expect(page.locator("html")).toHaveAttribute("data-theme", /^(light|dark)$/);
   await expect(page).toHaveTitle("Fake News Detection — News Analysis & Evidence");
   await expect(page.locator('meta[name="author"]')).toHaveAttribute("content", "Priti Kumari");
   const brand = page.locator(".brand:visible");

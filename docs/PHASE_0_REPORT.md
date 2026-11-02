@@ -1,6 +1,6 @@
 # Phase 0 — research, architecture and project identity
 
-Date: 2026-11-02. Owner/primary developer: **Priti Kumari**. Status: local acceptance verified; GitHub CI and production publication pending.
+Date: 2026-11-02. Owner/primary developer: **Priti Kumari**. Status: Phase 0 research/planning and renamed-application acceptance verified. Later development phases remain planned. Repository merge is gated by the checks on PR #2.
 
 ## Objective and scope
 
@@ -34,10 +34,23 @@ The first browser attempt used an older already-running backend on port 8000: ca
 
 Four actual local-production screenshots were captured with installed Playwright, without intercepted APIs or replacement workers, and visually inspected: dashboard, real sample-text prediction, recorded model metrics and the developer page. See screenshots/README.md for context.
 
-GitHub CI, PR and public deployment verification will be recorded after publication.
+## Publication and remote verification
+
+Source changes are in [PR #2](https://github.com/Priti02707/Fake-News-Detection/pull/2), including the previously deployed world-news feature and README update. Commit `bd4e884` was deployed through `npx --yes vercel --prod --scope priti-09 --yes` to the existing project. [Deployment dpl_FbmysvYP6nLUL8KxraRZ6Prb4iBh](https://vercel.com/priti-09/verity-news/FbmysvYP6nLUL8KxraRZ6Prb4iBh) reached **READY**. Public application: https://fake-news-detection-priti.vercel.app/. Hosting internal slug remains unchanged.
+
+Production checks:
+
+- Public health returned `status=ok`, `model_ready=true`, `fact_check_configured=false`.
+- OpenAPI reports **Fake News Detection API**; capabilities confirm the existing LR/SVM and unavailable deepfake classification.
+- One real `/api/world-news` request completed with both providers unavailable: Google key absent and GDELT unavailable. No real source-match or automated factual assessment is claimed.
+- `PLAYWRIGHT_BASE_URL=https://fake-news-detection-priti.vercel.app npx playwright test --workers=1 --output=/private/tmp/fake-news-phase-zero-production-tests`: **36 passed, 16 opt-in skipped**, plus two new identity cases failed because their navigation clicks preceded React hydration. The rest of the public workflows passed.
+- Fixed the identity test to wait for the mount-time theme effect. `PLAYWRIGHT_BASE_URL=https://fake-news-detection-priti.vercel.app npx playwright test tests/browser/project-identity.spec.ts --workers=1 --output=/private/tmp/fake-news-phase-zero-identity-recheck`: **2 passed** (desktop/mobile). Thus all 38 applicable public workflows have passed; skipped model integrations remain unverified for this release.
+- The first GitHub CI runs also failed only the two premature-click identity cases. Their readiness fix is included in the PR. The final check/merge status and exact revision are maintained in the [PR record](https://github.com/Priti02707/Fake-News-Detection/pull/2); merge only after the updated checks pass.
+
+The initial standalone Python public probe failed due to the host default CA store; rerunning with the installed certifi bundle succeeded with HTTPS verification enabled. No application TLS checks were disabled. Actual app code is unchanged by the final test/documentation correction; no new model accuracy measurement was made.
 
 ## Unresolved issues and next phase
 
 Google key absent in the last production check; GDELT temporarily unavailable. No managed auth/database, persistent media queue, evaluated Hindi/forensic classifier or grounded LLM agent is configured. Original article data redistribution rights remain unconfirmed. The owner has not selected a software license. None is silently added.
 
-Recommended checkpoint: `docs: establish Fake News Detection architecture and phased roadmap` plus `feat: align project identity and developer attribution`. Next prerequisite: complete Phase 1 foundation acceptance audit using the exact commands in PLAN.md before starting Phase 2's design system. Existing screenshots must state their capture revision and must not be presented as new interface captures until refreshed.
+Recommended checkpoint: `docs: establish Fake News Detection architecture and phased roadmap` plus `feat: align project identity and developer attribution`. Next prerequisite: complete Phase 1 foundation acceptance audit using the exact commands in PLAN.md before starting Phase 2's design system. Screenshots were refreshed from the real local production build; their capture context is recorded in screenshots/README.md.

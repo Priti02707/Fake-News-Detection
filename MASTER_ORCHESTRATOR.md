@@ -4,7 +4,7 @@ Owner/primary developer: **Priti Kumari** · [GitHub](https://github.com/Priti02
 
 ## Current release
 
-Phase 0: source review and architecture/planning. Requested display name: **Fake News Detection**. The existing GitHub repository and Vercel deployment are retained. [PLAN.md](PLAN.md), [PHASES.md](PHASES.md), [ROADMAP.md](ROADMAP.md), [architecture](docs/ARCHITECTURE.md), [reference comparison](docs/REFERENCE_COMPARISON.md), [API contract](docs/API_CONTRACT.md) and [evaluation](docs/MODEL_EVALUATION.md) are the current planning record. Historical implementation reports use a different phase numbering; their past completion totals do not apply to this master prompt.
+Phase 0: source review, architecture/planning and renamed-application acceptance verified; final repository release is gated by PR #2 checks. Requested display name: **Fake News Detection**. The existing GitHub repository and Vercel deployment are retained. [PLAN.md](PLAN.md), [PHASES.md](PHASES.md), [ROADMAP.md](ROADMAP.md), [architecture](docs/ARCHITECTURE.md), [reference comparison](docs/REFERENCE_COMPARISON.md), [API contract](docs/API_CONTRACT.md) and [evaluation](docs/MODEL_EVALUATION.md) are the current planning record. Historical implementation reports use a different phase numbering; their past completion totals do not apply to this master prompt.
 
 ## Decisions and dependencies
 
