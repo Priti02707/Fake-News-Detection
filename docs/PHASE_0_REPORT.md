@@ -1,0 +1,56 @@
+# Phase 0 — research, architecture and project identity
+
+Date: 2026-11-02. Owner/primary developer: **Priti Kumari**. Status: Phase 0 research/planning and renamed-application acceptance verified. Later development phases remain planned. Repository merge is gated by the checks on PR #2.
+
+## Objective and scope
+
+Execute the supplied prompt's starting phase against the existing repository, use the requested **Fake News Detection** name, preserve useful implemented work and define sequential acceptance gates. Do not begin all development phases together or claim planned services are deployed.
+
+## Deliverables
+
+Created: root `MASTER_ORCHESTRATOR.md`, `PLAN.md`, `PHASES.md`, `ROADMAP.md`, `ARCHITECTURE.md`; `docs/REFERENCE_COMPARISON.md`, `MASTER_REQUIREMENTS.md`, `MODEL_EVALUATION.md`, `API_CONTRACT.md`, and this report. Extended `AGENTS.md` while preserving the Next.js generated block; updated existing architecture/data/security/deployment/user guidance and README.
+
+Identity changes: application metadata, sidebar/mobile brand, About developer card, footer profile, backend API titles, package metadata and user-facing export filenames. Existing browser storage keys, hosting IDs, model artifacts and historic experiment records retain compatibility/provenance.
+
+Dependencies installed: **none**. Algorithms implemented: **none**; no retraining, fabricated metrics or reference code reuse. Existing classifiers and retrieval behavior are preserved.
+
+## Research and environment
+
+Both requested references were accessed through GitHub and inspected at fixed revisions recorded in the comparison report. Recursive trees contained no license file; no source copied. Workspace inspected: existing Next.js/FastAPI, browser media workers, production linear models, optional research, existing tests/CI and Vercel linkage. Environment: macOS arm64, Node 26.10.0, Python 3.12.7. Node 22 is the CI target. Existing owner repository/origin and authenticated GitHub CLI were verified; commit authorship remains the configured account.
+
+## Validation and publication
+
+Executed in this checkout:
+
+- `.venv/bin/python -m pytest tests -q`: **91 passed, 1 optional real-checkpoint test skipped**. Existing Starlette/httpx deprecation warning remains.
+- `npm run test:unit`: **11 passed**. Existing Node module-type warning remains.
+- `npm run build`: **passed**, including TypeScript and static generation.
+- `npm run typecheck`: **passed**.
+- `API_ORIGIN=http://127.0.0.1:8100 npm run build`, then `API_ORIGIN=http://127.0.0.1:8100 npm run start -- --hostname 127.0.0.1 --port 3100`, with `.venv/bin/python -m uvicorn backend.main:app --host 127.0.0.1 --port 8100`: isolated current production build and API.
+- `PLAYWRIGHT_BASE_URL=http://127.0.0.1:3100 npx playwright test --workers=1 --output=/private/tmp/fake-news-phase-zero-tests`: **38 passed, 16 opt-in integration cases skipped**, desktop and mobile. Includes model analysis, uncertainty/private-URL checks, media validation, exports/history, source traces, world-news provider states and project/developer attribution.
+- Local Markdown-link validation on the root planning documents and new API/evaluation/reference/report files: **passed**; `git diff --check`: **passed**.
+
+The first browser attempt used an older already-running backend on port 8000: capabilities and date-context checks failed. It was stopped; the isolated current-code rerun above passed. Existing user servers were not stopped. Model-download integration cases were not rerun; mocked provider/browser-worker cases test orchestration, not real model accuracy or live search reliability. No new ML experiment was executed.
+
+Four actual local-production screenshots were captured with installed Playwright, without intercepted APIs or replacement workers, and visually inspected: dashboard, real sample-text prediction, recorded model metrics and the developer page. See screenshots/README.md for context.
+
+## Publication and remote verification
+
+Source changes are in [PR #2](https://github.com/Priti02707/Fake-News-Detection/pull/2), including the previously deployed world-news feature and README update. Commit `bd4e884` was deployed through `npx --yes vercel --prod --scope priti-09 --yes` to the existing project. [Deployment dpl_FbmysvYP6nLUL8KxraRZ6Prb4iBh](https://vercel.com/priti-09/verity-news/FbmysvYP6nLUL8KxraRZ6Prb4iBh) reached **READY**. Public application: https://fake-news-detection-priti.vercel.app/. Hosting internal slug remains unchanged.
+
+Production checks:
+
+- Public health returned `status=ok`, `model_ready=true`, `fact_check_configured=false`.
+- OpenAPI reports **Fake News Detection API**; capabilities confirm the existing LR/SVM and unavailable deepfake classification.
+- One real `/api/world-news` request completed with both providers unavailable: Google key absent and GDELT unavailable. No real source-match or automated factual assessment is claimed.
+- `PLAYWRIGHT_BASE_URL=https://fake-news-detection-priti.vercel.app npx playwright test --workers=1 --output=/private/tmp/fake-news-phase-zero-production-tests`: **36 passed, 16 opt-in skipped**, plus two new identity cases failed because their navigation clicks preceded React hydration. The rest of the public workflows passed.
+- Fixed the identity test to wait for the mount-time theme effect. `PLAYWRIGHT_BASE_URL=https://fake-news-detection-priti.vercel.app npx playwright test tests/browser/project-identity.spec.ts --workers=1 --output=/private/tmp/fake-news-phase-zero-identity-recheck`: **2 passed** (desktop/mobile). Thus all 38 applicable public workflows have passed; skipped model integrations remain unverified for this release.
+- The first GitHub CI runs also failed only the two premature-click identity cases. Their readiness fix is included in the PR. The final check/merge status and exact revision are maintained in the [PR record](https://github.com/Priti02707/Fake-News-Detection/pull/2); merge only after the updated checks pass.
+
+The initial standalone Python public probe failed due to the host default CA store; rerunning with the installed certifi bundle succeeded with HTTPS verification enabled. No application TLS checks were disabled. Actual app code is unchanged by the final test/documentation correction; no new model accuracy measurement was made.
+
+## Unresolved issues and next phase
+
+Google key absent in the last production check; GDELT temporarily unavailable. No managed auth/database, persistent media queue, evaluated Hindi/forensic classifier or grounded LLM agent is configured. Original article data redistribution rights remain unconfirmed. The owner has not selected a software license. None is silently added.
+
+Recommended checkpoint: `docs: establish Fake News Detection architecture and phased roadmap` plus `feat: align project identity and developer attribution`. Next prerequisite: complete Phase 1 foundation acceptance audit using the exact commands in PLAN.md before starting Phase 2's design system. Screenshots were refreshed from the real local production build; their capture context is recorded in screenshots/README.md.

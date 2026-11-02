@@ -1,5 +1,5 @@
 {
-  "name": "verity-news",
+  "name": "fake-news-detection",
   "version": "2.0.0",
   "private": true,
   "scripts": {
@@ -27,5 +27,10 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "typescript": "^5.9.0"
+  },
+  "description": "Explainable news classification and evidence investigation by Priti Kumari",
+  "author": {
+    "name": "Priti Kumari",
+    "url": "https://github.com/Priti02707"
   }
 }

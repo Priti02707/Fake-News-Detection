@@ -26,7 +26,7 @@ test("citations require reader review, export source traces, and reset on claim 
   const download = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export evidence report" }).click();
   const downloaded = await download;
-  expect(downloaded.suggestedFilename()).toBe("verity-investigation.json");
+  expect(downloaded.suggestedFilename()).toBe("fake-news-detection-investigation.json");
   const report = JSON.parse(await readFile((await downloaded.path())!, "utf8"));
   expect(report.assessment_author).toBe("reader");
   expect(report.assessment).toBe("Conflicting reader assessments");

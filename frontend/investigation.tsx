@@ -135,7 +135,7 @@ export default function Investigation({ claim, sources = [], active = true, cont
   function exportReport() {
     const report = { schema_version: 2, claim_verification: { assessment: support && contradiction ? "MIXED" : support ? "SUPPORTED" : contradiction ? "REFUTED" : "INSUFFICIENT_EVIDENCE", assessment_author: "reader", confidence: null }, created_at: new Date().toISOString(), media_context: context || null, automated_factual_assessment: "INSUFFICIENT_EVIDENCE", claim, assessment, assessment_author: "reader", citations, comparison_models: models, limitations: ["Reader annotations and model text-relation suggestions are not independent fact verification.", "Lexical retrieval and semantic similarity measure relevance, not source reliability.", "Pasted sources are not authenticated. Multiple passages may come from one source.", "Media comparison and timeline flags are review heuristics, not verified factual conclusions."] };
     const url = URL.createObjectURL(new Blob([JSON.stringify(report, null, 2)], { type: "application/json" }));
-    const a = document.createElement("a"); a.href = url; a.download = "verity-investigation.json"; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+    const a = document.createElement("a"); a.href = url; a.download = "fake-news-detection-investigation.json"; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
   const english = !/[\u0900-\u097f]/.test(claim);
   return <section className="card investigation-card" aria-label="Evidence notebook">

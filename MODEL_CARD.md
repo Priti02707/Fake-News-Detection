@@ -1,4 +1,4 @@
-# Verity model card
+# Fake News Detection model card
 
 ## Intended use
 

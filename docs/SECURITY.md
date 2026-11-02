@@ -22,3 +22,11 @@ Selecting a media investigation sends its chosen text to GDELT, then requests up
 ## Classification upgrade — 2026-11-02
 
 Standalone audio has an explicit MIME allowlist, matching container signatures, a 20 MB / 60 second bound, actual codec decoding, metadata timeout, silence rejection, cancellation checks and the shared single-job browser model budget. Raw media remains browser-local. Paired-feature research loads NPZ with `allow_pickle=False`, verifies feature/checkpoint hashes and checkpoint path containment, requires reviewed licensing, and blocks publisher/group/vector overlap across splits. Similarity matrices are bounded to 128×1024 blocks; total screening time remains quadratic. Manifest declarations are not authenticated provenance.
+
+## Master-prompt security roadmap — planned controls
+
+Authentication and durable user history are not implemented. Before adding them, require verified sessions, authorization on every record/export/delete operation, owner-scoped queries, migrations, explicit retention, deletion and backup policy. The current opt-in browser history has a 30-record bound and can be cleared; do not describe it as private account storage.
+
+A future LLM receives source text as untrusted quoted data and may only cite identifiers from executed retrieval. Validate its schema, citation existence, exact quotations and insufficient-evidence behavior. Provider secrets remain server-side; allowlist endpoints and bound time/cost/retries. Model-written URLs cannot silently become evidence. Prompt-injection tests must include webpages, OCR and transcripts.
+
+Future server media processing requires an isolated non-shell FFmpeg invocation, bounded CPU/memory/duration, controlled temporary directories, safe filenames, MIME/signature/decode checks, private object storage with expiry and durable job ownership/status. Do not implement an in-memory job tracker as persistent infrastructure. Run dependency vulnerability checks in the relevant environment and record findings; do not claim an independent security audit. No software license or training-data permission is inferred from public repository access.

@@ -14,7 +14,20 @@ class URLInput(BaseModel):
 
 class ClaimInput(BaseModel):
     query: str = Field(min_length=8, max_length=300)
-    language: Literal["en", "hi"] = "en"
+    language: Literal["all", "en", "hi", "es", "fr", "pt", "de", "ar", "bn", "zh", "ja", "ru", "uk", "id", "tr"] = "en"
+
+
+class WorldNewsInput(ClaimInput):
+    language: Literal["all", "en", "hi", "es", "fr", "pt", "de", "ar", "bn", "zh", "ja", "ru", "uk", "id", "tr"] = "all"
+    country: Literal["all", "india", "unitedstates", "unitedkingdom", "brazil", "france", "germany", "nigeria", "southafrica", "australia", "canada", "japan"] = "all"
+    timespan: Literal["1d", "7d", "1month", "3months"] = "1month"
+
+    @model_validator(mode="after")
+    def meaningful_query(self):
+        self.query = self.query.strip()
+        if len(self.query) < 8:
+            raise ValueError("Enter at least 8 characters of news keywords or a claim.")
+        return self
 
 
 class EvidenceInput(BaseModel):

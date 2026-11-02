@@ -1,3 +1,4 @@
+import asyncio
 import json
 import os
 import re
@@ -15,11 +16,11 @@ from backend.inference import Classifier
 from backend.security import guard, correlation_id, logger
 from backend.evidence_providers import PROVIDERS
 from backend.language import identify_language
-from backend.schemas import AnalyzeInput, URLInput, ClaimInput, EvidenceInput
+from backend.schemas import AnalyzeInput, URLInput, ClaimInput, EvidenceInput, WorldNewsInput
 from backend.investigation import select_claims, retrieve_passages, publication_context
 
 ROOT = Path(__file__).resolve().parents[1]
-app = FastAPI(title="Verity News API", version="2.0.0", docs_url="/api/docs", openapi_url="/api/openapi.json")
+app = FastAPI(title="Fake News Detection API", version="2.0.0", docs_url="/api/docs", openapi_url="/api/openapi.json")
 
 
 @app.middleware("http")
@@ -94,6 +95,27 @@ def evaluation():
 @app.post("/api/coverage")
 async def coverage(payload: ClaimInput):
     return await PROVIDERS["gdelt"].search(payload)
+
+
+@app.post("/api/world-news")
+async def world_news(payload: WorldNewsInput):
+    results = await asyncio.gather(
+        PROVIDERS["gdelt"].search(payload),
+        PROVIDERS["google_fact_check"].search(payload),
+        return_exceptions=True,
+    )
+    def available(result):
+        if isinstance(result, Exception):
+            return {"status": "unavailable", "results": [], "message": "This search provider is temporarily unavailable. Try again later."}
+        return result
+    return {
+        "query": payload.query,
+        "filters": {"language": payload.language, "country": payload.country, "timespan": payload.timespan},
+        "checked_at": datetime.now(timezone.utc).isoformat(),
+        "assessment": "INSUFFICIENT_EVIDENCE",
+        "news": available(results[0]), "fact_checks": available(results[1]),
+        "note": "Search results are leads for review, not an automated factual verdict. Country and time filters apply to news coverage only; fact-checks use the selected language across all countries and dates. Coverage depends on provider indexing and query language.",
+    }
 
 
 @app.get("/api/health")
