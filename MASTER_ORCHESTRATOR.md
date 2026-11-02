@@ -40,3 +40,7 @@ Next: Phase 1 foundation acceptance audit, then Phase 2 design system. Open late
 ## Subsequent explicit user request: combined assessment
 
 The user requested the screenshot-style detect/verify selector after Phase 0. This bounded feature adds detection, source-only and combined modes, source/context notes, independent evidence reports and browser recovery; see [implementation and checks](docs/DETECT_VERIFY.md). It does not certify the full design-system, grounded-LLM or later research phases. Provider configuration remains a dependency.
+
+## Subsequent explicit user request: research-workspace interface
+
+Implemented the user-supplied dark/violet editor-and-assessment layout with preserved Fake News Detection identity. Manual saved assessments now include verification-only reports, original input, mode, notes, source metadata and reader reviews; reset, restoration, download, deletion and clear actions are connected. Existing routes, models and browser-local media remain available. This is a bounded interface/history release, not certification of all remaining master-prompt phases. See [workspace behavior and verification](docs/RESEARCH_WORKSPACE.md).

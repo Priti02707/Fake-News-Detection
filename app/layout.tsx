@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "../frontend/globals.css";
+import "../frontend/research.css";
 
 export const metadata: Metadata = {
   title: "Fake News Detection — News Analysis & Evidence",
@@ -9,5 +10,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body>{children}</body></html>;
+  return <html lang="en" suppressHydrationWarning><body>{children}</body></html>;
 }

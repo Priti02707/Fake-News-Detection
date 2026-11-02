@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test("analyze, explain, save, download, and evaluate", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: /Read beyond/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Enter the news", exact: true })).toBeVisible();
   await page.getByRole("button", { name: /Try an example/ }).click();
   await page.getByLabel("Save this analysis in this browser").check();
   await page.getByRole("button", { name: "Analyze article", exact: true }).click();

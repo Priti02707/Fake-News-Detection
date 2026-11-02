@@ -3,11 +3,12 @@ import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 
 export default function ThemeToggle() {
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState(true);
   useEffect(() => {
     let preference: string | null = null;
     try { preference = localStorage.getItem("verity.theme"); } catch { /* Theme remains usable without storage. */ }
-    const selected = preference ? preference === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const forcedColors = window.matchMedia("(forced-colors: active)").matches;
+    const selected = preference ? preference === "dark" : !forcedColors;
     setDark(selected); document.documentElement.dataset.theme = selected ? "dark" : "light";
   }, []);
   function toggle() {

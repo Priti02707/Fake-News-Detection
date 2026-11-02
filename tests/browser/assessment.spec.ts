@@ -59,7 +59,7 @@ test("verification only retrieves real pasted evidence and never displays a mode
   await expect(verification).toBeVisible({ timeout: 25000 });
   await expect(verification.locator(".verification-quotes blockquote").first()).toHaveText(claim);
   await expect(page.getByRole("heading", { name: "A little more perspective." })).toHaveCount(0);
-  await expect(page.getByLabel("Save this analysis in this browser")).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Save current report", exact: true })).toBeEnabled();
 });
 
 test("unexpected client rendering failures show a recovery screen", async ({ page }) => {
