@@ -64,3 +64,9 @@ Authentication/records/database, atomic-claim NLP, grounded automatic assessment
 Preserve original source URLs, retrieved timestamps, source-language text and quote offsets. Keep a factual verdict separate from the classifier prediction even when they disagree. Planned verdicts include Supported, Contradicted, Misleading Context, Mixed Evidence, Unverified and Insufficient Evidence; the current API automatically returns only insufficient evidence, while notebook assessments are reader-authored. Retrieved documents never become trusted execution instructions.
 
 Lifecycle: licensed data manifest → disjoint preprocessing/splits → training/validation/calibration → independent evaluation and ablations → checksummed registry entry → reviewed promotion → monitored inference. A missing checkpoint or failed provider must remain unavailable. See [phase gates](../PHASES.md) and [API contract](API_CONTRACT.md).
+
+## Combined assessment workflow
+
+`backend/assessment.py` orchestrates `POST /api/v2/assess` through existing classifier, fusion report, evidence providers and SSRF-protected passage retrieval. Detection and source review have separate nullable results/errors. Search overlaps explicit retrieval; absent explicit sources, at most two discovered news leads are read in parallel. The client presents assessment modes and optional reader/source context, preserves combined reports in browser history, and exports source verification separately. A source match never promotes the automatic factual assessment beyond insufficient evidence. See [DETECT_VERIFY.md](DETECT_VERIFY.md).
+
+Route/root error boundaries provide a reload/alternate-address fallback for render errors. Next.js uses the host-provided deployment identifier for asset versioning when available. These improve recovery; the reported user-specific Chrome/Edge blank screen was not reproduced.

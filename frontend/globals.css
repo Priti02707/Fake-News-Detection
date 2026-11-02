@@ -140,3 +140,19 @@
 .developer-card{padding:24px;margin:24px 0}.developer-card h2{font:28px var(--serif);margin-bottom:10px}.developer-card>p{font-size:13px}
 footer a{text-decoration:underline;text-underline-offset:3px}
 @media(max-width:600px){footer{flex-direction:column;align-items:flex-start}.mobile-bar .brand{font-size:17px}.mobile-bar .brand .brand-mark{width:30px;height:32px}}
+
+.assessment-controls{padding:20px 24px;border-bottom:1px solid var(--line)}
+.assessment-controls label{display:block;font-size:12px;font-weight:600;margin:10px 0}
+.assessment-controls select,.assessment-controls input,.assessment-controls textarea{display:block;width:100%;min-width:0;padding:12px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font:13px var(--sans)}
+.assessment-controls .assessment-source-notes textarea{width:100%;min-height:80px;margin:0;padding:12px;border:1px solid var(--line);resize:vertical}
+.assessment-source-notes{margin-top:16px}.assessment-source-notes summary{cursor:pointer;font-size:12px;line-height:1.7}
+.analyze-button.verify-action{background:#a995ef;color:#17152b}.analyze-button.verify-action:hover:not(:disabled){background:#bcabfa}
+.verification-assessment{margin:24px 0;min-width:0}.verification-assessment .card-header{flex-wrap:wrap}
+.verification-body{padding:0 24px 24px;font-size:13px;line-height:1.7}.verification-body h3{font:21px var(--serif);margin-top:20px}
+.verification-body blockquote{padding:14px;border-left:3px solid #a995ef;background:var(--paper);white-space:pre-wrap;overflow-wrap:anywhere;margin:14px 0}
+.verification-providers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.verification-providers>section{border:1px solid var(--line);padding:16px;border-radius:8px;min-width:0}
+.verification-quotes{padding-top:10px;margin-top:20px;border-top:1px solid var(--line)}.verification-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px}
+@media(max-width:650px){.verification-providers{grid-template-columns:1fr}.assessment-controls{padding:16px}.input-controls{flex-wrap:wrap}.analyze-button{white-space:normal}.verification-actions button{white-space:normal}}
+
+.analysis-card>.input-dropzone{margin:16px 24px}.analysis-card .input-dropzone textarea{width:100%;margin:0;padding:12px;overflow-wrap:anywhere}
+@media(max-width:600px){.analysis-card>.input-dropzone{margin:14px 16px}}

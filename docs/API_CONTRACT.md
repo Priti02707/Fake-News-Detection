@@ -9,6 +9,7 @@ FastAPI OpenAPI is the authoritative request/response schema: local `/api/docs` 
 | `GET /api/metrics`, `/api/evaluation`, `/api/v2/models/metrics` | Recorded model, robustness and registry metadata |
 | `POST /api/analyze` | `text` 40–20,000 characters, at least 8 words; `model`: `logistic` or `svm`. Writing-pattern result with uncertainty, features and heuristic claims |
 | `POST /api/v2/analyze/text` | `text` 10–20,000 chars, optional model and reader findings; `AnalysisEnvelope` separates classification and verification. Short inputs abstain |
+| `POST /api/v2/assess` | `text` 10–20,000 chars; `mode`: `detect`, `verify`, `detect_verify` (default). Optional `claim`, `source_url`, `source_text`, `notes`, review `language` (`all`/`en`/`hi`) and reviewed `media`. Returns nullable `analysis`/`report`, independent `classification_error`, and nullable source `verification` with discovery, exact evidence and explicit availability. Verification-only never calls the classifier; detection-only never searches. |
 | `POST /api/extract` | Public `url` 8–2,048 chars; extracted source text/metadata, SSRF protections |
 | `POST /api/v2/analyze/url` | Same URL input; source, analysis and structured report |
 | `POST /api/v2/analyze/image`, `/video`, `/audio` | Reviewed `text`, model, and bounded client-supplied `media` observation. Accepts JSON metadata, not raw uploads; full-media classification is not evaluated |

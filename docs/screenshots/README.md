@@ -11,6 +11,7 @@ They are browser screenshots, not generated images or design mockups.
 
 | File | Visible workflow | How it was captured |
 | --- | --- | --- |
+| [detect-verify.png](detect-verify.png) | Combined assessment selector and action | Later `feature/detect-and-verify` local production build, 1440 × 1100, dark theme. Load the built-in practice article, select the combined assessment mode, capture the actual input card. No result is simulated or shown. |
 | [dashboard.png](dashboard.png) | Dashboard and available input options | Open the site and wait for model availability to load. |
 | [text-analysis.png](text-analysis.png) | Real prediction response and analysis coverage | Select **Try an example**, then **Analyze article**, wait for results, and scroll to the result section. |
 | [developer.png](developer.png) | Priti Kumari owner/developer card and GitHub link | Open **How it works** and scroll the developer card into view. |
