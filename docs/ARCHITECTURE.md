@@ -33,3 +33,7 @@ API v2 image/video routes accept reviewed extraction metadata, not raw media upl
 ## Frontend source organization
 
 `frontend/` contains React interface modules, CSS, media processing helpers and browser workers. `app/page.tsx` re-exports the main interface; `app/layout.tsx` keeps the Next.js root layout and loads `frontend/globals.css`. The icon remains a framework file under `app/`. Root Node dependencies/configuration, `/api/*` routes, Docker commands and Vercel project settings are preserved. Run all npm commands from the repository root. This separation moves source files without duplicating the interface or creating a second website.
+
+## Classification upgrade — 2026-11-02
+
+The classification dashboard reads `/api/v2/capabilities`. Standalone audio shares bounded browser decoding/resampling and the existing Whisper worker with video. `POST /api/v2/analyze/audio` accepts reviewed words/metadata, never raw audio. Reports distinguish `prediction_scope=reviewed_media_text` from an uncertain, unevaluated full-media classification. `backend/learned_fusion.py` is imported only by the offline research commands; ordinary API startup never imports PyTorch.

@@ -9,6 +9,7 @@ playwright-report
 reports
 configs
 requirements-ml.txt
+requirements-tracking.txt
 .env*
 !.env.example
 __pycache__

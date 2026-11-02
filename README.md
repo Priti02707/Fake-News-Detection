@@ -8,6 +8,10 @@ Built from the original Fake News Detection notebook, with a Next.js interface, 
 
 > Predictions describe learned writing patterns. They do not establish factual truth. Evidence search is a separate step, and extracted sentences remain unverified.
 
+## Implementation progress
+
+Against the advanced eleven-phase requirements: **2 complete, 8 partial, 1 not implemented**. Text/URL classification, media extraction and review, the dashboard and downloadable reports work. Full-media, acoustic, Hindi-veracity and deepfake models still require suitable data and independent evaluation. See [the phase-by-phase status and measured results](docs/IMPLEMENTATION_STATUS.md).
+
 ## Features
 
 - **Image–news mismatch review:** compare a headline/caption with an alternative image description, flag relative visual mismatch for investigation, and gather cited source passages. Image identity, event date and location remain unverified until supported by evidence.
@@ -63,12 +67,15 @@ Enable the Google Fact Check Tools API in a Google Cloud project. Export `GOOGLE
 
 ## Analyze images and videos
 
-Select **Image** or **Video** beside Paste text. Choose a file, select **Extract image text** or **Transcribe video**, correct the extracted words, then select **Use reviewed text**. This fills the article editor; **Analyze article** starts the existing text analysis.
+Select **Image**, **Audio**, or **Video** beside Paste text. Choose a file, select **Extract image text** or **Transcribe video**, correct the extracted words, then select **Use reviewed text**. This fills the article editor; **Analyze article** starts the existing text analysis.
 
 | Input | Limits | What is extracted |
 |---|---|---|
 | PNG, JPEG, WebP | 10 MB, 20 megapixels | English written text with Tesseract.js |
+| WAV, MP3, M4A, OGG, FLAC, WebM audio | 20 MB, 60 seconds | Reviewed speech with browser-local Whisper; codec support varies |
 | MP4, WebM, MOV | 25 MB, 60 seconds | English speech with Whisper tiny.en through Transformers.js |
+
+The dashboard reads model availability from `/api/v2/capabilities`. Use the theme control to select a locally saved light/dark preference. Media inputs accept one file by drag-and-drop or file selection. **Classify reviewed words** runs classification in place; **Use reviewed text** transfers the words to the article editor. Full-media predictions remain **Uncertain**, separately from reviewed-text scores.
 
 Files remain in the browser. MIME/signature checks are supplemented by real decoding. Recognition runs in a worker and can be cancelled; only one expensive model job runs per page. First use downloads recognition software/models from jsDelivr, Hugging Face, and their delivery hosts; these hosts receive normal connection metadata. The browser may cache models for later use. No additional API key is required. Only reviewed text is sent to the analysis server when requested.
 
@@ -283,3 +290,7 @@ VERITY_TEST_RESEARCH_MODEL_DIR=.artifacts/distilbert-base-uncased \
 ```
 
 See [baseline audit](docs/BASELINE_AUDIT.md), [dataset contracts](docs/DATASETS.md), [multimodal pipelines](docs/MULTIMODAL_PIPELINES.md), [security](docs/SECURITY.md), [deployment and Docker](docs/DEPLOYMENT.md), and [implementation record](docs/CHANGELOG_IMPLEMENTATION.md). Docker Compose configuration is provided; image-build verification depends on a running Docker daemon.
+
+## Optional paired-feature fusion research
+
+Early, late and attention fusion training/inference are available locally for operator-reviewed paired embedding datasets. These are research models, with no production checkpoint or new accuracy claim. See [the dataset contract and commands](docs/ADVANCED_CLASSIFICATION_AUDIT.md), including validation results and remaining limitations. Production LR/SVM weights remain unchanged.

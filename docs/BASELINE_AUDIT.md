@@ -43,3 +43,7 @@ Baseline verification from the preceding completed work: 16 API cases passed, bu
 6. `app/image-context*`, `content-credentials.tsx`: optional, explicitly limited visual-language and C2PA observations.
 7. `backend/fusion.py`, `app/analysis-summary.tsx`: transparent modality coverage and uncertainty, without a combined truth score.
 8. `tests/`, `reports/`, `docs/`, Docker files and deployment exclusions: regression/integration evidence, reproducibility, honest capability documentation.
+
+## Classification continuation — 2026-11-02
+
+Resumed an existing unfinished working tree on `feature/advanced-classification`; no changes were discarded. The initial resumed checks passed 69 Python tests (one opt-in skipped), 10 Node logic tests, and type checking. Existing local servers were running older code, so validation used isolated API/web ports 8100/3100. See [the classification audit](ADVANCED_CLASSIFICATION_AUDIT.md) for completed work, dataset boundaries and final checks.

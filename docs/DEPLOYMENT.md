@@ -43,3 +43,7 @@ Visit `/api/research/docs` on that port. Health exposes `configured` and `model_
 `playwright.config.ts` accepts `PLAYWRIGHT_BASE_URL`; its default remains the local server. After deploying, run `PLAYWRIGHT_BASE_URL=https://fake-news-detection-priti.vercel.app npm run test:e2e -- --workers=1`. This checks the actual public site, including new media/evidence flows. Optional model integrations remain opt-in.
 
 The manually triggered **Production smoke checks** GitHub workflow runs public desktop/mobile workflows plus actual image OCR and original local-video frame/timeline checks from a separate network. Trigger with `gh workflow run production-smoke.yml --ref main`. Add `-f research_models=true` to also execute actual CLIP, NLI and Whisper checks with large model downloads. These are functional checks, not domain accuracy benchmarks. It needs no new application secrets and does not upload raw user media. A successful Vercel build, authenticated health check and public browser smoke run are distinct results; report any failed/unavailable stage explicitly.
+
+## Classification upgrade — 2026-11-02
+
+The audio route adds no server-side decoder or heavyweight runtime dependency. Keep `requirements-ml.txt` and optional `requirements-tracking.txt` outside Vercel. Training outputs belong under ignored `.artifacts/`, with paired inputs under ignored `data/multimodal/`; neither is a production model. This continuation is validated locally and has not been published. Existing production remains on its previous release.

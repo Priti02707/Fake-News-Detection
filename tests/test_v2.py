@@ -13,6 +13,35 @@ client = TestClient(app)
 TEXT = "The city council announced a new public transport proposal on Tuesday. Officials said that the proposal would be open for public comment for thirty days before a final vote. Residents can submit feedback at a public meeting next month."
 
 
+def test_reviewed_audio_preserves_text_prediction_and_abstains_on_full_media():
+    article = TEXT + " Further details will follow after the final public meeting."
+    payload = {"text": article, "media": {"kind": "audio", "filename": "speech.wav", "segments": [{"text": article, "start": 0, "end": 15}]}}
+    response = client.post("/api/v2/analyze/audio", json=payload)
+    assert response.status_code == 200
+    result = response.json()
+    text_result = client.post("/api/v2/analyze/text", json={"text": article}).json()
+    for field in ("verdict", "confidence", "real_probability", "word_count"):
+        assert result["analysis"][field] == text_result["analysis"][field]
+    report = result["report"]
+    assert report["prediction_scope"] == "reviewed_media_text"
+    assert report["media_classification"]["verdict"] == "uncertain"
+    assert report["media_classification"]["confidence"] is None
+    assert report["modalities"]["audio_speech"] == "client_transcript_reviewed"
+    assert report["modalities"]["audio_acoustic"] == "not_analyzed"
+    assert report["claim_verification"]["assessment"] == "INSUFFICIENT_EVIDENCE"
+    assert client.post("/api/v2/analyze/video", json=payload).status_code == 422
+    payload["media"]["segments"][0]["end"] = 61
+    assert client.post("/api/v2/analyze/audio", json=payload).status_code == 422
+
+
+def test_audio_capabilities_report_real_limits_and_unavailable_models():
+    capabilities = client.get("/api/v2/capabilities").json()
+    assert capabilities["maximum_audio_seconds"] == 60
+    assert capabilities["maximum_audio_bytes"] == 20 * 1024 * 1024
+    assert "not evaluated" in capabilities["classification"]["audio"]
+    assert capabilities["raw_media_uploads"] is False
+
+
 def test_v2_text_contract_preserves_legacy_prediction_and_no_truth_average():
     old = client.post("/api/analyze", json={"text": TEXT}).json()
     response = client.post("/api/v2/analyze/text", json={"text": TEXT})

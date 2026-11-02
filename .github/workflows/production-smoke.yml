@@ -36,4 +36,4 @@ jobs:
         env:
           MEDIA_INTEGRATION: '1'
           RESEARCH_INTEGRATION: '1'
-        run: npm run test:e2e -- --workers=1 --project=desktop --grep 'local semantic ranking|visual-language comparison|video speech is extracted'
+        run: npm run test:e2e -- --workers=1 --project=desktop --grep 'local semantic ranking|visual-language comparison|video speech is extracted|actual audio transcription'

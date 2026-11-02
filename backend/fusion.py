@@ -20,6 +20,10 @@ def fuse(analysis, media=None, findings=None):
         if media.provenance:
             modalities["content_credentials"] = f"client_reported_{media.provenance.status}; signer trust not checked"
         if media.kind == "image": modalities["image_ocr"] = "client_extraction_reviewed"
+        elif media.kind == "audio":
+            modalities["audio_speech"] = "client_transcript_reviewed" if media.segments else "not_analyzed"
+            modalities["audio_acoustic"] = "not_analyzed"
+            warnings.append("Only reviewed speech words were classified. No trained acoustic misinformation or synthetic-speech detector is deployed.")
         else:
             modalities["video_speech"] = "client_transcript_reviewed" if media.segments else "not_analyzed"
             modalities["video_frames"] = "client_samples_inspected" if media.frames else "not_analyzed"
@@ -35,4 +39,5 @@ def fuse(analysis, media=None, findings=None):
     if findings: warnings.append("Reader-authored findings/citations are not independently authenticated or verified by this server.")
     if assessment == "MIXED": conflicts.append("Reader annotations include both support and refutation across the listed claims; inspect each claim separately.")
     verification = {"assessment": assessment, "assessment_author": "reader" if findings else "not_verified", "claims": analysis.get("claims", []), "findings": [item.model_dump() for item in findings], "confidence": None, "explanation": "Reader-authored citation annotations are aggregated without a truth probability. Inspect each source and claim." if findings else "Candidate statements require relevant cited evidence and review; article-classifier scores do not verify them."}
-    return AnalysisReport(content_classification=analysis, claim_verification=verification, modalities=modalities, conflicting_signals=conflicts, uncertainty=warnings, observations_origin="browser-submitted review metadata" if media or findings else "server text analysis").model_dump()
+    media_classification = None if media is None else {"verdict": "uncertain", "confidence": None, "status": "not_evaluated", "explanation": f"No independently evaluated full-{media.kind} fake-news classifier is deployed. The displayed text prediction covers reviewed words only; visual/acoustic observations do not determine this classification."}
+    return AnalysisReport(content_classification=analysis, claim_verification=verification, modalities=modalities, conflicting_signals=conflicts, uncertainty=warnings, observations_origin="browser-submitted review metadata" if media or findings else "server text analysis", prediction_scope="reviewed_media_text" if media else "article_text", media_classification=media_classification).model_dump()

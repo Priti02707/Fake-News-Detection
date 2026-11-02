@@ -11,3 +11,7 @@ The original files have no authenticated publisher IDs. Dates support chronologi
 LIAR, FEVER, AVeriTeC, FakeNewsNet and other datasets are not silently downloaded or merged. Article labels, short-claim truth labels, evidence entailment labels, and multimodal context labels are distinct tasks. Before external evaluation, supply licensed accessible data and a manifest identifying provenance, task, label mapping, dates and restrictions. No external dataset metric is claimed merely because a download script exists.
 
 External article evaluation is implemented in `scripts/evaluate_external.py` with a required task/license/label manifest and normalized overlap exclusion. The code path has a synthetic unit fixture; no real external-corpus result is claimed until an accessible, appropriately licensed independent dataset is supplied.
+
+## Classification upgrade — 2026-11-02
+
+No paired multimodal corpus was acquired by the classification upgrade. Fusion training requires operator-reviewed licensing, explicit 0=fake / 1=real labels, feature checksums, encoder revisions, and publisher/duplicate-group disjoint train/validation/test partitions. Synthetic test vectors verify execution only. See [the NPZ/manifest contract](ADVANCED_CLASSIFICATION_AUDIT.md).

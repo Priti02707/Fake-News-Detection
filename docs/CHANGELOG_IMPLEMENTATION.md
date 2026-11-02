@@ -64,3 +64,7 @@ No transformer challenger is automatically promoted. Small pilots do not establi
 ## Validation record
 
 Executed experiment artifacts are in `reports/`; baseline and robustness metrics are in `models/`. Final test counts, production checks and deployment result are recorded in the final release report. Interrupted or unavailable external checks are not counted as passes. See the remaining limitations and commands in the adjacent documentation.
+
+## Classification upgrade — 2026-11-02
+
+Continued the unfinished classification upgrade on `feature/advanced-classification`: dashboard availability, audio upload/preview/Whisper review, direct reviewed-word classification, full-media abstention, saved light/dark preference, drag-and-drop, and offline paired-feature fusion research. Added audio contract/signature/browser checks and bounded research overlap matrices in both dimensions. Original classifiers and legacy routes remain intact. Full commands, exact changed files, validation outcomes and outstanding limits are recorded in [the classification audit](ADVANCED_CLASSIFICATION_AUDIT.md).

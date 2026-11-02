@@ -44,6 +44,10 @@ def build_router(analyze, extract, retrieve, metrics, evaluation):
     def video_analysis(payload: MultimodalInput):
         return reviewed_media(payload, "video")
 
+    @router.post("/analyze/audio", response_model=AnalysisEnvelope)
+    def audio_analysis(payload: MultimodalInput):
+        return reviewed_media(payload, "audio")
+
     @router.post("/verify/claims", response_model=VerificationResponse)
     async def verify(payload: VerifyInput):
         evidence, warnings = [], []
@@ -62,6 +66,6 @@ def build_router(analyze, extract, retrieve, metrics, evaluation):
 
     @router.get("/capabilities")
     def capabilities():
-        return {"media_execution": "asynchronous browser workers", "raw_media_uploads": False, "server_media_jobs": False, "maximum_video_seconds": 60, "maximum_video_bytes": 25 * 1024 * 1024, "maximum_frames": 6, "production_text_models": ["logistic", "svm"], "transformer_challengers": "local research only", "deepfake_detection": "unavailable", "claim_verification": "cited retrieval plus reader review; browser textual-entailment assistance is experimental"}
+        return {"media_execution": "asynchronous browser workers", "raw_media_uploads": False, "server_media_jobs": False, "maximum_video_seconds": 60, "maximum_video_bytes": 25 * 1024 * 1024, "maximum_audio_seconds": 60, "maximum_audio_bytes": 20 * 1024 * 1024, "maximum_frames": 6, "production_text_models": ["logistic", "svm"], "transformer_challengers": "local research only", "deepfake_detection": "unavailable", "claim_verification": "cited retrieval plus reader review; browser textual-entailment assistance is experimental", "classification": {"text": "evaluated English article models", "url": "reviewed article text", "image": "reviewed text only; full-image classifier not evaluated", "video": "reviewed text only; full-video classifier not evaluated", "audio": "reviewed speech text only; acoustic classifier not evaluated", "multimodal_fusion": "research training only; no production checkpoint", "hindi": "extraction only; veracity classifier unavailable"}}
 
     return router

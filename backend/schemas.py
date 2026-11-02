@@ -66,7 +66,7 @@ class Frame(BaseModel):
 
 
 class MediaObservation(BaseModel):
-    kind: Literal["image", "video"]
+    kind: Literal["image", "video", "audio"]
     filename: str = Field(max_length=255)
     language: Literal["en", "hi"] = "en"
     original_text: str = Field(default="", max_length=20000)
@@ -122,6 +122,8 @@ class AnalysisReport(BaseModel):
     uncertainty: list[str]
     human_review_recommended: bool = True
     observations_origin: str
+    prediction_scope: str = "article_text"
+    media_classification: dict | None = None
 
 
 class AnalysisEnvelope(BaseModel):

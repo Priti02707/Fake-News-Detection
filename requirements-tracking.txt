@@ -1,0 +1,2 @@
+# Optional only for local experiment tracking, never installed by Vercel.
+mlflow-skinny>=2.20,<4

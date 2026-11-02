@@ -1,7 +1,7 @@
 // This worker only receives local file data. Model downloads contain no user media.
 import browserModels from "../models/browser-models.json";
 import type { MediaSegment } from "./media-types";
-type MediaRequest = ({ kind: "image"; file: File } | { kind: "video"; audio: Float32Array } | { kind: "frames"; frames: { id: string; timestamp: number; file: File; width: number; height: number; scene_change: number }[] }) & { language: "en" | "hi" };
+type MediaRequest = ({ kind: "image"; file: File } | { kind: "video" | "audio"; audio: Float32Array } | { kind: "frames"; frames: { id: string; timestamp: number; file: File; width: number; height: number; scene_change: number }[] }) & { language: "en" | "hi" };
 const report = (message: string) => self.postMessage({ status: "progress", message });
 
 self.addEventListener("message", async (event: MessageEvent<MediaRequest>) => {

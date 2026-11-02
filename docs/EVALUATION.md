@@ -31,3 +31,7 @@ RESEARCH_INTEGRATION=1 MEDIA_INTEGRATION=1 npm run test:e2e -- --workers=1
 ```
 
 Real-model checks are opt-in because they need network access, model memory and public fixtures. CI uses deterministic provider boundaries, with failures and unavailable services tested explicitly. An interrupted long-running integration is not recorded as a pass.
+
+## Classification upgrade — 2026-11-02
+
+Fusion tests execute one epoch of actual early/late/attention optimization on seeded synthetic vectors, calibration, held-out metric computation, checkpoint export/reload, masking invariance and checksum rejection. These synthetic labels provide no misinformation accuracy evidence. Existing production metrics and splits remain unchanged. The browser suite additionally covers audio validation and real silent-WAV decoding; a separate `MEDIA_INTEGRATION=1` case exercises actual Whisper transcription.
