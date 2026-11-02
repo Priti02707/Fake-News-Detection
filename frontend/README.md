@@ -8,6 +8,7 @@ This folder contains the existing website's React/TypeScript interface, styles a
 | `classification-dashboard.tsx` | Current model capabilities and input selection |
 | `theme-toggle.tsx` | Locally saved light/dark preference |
 | `globals.css` | Styling, responsive layouts and print presentation |
+| `drop-area.tsx` | Shared drag feedback and guarded drop handling for all five input modes |
 | `media-input.tsx` | Image/video/audio uploads, local extraction and review |
 | `speech-audio.ts` | Bounded audio decoding, silence checks and speech resampling |
 | `image-context.tsx` | Image–caption comparison and investigation |

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import MediaInput from "./media-input";
 import ThemeToggle from "./theme-toggle";
 import ClassificationDashboard from "./classification-dashboard";
+import DropArea from "./drop-area";
 import Investigation from "./investigation";
 import Robustness from "./robustness";
 import AnalysisSummary from "./analysis-summary";
@@ -71,6 +72,8 @@ export default function Home() {
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState("");
   const resultsRef = useRef<HTMLDivElement>(null);
+  const textImport = useRef(0);
+  useEffect(() => { textImport.current++; }, [mode]);
 
   useEffect(() => {
     try {
@@ -86,7 +89,36 @@ export default function Home() {
   }, [view, metrics]);
 
   function navigate(next: View) { setView(next); setMobile(false); setNotice(""); }
-  function resetAnalysis(value: string) { setText(value); setResult(null); setEvidence(null); setError(""); setNotice(""); }
+  function resetAnalysis(value: string) { textImport.current++; setText(value); setResult(null); setEvidence(null); setError(""); setNotice(""); }
+  async function importText(files: File[], droppedText = "") {
+    const selection = ++textImport.current;
+    try {
+      let content = droppedText;
+      if (files.length) {
+        if (files.length !== 1) throw new Error("Drop one text file at a time.");
+        const file = files[0];
+        if (!/\.(txt|md)$/i.test(file.name) || (file.type && !["text/plain", "text/markdown"].includes(file.type))) throw new Error("Choose a .txt or .md text file, or drop selected article text.");
+        if (!file.size || file.size > 1024 * 1024) throw new Error("Choose a non-empty text file up to 1 MB.");
+        try { content = new TextDecoder("utf-8", { fatal: true }).decode(await file.arrayBuffer()); }
+        catch { throw new Error("This text file is not readable UTF-8. Save it as UTF-8 and try again."); }
+      }
+      if (selection !== textImport.current) return;
+      if (!content.trim() || content.includes("\0")) throw new Error("Drop readable article text or a non-empty text file.");
+      if (content.length > 20000) throw new Error("Dropped text exceeds 20,000 characters. Shorten it and try again.");
+      resetAnalysis(content); setSource(null); setMediaTrace(null); setMediaFiles(null);
+      setNotice("Text added. Review it, then select Analyze article.");
+    } catch (error) { if (selection === textImport.current) setError((error as Error).message); }
+  }
+  function dropURL(data: DataTransfer) {
+    try {
+      if (data.files.length) throw new Error("Drop an article link here. Use the other tabs for files.");
+      const value = (data.getData("text/uri-list") || data.getData("text/plain")).split(/\r?\n/).filter(line => line.trim() && !line.startsWith("#"));
+      if (value.length !== 1 || value[0].length > 2048) throw new Error("Drop one article URL up to 2,048 characters.");
+      const parsed = new URL(value[0].trim());
+      if (!["https:", "http:"].includes(parsed.protocol)) throw new Error("Use an HTTP or HTTPS article link.");
+      setUrl(parsed.href); setError(""); setNotice("Article link added. Select Extract to review its text.");
+    } catch (error) { setError(error instanceof TypeError ? "Drop a valid HTTP or HTTPS article link." : (error as Error).message); }
+  }
   async function extract() {
     setError(""); setExtracting(true); setSource(null);
     try {
@@ -150,9 +182,9 @@ export default function Home() {
           <section className="workspace-grid" aria-label="News analysis workspace">
             <div className="analysis-card card"><div className="card-header"><div><span className="step-number">01</span><h2>Let’s take a closer look</h2></div><span className="small-muted">Your reading, with context.</span></div>
               <div className="input-tabs" role="tablist" aria-label="Input type"><button role="tab" aria-selected={mode === "text"} className={mode === "text" ? "selected" : ""} onClick={() => setMode("text")}><FileText size={16} />Paste text</button><button role="tab" aria-selected={mode === "url"} className={mode === "url" ? "selected" : ""} onClick={() => setMode("url")}><Link2 size={16} />Article URL</button><button role="tab" aria-selected={mode === "image"} className={mode === "image" ? "selected" : ""} onClick={() => setMode("image")}><ImagePlus size={16} />Image</button><button role="tab" aria-selected={mode === "audio"} className={mode === "audio" ? "selected" : ""} onClick={() => setMode("audio")}><Mic size={16} />Audio</button><button role="tab" aria-selected={mode === "video"} className={mode === "video" ? "selected" : ""} onClick={() => setMode("video")}><Video size={16} />Video</button></div>
-              {mode === "image" || mode === "video" || mode === "audio" ? <MediaInput key={mode} kind={mode} analysisBusy={busy} onAnalyze={(reviewed, trace, files) => { setSource(null); void analyze(reviewed, trace, files); }} onReviewed={(reviewed, filename, trace, files) => { setMediaFiles(files); setMediaTrace(trace); setEvidenceLanguage(trace.language); resetAnalysis(reviewed); setSource(null); setMode("text"); setNotice(`Reviewed text from ${filename} is ready. Check the article editor, then select Analyze article. The assessment covers these words only.`); setTimeout(() => document.getElementById("article-text")?.focus(), 0); }} /> : mode === "url" ? <form onSubmit={event => { event.preventDefault(); void extract(); }} className="url-form"><label htmlFor="article-url">Article URL</label><div className="url-row"><input id="article-url" type="url" placeholder="https://publisher.com/article" required maxLength={2048} value={url} onChange={e => setUrl(e.target.value)} /><button className="primary-button" disabled={extracting}>{extracting ? <LoaderCircle className="spin" size={17} /> : <ArrowDown size={17} />}Extract</button></div><p className="field-help">We’ll extract the article for you to review before analysis. Some publishers block automated reading.</p></form> : <>
+              {mode === "image" || mode === "video" || mode === "audio" ? <MediaInput key={mode} kind={mode} analysisBusy={busy} onAnalyze={(reviewed, trace, files) => { setSource(null); void analyze(reviewed, trace, files); }} onReviewed={(reviewed, filename, trace, files) => { setMediaFiles(files); setMediaTrace(trace); setEvidenceLanguage(trace.language); resetAnalysis(reviewed); setSource(null); setMode("text"); setNotice(`Reviewed text from ${filename} is ready. Check the article editor, then select Analyze article. The assessment covers these words only.`); setTimeout(() => document.getElementById("article-text")?.focus(), 0); }} /> : mode === "url" ? <DropArea label="Article URL drop area" hint="Drag an article link here, or enter its URL below." disabled={busy || extracting} onDrop={dropURL}><form onSubmit={event => { event.preventDefault(); void extract(); }} className="url-form"><label htmlFor="article-url">Article URL</label><div className="url-row"><input id="article-url" type="url" placeholder="https://publisher.com/article" required maxLength={2048} value={url} onChange={e => setUrl(e.target.value)} /><button className="primary-button" disabled={extracting}>{extracting ? <LoaderCircle className="spin" size={17} /> : <ArrowDown size={17} />}Extract</button></div><p className="field-help">We’ll extract the article for you to review before analysis. Some publishers block automated reading.</p></form></DropArea> : <>
                 {source && <div className="source-preview"><Globe2 size={16} /><div><strong>{source.title}</strong><span>{source.publisher}{source.truncated ? " · Long article shortened for analysis" : " · Review extracted text below"}</span></div><button className="icon-button" aria-label="Remove article source" onClick={() => setSource(null)}><X size={15} /></button></div>}
-                <label htmlFor="article-text" className="sr-only">News article text</label><textarea id="article-text" value={text} maxLength={20000} onChange={event => { resetAnalysis(event.target.value); setSource(null); }} placeholder={"Paste a news article or a claim you’d like to explore…\n\nA full article gives the model more context than a headline alone."} />
+                <DropArea label="Text drop area" hint="Drag selected text or a .txt / .md file here, or type below." disabled={busy || extracting} onDrop={data => void importText(Array.from(data.files), data.getData("text/plain"))}><label className="text-upload-label">Choose text file<input type="file" accept=".txt,.md,text/plain,text/markdown" disabled={busy || extracting} onChange={event => { if (event.target.files?.length) void importText(Array.from(event.target.files)); event.target.value = ""; }} /></label><label htmlFor="article-text" className="sr-only">News article text</label><textarea id="article-text" value={text} maxLength={20000} onChange={event => { resetAnalysis(event.target.value); setSource(null); }} placeholder={"Paste a news article or a claim you’d like to explore…\n\nA full article gives the model more context than a headline alone."} /></DropArea>
                 <div className="editor-meta"><span>{words.toLocaleString()} words <span className="meta-dot">·</span> {text.length.toLocaleString()} / 20,000 characters</span><button onClick={() => { resetAnalysis(sample); setSource(null); setMediaTrace(null); setMediaFiles(null); setNotice("Illustrative example loaded. This is invented practice text, not a verified news report."); }}>Try an example <ArrowUpRight size={13} /></button></div>
                 <div className="input-controls"><div className="model-control"><label htmlFor="model">ANALYSIS MODEL</label><select id="model" value={model} onChange={event => { setModel(event.target.value); setResult(null); }}><option value="logistic">Logistic Regression</option><option value="svm">Calibrated Linear SVM</option></select></div><button className="primary-button analyze-button" onClick={() => void analyze()} disabled={busy || text.trim().length < 10}>{busy ? <><LoaderCircle size={17} className="spin" />Analyzing…</> : <>Analyze article <ArrowRight size={17} /></>}</button></div>
                 <label className="history-opt"><input type="checkbox" checked={saveHistory} onChange={e => setSaveHistory(e.target.checked)} />Save this analysis in this browser</label>
