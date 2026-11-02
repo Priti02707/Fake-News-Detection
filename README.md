@@ -1,296 +1,197 @@
-# Verity AI · Explainable Fake News Detection
+# Verity AI — Fake News Detection System
 
-A fake news classification application by **Priti**. Analyze English articles and URLs with calibrated models and influential-word explanations. Extract and review words from images, video and audio, inspect media context, and optionally investigate claims with cited evidence. Full-media classification remains uncertain until independently evaluated models are available.
+[![Next.js](https://img.shields.io/badge/Next.js-000000?logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+[![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Vercel](https://img.shields.io/badge/Deployed_on-Vercel-000000?logo=vercel&logoColor=white)](https://fake-news-detection-priti.vercel.app/)
 
-**Live website:** https://fake-news-detection-priti.vercel.app · [Vercel project](https://vercel.com/priti-09/verity-news)
+Verity AI helps you assess news using machine learning and understandable explanations.
+Analyze English articles, review text extracted from media, and see which words influenced the prediction.
 
-Built from the original Fake News Detection notebook, with a Next.js interface, FastAPI backend, reproducible training, and portable model parameters that require no TensorFlow or scikit-learn in production.
+> A prediction identifies learned writing patterns. It does not independently verify factual truth.
 
-> Predictions describe learned writing patterns. They do not establish factual truth. Evidence search is a separate step, and extracted sentences remain unverified.
+## Live Demo
 
-## Implementation progress
+- **Website:** [Try Verity AI](https://fake-news-detection-priti.vercel.app/)
+- **Repository:** [Priti02707/Fake-News-Detection](https://github.com/Priti02707/Fake-News-Detection)
 
-Against the advanced eleven-phase requirements: **2 complete, 8 partial, 1 not implemented**. Text/URL classification, media extraction and review, the dashboard and downloadable reports work. Full-media, acoustic, Hindi-veracity and deepfake models still require suitable data and independent evaluation. See [the phase-by-phase status and measured results](docs/IMPLEMENTATION_STATUS.md).
+## About the Project
 
-## Features
+Misleading news can spread quickly and make reliable information harder to identify.
+Verity AI helps readers examine articles using models trained on fake-labeled and real-labeled news.
+It explains the words and phrases that influenced each prediction.
+Readers can also extract text from images, audio, and videos before analyzing it.
+The project encourages careful review and returns an uncertain result when the available text is unsuitable for a confident classification.
 
-- **Image–news mismatch review:** compare a headline/caption with an alternative image description, flag relative visual mismatch for investigation, and gather cited source passages. Image identity, event date and location remain unverified until supported by evidence.
-- **Video investigation timeline:** chronological speech and sampled frame/subtitle observations, clickable playback locations, nearby wording/negation review flags, and timestamp-linked evidence notebooks.
-- **Explainable fact verification:** bounded source discovery/retrieval, verbatim quotations, publication dates, optional NLI suggestions, reader-authored support/contradiction findings, and contextual JSON/print-to-PDF reports.
-- Responsive editorial interface with keyboard-accessible navigation.
-- English text analysis with Logistic Regression and calibrated Linear SVM.
-- Signed word/phrase contributions and highlighted words in context.
-- **Uncertain** results for short text, low scores, low vocabulary overlap, unsupported scripts, or classifier disagreement.
-- Public article extraction with a review step before analysis.
-- Browser-local English OCR for news screenshots/photos and speech transcription for short video clips, with editable review before analysis.
-- Related published fact-checks through the optional Google Fact Check Tools API, preserving publisher ratings and source links.
-- Evaluation dashboard, confusion matrices, and downloadable JSON reports.
-- Opt-in browser-local history, limited to 30 analyses; no article database.
-- API tests and desktop/mobile browser checks.
-- Evidence notebooks with verbatim passages, source dates, citations, reader assessments, and downloadable investigation reports.
-- Optional browser-local semantic retrieval and English textual-entailment assistance; model suggestions remain separate from reader assessments.
-- Recent-news source discovery through GDELT, alongside optional published fact-check search.
-- OCR line regions, video transcript timestamps, experimental Hindi extraction, image-description comparison, and embedded C2PA inspection.
-- Grouped/stratified/temporal holdouts, calibration and bootstrap/Wilson intervals, headline/style stress tests, and sampled semantic/lexical overlap diagnostics.
-- Configurable local DistilBERT/RoBERTa/DeBERTa research training, matched small pilots, artifact checksums, and an explicit no-automatic-promotion registry.
-- Typed v2 report APIs, modality coverage summaries, and browser Print / save PDF alongside JSON exports.
+## Key Features
 
-## Run locally
+- **Text Fake News Detection:** Analyze English articles using Logistic Regression or calibrated Linear SVM.
+- **Image Text Extraction and Analysis:** Read screenshot/photo text with OCR, correct it, and classify the reviewed words.
+- **Video Speech Extraction and Analysis:** Transcribe short clips, inspect sampled frame text, and follow timestamps.
+- **News URL Analysis:** Extract a public article and review its text before analysis.
+- **Fake/Real Prediction:** Receive a fake-like or real-like writing-pattern result, or **Uncertain** when appropriate.
+- **Explainable Prediction Results:** Inspect influential words, phrase contributions, and reasons for uncertainty.
+- **Model Performance Dashboard:** View recorded accuracy, dataset splits, and confusion matrices.
+- **Audio Transcription:** Review speech from short audio files before classifying the spoken words.
+- **Drag and Drop:** Add text, article links, images, audio, or video through the matching input tab.
+- **Reports and History:** Download JSON reports, print/save PDF, and optionally keep up to 30 analyses in your browser.
+- **Accessible Interface:** Responsive layouts, keyboard controls, previews, progress feedback, and light/dark themes.
 
-Use Node.js 22+ and Python 3.12. The trained model is included; training is optional.
+**Optional and experimental:** image–description comparison with CLIP, semantic evidence comparison,
+Content Credentials inspection, and Hindi extraction. These do not establish media authenticity or factual truth.
+Evidence notebooks support source review; Google Fact Check search requires a configured API key.
+See [capabilities and limitations](docs/USER_GUIDE.md).
+
+## Technologies Used
+
+| Area | Technologies used |
+| --- | --- |
+| Frontend | Next.js, React, TypeScript, Tailwind CSS, Lucide icons |
+| Backend | Python, FastAPI, Pydantic, HTTPX |
+| Machine Learning | Logistic Regression, Linear SVM; scikit-learn for training/evaluation, exported parameters for production |
+| NLP | TF-IDF word/phrase features, language checks, optional Transformers.js evidence tools |
+| Image Processing | Tesseract.js OCR; optional CLIP image–description comparison |
+| Video Processing | Browser media APIs, Whisper through Transformers.js, sampled frames and OCR |
+| Deployment | Vercel for Next.js and the lightweight FastAPI API; GitHub Actions for checks |
+
+## How It Works
+
+1. **Provide news content:** Paste text, enter a URL, or choose an image, audio file, or video.
+2. **Process the input:** The app extracts article text, reads image text, or transcribes speech for your review.
+3. **Analyze the text:** TF-IDF represents words and phrases, and the selected machine learning model scores them.
+4. **Predict a class:** The app returns **Fake**, **Real**, or **Uncertain**, shown with writing-pattern labels and confidence where available.
+5. **Explain the result:** Review influential terms, uncertainty notes, and a downloadable report.
+
+Image and video predictions currently depend on reviewed extracted text.
+They are **not** outputs from an independently evaluated visual or full-video fake-news classifier.
+The report keeps full-media uncertainty separate from the text prediction.
+
+## Project Screenshots
+
+Real screenshots captured from the [deployed website](https://fake-news-detection-priti.vercel.app/).
+Capture details are recorded in [docs/screenshots/README.md](docs/screenshots/README.md).
+
+**Dashboard and input options**
+
+![Verity AI dashboard with text, image, video, audio, and URL input options](docs/screenshots/dashboard.png)
+
+<details>
+<summary>View text analysis and model performance</summary>
+
+**Text analysis result** — the built-in illustrative example, not a verified news report.
+The displayed score describes the model's prediction, not factual truth.
+
+![Actual text-analysis result with calibrated model score and analysis coverage](docs/screenshots/text-analysis.png)
+
+**Recorded model performance**
+
+![Model performance dashboard showing dataset splits, evaluation metrics, and confusion matrices](docs/screenshots/model-performance.png)
+
+</details>
+
+## Installation
+
+Prerequisites: **Node.js 22 or newer**, **npm**, and **Python 3.12**.
+The trained text-model parameters are included; no training or API key is needed for basic analysis.
+
+Clone the repository and install the dependencies:
 
 ```sh
+git clone https://github.com/Priti02707/Fake-News-Detection.git
+cd Fake-News-Detection
 npm ci
 python3.12 -m venv .venv
-.venv/bin/pip install -r requirements.txt
+.venv/bin/python -m pip install -r requirements.txt
 ```
 
-Start the API in one terminal:
+Start the backend in the first terminal, from the repository root:
 
 ```sh
 .venv/bin/python -m uvicorn backend.main:app --reload --port 8000
 ```
 
-Start the website in another:
+Start the frontend in a second terminal, also from the repository root:
 
 ```sh
 npm run dev
 ```
 
-Open **http://localhost:3000**. Next.js proxies `/api/*` to FastAPI locally. API docs: **http://localhost:8000/api/docs**.
+Open **http://localhost:3000**. Interactive API documentation is at **http://localhost:8000/api/docs**.
+On Windows, use `py -3.12 -m venv .venv` and `.venv\Scripts\python.exe` instead of the Unix Python paths.
 
-### Optional fact-check search
+Media recognition downloads models on first use and needs internet access, browser codec support,
+and sufficient device memory. Your raw media stays in the browser; reviewed text is sent for requested analysis.
 
-Enable the Google Fact Check Tools API in a Google Cloud project. Export `GOOGLE_FACT_CHECK_API_KEY` in the API process environment before starting Uvicorn. In Vercel, add it to the project's environment variables and redeploy. Never use a `NEXT_PUBLIC_` variable for this key.
+See [setup, testing, and deployment](docs/DEPLOYMENT.md) for optional services and additional checks.
 
-`.env.example` documents the name; Python does not automatically load Next.js `.env.local` files. Without a key, analysis and extraction still work. The evidence panel reports that search is unconfigured and provides a manual Google Fact Check Explorer link. This is distinct from a successful search returning **No matching fact-check found**.
+## How to Use
 
-## Analyze images and videos
+- **Text:** Select **Paste text**, type/paste an article or drop a `.txt`/`.md` file, choose a model, and select **Analyze article**.
+- **Image:** Select **Image**, upload/drop a readable screenshot, select **Extract image text**, and correct recognition errors.
+- **Video:** Select **Video**, upload/drop a short clip, select **Transcribe video**, and review the transcript. Use **Inspect video frames** for on-screen text.
+- **Audio:** Select **Audio**, upload/drop a short speech recording, select **Transcribe audio**, and review the words.
+- **News URL:** Select **Article URL**, enter/drop a public article link, select **Extract**, review the text, and select **Analyze article**.
 
-Select **Image**, **Audio**, or **Video** beside Paste text. Choose a file, select **Extract image text** or **Transcribe video**, correct the extracted words, then select **Use reviewed text**. This fills the article editor; **Analyze article** starts the existing text analysis.
+After media extraction, select **Classify reviewed words** to analyze in place,
+or **Use reviewed text** to move the words to the article editor.
+Dropping content does not automatically analyze it. Some publishers block article extraction.
 
-| Input | Limits | What is extracted |
-|---|---|---|
-| PNG, JPEG, WebP | 10 MB, 20 megapixels | English written text with Tesseract.js |
-| WAV, MP3, M4A, OGG, FLAC, WebM audio | 20 MB, 60 seconds | Reviewed speech with browser-local Whisper; codec support varies |
-| MP4, WebM, MOV | 25 MB, 60 seconds | English speech with Whisper tiny.en through Transformers.js |
+Images support PNG/JPEG/WebP up to **10 MB** and **20 megapixels**.
+Video supports MP4/WebM/MOV up to **25 MB / 60 seconds**; audio supports common formats up to **20 MB / 60 seconds**.
+Text is limited to **20,000 characters**. See the [user guide](docs/USER_GUIDE.md) for formats and troubleshooting.
 
-The dashboard reads model availability from `/api/v2/capabilities`. Use the theme control to select a locally saved light/dark preference. All five input tabs support drag-and-drop with a highlighted drop area. Paste text accepts selected text or one UTF-8 `.txt` / `.md` file (up to 1 MB and 20,000 characters); Article URL accepts one HTTP(S) link. Image, Audio and Video accept one supported file with their existing size/format checks. Dropping content fills the input for review without automatically fetching or analyzing it. File pickers and typing remain available. **Classify reviewed words** runs classification in place; **Use reviewed text** transfers the words to the article editor. Full-media predictions remain **Uncertain**, separately from reviewed-text scores.
+## Model Performance
 
-Files remain in the browser. MIME/signature checks are supplemented by real decoding. Recognition runs in a worker and can be cancelled; only one expensive model job runs per page. First use downloads recognition software/models from jsDelivr, Hugging Face, and their delivery hosts; these hosts receive normal connection metadata. The browser may cache models for later use. No additional API key is required. Only reviewed text is sent to the analysis server when requested.
+Recorded results on **1,993 held-out English articles**:
 
-Video playback and audio decoding depend on the browser's codec support. MP4 with AAC audio or WebM with Opus audio are recommended. Clear audio, readable screenshots, an internet connection for model downloads, and sufficient device memory are required. First-time video transcription can take several minutes, particularly on phones. Text is limited to 20,000 characters; longer extractions are shortened with a notice. A stalled extraction stops after ten minutes.
+| Model | Accuracy | Macro-F1 | Test errors |
+| --- | ---: | ---: | ---: |
+| Logistic Regression | **99.05%** | 0.9905 | 19 |
+| Linear SVM | **99.90%** | 0.9990 | 2 |
 
-These features analyze extracted words, not visual authenticity, deepfakes, video scenes, or factual truth. Recognition can omit or invent words, especially with noise, silence, or unsupported languages. Review the transcript and its context. The existing evaluation scores apply to the article classifiers, not OCR or speech accuracy.
+The experiment used **9,964 usable articles**: 5,977 training, 1,994 calibration, and 1,993 test examples.
+Normalized duplicates were removed, and matching normalized headline groups stayed in one partition.
 
-References: [Tesseract.js](https://github.com/naptha/tesseract.js), [Transformers.js browser workers](https://huggingface.co/docs/transformers.js/en/tutorials/next), [Whisper tiny.en ONNX model](https://huggingface.co/onnx-community/whisper-tiny.en).
+**Historical dataset accuracy does not guarantee accuracy on new real-world news.**
+Source/style cues and remaining similar articles can inflate these scores.
+They do not measure OCR, speech recognition, Hindi classification, or full-media detection accuracy.
 
-## Investigate a claim
+Sources: [recorded metrics](models/metrics.json), [model card](MODEL_CARD.md), and [evaluation details](docs/EVALUATION.md).
 
-Open **Investigate claims** in the navigation, or select **Open evidence notebook** after analyzing an article. Candidate statements are ranked across the input using transparent heuristics (numbers/dates, reported events, named entities, and opinion cues), not a trained check-worthiness model. Edit one claim before gathering evidence.
-
-1. Discover recent news using topic keywords, inspect a related published fact-check, enter a public source URL, or paste source text.
-2. Retrieve verbatim source passages. The server uses BM25 lexical relevance and returns original character offsets, source-reported publication dates, retrieval timestamps, and the final fetched URL. Pasted text is explicitly unauthenticated and has no invented citation URL.
-3. Optionally select **Compare evidence with AI**. This downloads `Xenova/all-MiniLM-L6-v2` for semantic ranking and `Xenova/nli-deberta-v3-xsmall` for English textual entailment, then runs them in a browser worker. Up to four passages are compared; weak or neutral results remain inconclusive. The 0.8 score and 0.2 margin thresholds are product heuristics, not validated fact-verification thresholds.
-4. Record your own assessment and reasoning for each passage, then export **verity-investigation.json**. The report includes exact passages, citations, retrieval dates, model suggestions/probabilities, and reader annotations. Changing the claim clears its previous notebook. The notebook is held in page memory; export before reloading or leaving.
-
-An entailment model compares statements; it does not authenticate the publisher, establish factual truth, or verify that a source is independent. Similarity measures relevance, not credibility. Conflicting reader assessments are shown explicitly. Neither retrieval nor reader annotations change the article classifier's score.
-
-Repeated passages within a source are deduplicated before shortlisting. Citation cards and JSON exports include publication-date review notes for unknown, invalid, future or older dates. A one-year review window is a context aid: old evidence can be appropriate for historical claims, and recent evidence can still be unreliable. Publication metadata remains source-reported.
-
-GDELT recent-news search needs no API key, sends the chosen query to GDELT, and searches a recent coverage window. News leads are not fact-check verdicts. Provider outages and no matches are separate states. The optional Google Fact Check API still requires `GOOGLE_FACT_CHECK_API_KEY`; manual evidence review remains available without it.
-
-### Connected image and video investigations
-
-1. Select **Image** and upload a photo. Open **Explore image context**, enter its associated headline/caption under **Description to investigate**, and supply an alternative visual description. Optional CLIP comparison reports a potential relative mismatch when the alternative's score exceeds the caption's by at least 0.2. This is a review heuristic, not a validated misinformation detector. A match cannot establish the event, date or location.
-2. Select **Investigate this image claim** to search GDELT and retrieve passages from up to two distinct source URLs through the existing SSRF-protected server. Only selected words are sent; the image stays local. Sources are leads until reviewed, and separate domains do not prove independence. If providers fail or no passages match, the notebook remains insufficient evidence and accepts manual sources.
-3. For **Video**, transcribe speech and/or inspect frames. The **Video investigation timeline** combines timestamped speech, sampled frame text and optional visual comparisons. Nearby topic differences or aligned wording with different negation are marked for review. These English lexical heuristics do not establish contradictions or deepfakes. Sampling spans the full clip, up to six frames, with scene-change selection; intermediate scenes and subtitles may be missed.
-4. Select **Investigate this moment with sources** to gather evidence for that excerpt. Correct the selected claim, inspect citations and dates, optionally run English NLI, and record your assessment. Image/video notebooks export the original media context or timestamp with citations and reader findings. **Download timeline JSON** exports the chronological observations separately. **Print evidence / save PDF** uses the browser print dialog.
-
-Claim edits clear prior citations and cancel active retrieval. Changing files clears the associated notebook; export before moving to article analysis. Saved text-analysis reports also derive timeline observations from retained media metadata, but raw original files/previews are not persisted. The deployed classifier and model metrics are unchanged. Deepfake detection remains an optional research extension without a simulated detector.
-
-## Media context and provenance
-
-Image extraction now retains OCR line rectangles. Select a line to highlight its image region. Video transcripts retain approximate timestamps; select one to seek in the original clip. **Inspect video frames** samples bounded representative keyframes with simple scene-change selection and runs OCR on their on-screen text. Sampling interval and frame count are configurable, up to six frames and 4K input dimensions. Sampled scenes can be missed; no complete visual or authenticity verification is claimed. Silent clips can use frame inspection independently. Each keyframe also offers optional description comparison. Choose **Add on-screen text to review** to include frame text in the editable analysis input. These traces describe the original extraction, even after text corrections, and are included in article-report exports and opt-in saved history. JSON reports do not contain the media file itself.
-
-Choose **Hindi + English (experimental)** for Hindi image OCR or Hindi speech transcription (`onnx-community/whisper-tiny`). Recognition quality has not been independently measured for Hindi. The article classifier remains English-only and abstains on Hindi-script text. Hindi evidence can be reviewed manually and searched in published fact-checks; English entailment assistance is disabled for Hindi-script claims.
-
-**Explore image context** compares two reader-provided English descriptions with `Xenova/clip-vit-base-patch32`. Scores express relative visual match between those descriptions only. They cannot establish the image's event, date, location, authenticity, or factual truth. Reverse-image search is a manual external step, with its own provider's data handling.
-
-**Inspect Content Credentials** uses `@contentauth/c2pa-web` to inspect embedded C2PA manifests locally. The reader downloads from jsDelivr. Remote-manifest fetching is disabled and signer trust is not established; the report preserves the SDK's validation state. Missing credentials do not mean fake; present credentials do not verify news claims. Credential reports can be downloaded separately. No media is uploaded by these local tools.
-
-All optional model tools have cancel controls/time limits or bounded reader timeouts. Downloads can take several minutes and may fail on devices with insufficient memory. Source retrieval/search sends the chosen query, URL, or pasted text to the application server; external search providers receive queries only when their search is requested.
-
-## Evaluation
-
-The website uses newly trained models from the repository samples, rather than the older notebook's results.
-
-| Measure | Logistic Regression | Linear SVM |
-|---|---:|---:|
-| Test accuracy | 99.05% | 99.90% |
-| Macro F1 | 0.9905 | 0.9990 |
-| Brier score, lower is better | 0.0062 | 0.0013 |
-| Test errors | 19 | 2 |
-
-**10,000 input rows → 9,964 usable articles**, split into 5,977 training, 1,994 calibration, and 1,993 test articles. Normalized content duplicates and conflicting labels are removed. Normalized headline groups stay in one partition. TF-IDF fits training only; sigmoid calibration fits validation only. Seeds, CSV checksums, library versions, and metrics are in [models/metrics.json](models/metrics.json).
-
-These are historical, in-domain results. The original grouped experiment has no publisher or temporal holdout; source cues and semantic near-duplicates can inflate scores. Hindi, current events, short claims, and broad real-world generalization have not been evaluated. Reported batch scoring excludes text processing and network time. See [MODEL_CARD.md](MODEL_CARD.md).
-
-Research/training and API contracts are documented in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/MODELS.md](docs/MODELS.md), and [docs/EVALUATION.md](docs/EVALUATION.md).
-
-The original table above describes the original grouped split. Additional, separately retrained experiments are in [models/robustness.json](models/robustness.json) and the website's Model evaluation view. Additional stratified and sampled semantic experiments and their per-class/interval metrics are in the same report:
-
-| Temporal holdout | Logistic Regression | Linear SVM |
-|---|---:|---:|
-| Accuracy | 99.45% | 99.80% |
-| Macro F1 | 0.9905 | 0.9965 |
-
-The temporal experiment has 5,962 training, 1,987 calibration, and 2,014 test examples. Date boundaries are disjoint; repeated normalized headline groups are removed from later partitions. Each experiment fits its own vectorizer/model/calibration without replacing production weights. The report also includes balanced accuracy, Brier score, calibration bins/ECE, headline-only stress tests, removal of four selected source cues, and results after excluding test examples with training cosine similarity ≥ 0.85. This is lexical screening, not semantic deduplication or an independent-corpus test.
-
-Publisher holdout remains unmeasured because the original CSVs lack authenticated publisher IDs. Independent-corpus accuracy and domain accuracy of the experimental evidence/image models remain unmeasured. Functional browser checks do not establish research accuracy.
-
-Reproduce these additional experiments without changing deployed models:
-
-```sh
-.venv/bin/python scripts/evaluate.py
-```
-
-## Reproduce training
-
-```sh
-.venv/bin/pip install -r requirements-dev.txt
-.venv/bin/python scripts/restore_data.py
-.venv/bin/python scripts/train.py
-```
-
-The restore script reads the original sample CSVs from commit `afe1eb8`; it does not recommit article content. A shallow checkout may need `git fetch --unshallow` first. For your own CSVs with `title` and `text` columns:
-
-```sh
-.venv/bin/python scripts/train.py --fake /path/Fake.csv --real /path/True.csv
-```
-
-Training fails on malformed rows. See [data/README.md](data/README.md) for provenance limitations. Export compares both portable models against sparse-matrix calculations on 25 held-out articles.
-
-The preserved [original notebook](Fake_News_Detection_Complete.ipynb) contains older Colab experiments on a larger dataset. Its LSTM/CNN code does not establish completed deep-learning results and is not used by the website.
-
-## Verify
-
-```sh
-.venv/bin/pip install -r requirements-dev.txt
-.venv/bin/python -m pytest tests -q
-npm run build
-npm run typecheck
-npm run test:unit
-npx playwright install chromium
-```
-
-With both local development servers running:
-
-```sh
-npm run test:e2e
-```
-
-To additionally run real OCR and video transcription checks (downloads recognition models and a public-domain speech sample):
-
-```sh
-MEDIA_INTEGRATION=1 npm run test:e2e -- --project=desktop tests/browser/media.spec.ts
-```
-
-Real optional evidence models, image-context comparison, C2PA fixtures, Hindi OCR, and media checks:
-
-```sh
-RESEARCH_INTEGRATION=1 MEDIA_INTEGRATION=1 npm run test:e2e
-```
-
-These optional checks download third-party recognition models and public test fixtures. Regular CI runs deterministic API/UI checks and skips those network-heavy integration cases.
-
-GitHub Actions runs API, build, type, and browser checks. Browser tests use the unconfigured-key state; leave `GOOGLE_FACT_CHECK_API_KEY` unset for that suite.
-
-After production deployment, the **Production smoke checks** GitHub workflow verifies the public site from a cloud runner, including desktop/mobile workflows and real image/video-frame OCR. It can be triggered with `gh workflow run production-smoke.yml --ref main`. Locally, set `PLAYWRIGHT_BASE_URL` to test a deployed URL instead of localhost. See [the multimodal release record](docs/MULTIMODAL_RELEASE.md) for executed results and unavailable checks.
-
-## Deploy to Vercel
-
-The root `vercel.json` builds Next.js and routes `/api/*` to `api/index.py`, which exports FastAPI. Training libraries and datasets are excluded from deployment.
-
-```sh
-npx vercel --scope priti-09
-npx vercel --prod --scope priti-09
-```
-
-Verify `/api/health` after deployment. Add the optional Google API key in Vercel settings. Apply provider API-key restrictions, quotas, and Vercel rate limits before high-traffic sharing. No paid service or database is required by the app itself; provider usage limits and terms still apply.
-
-## Structure
+## Project Structure
 
 ```text
-frontend/               React interface, styles, components and browser workers
-app/                    Next.js route entry, root layout and icon
-api/index.py            Vercel Python entry point
-backend/main.py         API endpoints and uncertainty policy
-backend/inference.py    Portable TF-IDF and calibrated linear inference
-backend/extraction.py   Public URL extraction with pinned connections
-models/                 Parameters and measured evaluation
-scripts/                Dataset recovery and training
-tests/                  API and browser tests
+app/          Next.js route entry, layout, and icon
+frontend/     Interface, styles, upload controls, and browser workers
+backend/      FastAPI routes, text inference, retrieval, and validation
+api/          Vercel Python entry point
+models/       Exported model parameters and evaluation metadata
+scripts/      Data preparation, training, and evaluation commands
+tests/        API, logic, and browser tests
+docs/         User guide, architecture, research notes, and screenshots
+reports/      Recorded research experiments and dataset audits
 ```
 
-### Where is the frontend?
+Technical references: [architecture](docs/ARCHITECTURE.md), [models](docs/MODELS.md),
+[datasets](docs/DATASETS.md), [security](docs/SECURITY.md), and [implementation status](docs/IMPLEMENTATION_STATUS.md).
 
-The **`frontend/` folder contains the website interface**, built with Next.js, React and TypeScript. The small `app/` folder connects this interface to Next.js routing.
+## Future Improvements
 
-| File | What to edit |
-|---|---|
-| [`frontend/page.tsx`](frontend/page.tsx) | Main page, navigation, input tabs, results and history |
-| [`frontend/globals.css`](frontend/globals.css) | Colors, spacing, responsive layouts and print styles |
-| [`app/layout.tsx`](app/layout.tsx) | Root page layout and website metadata |
-| [`frontend/media-input.tsx`](frontend/media-input.tsx) | Image/video uploads, previews and extraction review |
-| [`frontend/image-context.tsx`](frontend/image-context.tsx) | Image–caption comparison and investigation controls |
-| [`frontend/video-timeline.tsx`](frontend/video-timeline.tsx) | Timestamped video investigation interface |
-| [`frontend/investigation.tsx`](frontend/investigation.tsx) | Evidence search, citations, reader findings and exports |
+- Evaluate advanced text models such as DistilBERT, RoBERTa, and DeBERTa on independent publishers and newer news.
+- Train and independently evaluate image–text fake-news classifiers.
+- Extend video analysis with evaluated visual/temporal models and background processing for longer clips.
+- Evaluate combined acoustic and spoken-content models for audio.
+- Develop reliable Hindi and mixed-language classification beyond experimental extraction.
+- Add separately evaluated deepfake detection, keeping media manipulation distinct from news classification.
+- Validate learned multimodal fusion on suitable licensed datasets before production use.
 
-Files ending in `.worker.ts` run model tasks in browser workers. `backend/` contains the Python API. `.next/` contains generated build output; edit the source files in `frontend/` to change the website. Root `package.json`, Next.js configuration and the API deployment stay in place, so existing commands continue to work. Run `npm run dev` to open the frontend at http://localhost:3000; start FastAPI as described above for API-backed workflows.
+Research training pipelines and small transformer pilots exist, but they have not been promoted to production.
+No validated deepfake detector or full-media accuracy is claimed.
 
-## Data handling and limitations
+## Author
 
-Article text is processed without database storage. Optional history stays in the browser. Hosting providers can retain standard request metadata. Fact-check search sends the chosen query to Google. URL extraction checks resolved addresses and redirect targets, pins connections to public IPs, verifies HTTPS certificates, and limits response size. It cannot bypass paywalls or publisher restrictions.
+**Priti** — [@Priti02707](https://github.com/Priti02707)
 
-Planned research: independently evaluated Hindi classifiers, domain-validated claim verification, independent-publisher/corpus evaluation, and deepfake detection. No deepfake detector or factual-truth probability is claimed by this release. Full independent-source transformer benchmarking is not completed; the recorded 64/32/32 pilots are execution checks, not production selection. See [UPGRADE_REPORT.md](UPGRADE_REPORT.md).
+## License
 
-Resume description: **Verity AI 2.0 — Explainable Multimodal Misinformation Detection and Evidence Verification Platform**. Describe the implemented evidence/review workflows and measured tests alongside the limitations; no independently validated multimodal factual accuracy or deepfake performance is claimed.
-
-
-## API v2 and local research
-
-Legacy routes remain available. The frontend uses `/api/v2/analyze/text`, `/analyze/image`, and `/analyze/video` for structured reports. Image/video inputs contain reviewed browser extraction metadata; raw files are not uploaded. Reports distinguish text scores, client-reported modality observations, reader findings, unverified evidence, and unavailable authenticity analysis. V2 short inputs receive no full-article model score. `/api/v2/verify/claims` returns actual retrieved passages or explicit insufficient evidence; `/api/v2/models/metrics` includes registry metadata and measured evaluation. `/api/v2/capabilities` documents deployment limits. Serverless instance memory is not advertised as a durable media-job queue.
-
-Optional CPU/CUDA research, excluded from Vercel:
-
-```sh
-.venv/bin/pip install -r requirements-ml.txt
-.venv/bin/python scripts/audit_data.py --semantic --limit 500
-.venv/bin/python scripts/benchmark_transformers.py --config configs/transformer-pilots.json
-.venv/bin/python scripts/build_registry.py
-```
-
-The larger `configs/transformer-benchmark.json` supports full fine-tuning configurations. Large checkpoints stay under ignored `.artifacts/` and `.cache/`. The deployed linear models are preserved. Public evidence does not become a calibrated truth probability through fusion.
-
-After creating a local checkpoint, optionally start the separate research API:
-
-```sh
-VERITY_RESEARCH_MODEL_DIR=.artifacts/distilbert-base-uncased \
-  .venv/bin/python -m uvicorn backend.research_api:app --host 127.0.0.1 --port 8010 --workers 1
-```
-
-Its docs are at **http://127.0.0.1:8010/api/research/docs**. `POST /api/research/analyze/text` accepts `{"text":"an English article of at least 40 words"}`. It lazily verifies and loads local safetensors, with one model request at a time and no downloads. Unconfigured, invalid and busy states return 503; short or non-English inputs receive no score. Outputs always remain `research_only`, with `confidence: null`; the research score describes a dataset label, never factual certainty. Existing tiny pilots remain unsuitable for promotion. This service is separate from the website's production classifier selector and Vercel API.
-
-Run the actual saved-checkpoint integration check separately:
-
-```sh
-VERITY_TEST_RESEARCH_MODEL_DIR=.artifacts/distilbert-base-uncased \
-  .venv/bin/python -m pytest tests/test_research.py -q -k actual_local
-```
-
-See [baseline audit](docs/BASELINE_AUDIT.md), [dataset contracts](docs/DATASETS.md), [multimodal pipelines](docs/MULTIMODAL_PIPELINES.md), [security](docs/SECURITY.md), [deployment and Docker](docs/DEPLOYMENT.md), and [implementation record](docs/CHANGELOG_IMPLEMENTATION.md). Docker Compose configuration is provided; image-build verification depends on a running Docker daemon.
-
-## Optional paired-feature fusion research
-
-Early, late and attention fusion training/inference are available locally for operator-reviewed paired embedding datasets. These are research models, with no production checkpoint or new accuracy claim. See [the dataset contract and commands](docs/ADVANCED_CLASSIFICATION_AUDIT.md), including validation results and remaining limitations. Production LR/SVM weights remain unchanged.
+No license file is currently included in this repository.
