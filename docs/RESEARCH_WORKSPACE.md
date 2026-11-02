@@ -19,6 +19,14 @@ The requested reference image guides the dark charcoal/navy panels, violet actio
 
 This implements the specifically requested workspace, not every planned page/research phase in the master prompt. There are no fabricated analytics, published ratings, quotes or result examples. Screenshots use actual app rendering; any practice article is labeled illustrative.
 
+## Supplied reference refinement (2026-11-02)
+
+The follow-up reference is applied to the existing working system: prominent Text, Image and Video tabs, a separate row for the retained URL/audio tools, a larger editor and diamond assessment graphic. Tabs support Left/Right, Home/End and a single keyboard tab stop, with an explicitly named content panel. Source/context notes are available in every assessment mode and survive mode changes; detection-only mode explains that source retrieval needs a verification mode. The existing 20,000-character and 30-report compatibility limits remain in place. Saving remains opt-in, and restoring a report cancels pending article extraction and text imports.
+
+Existing model, media, source-retrieval, reader-review and report features are retained. This refinement does not configure the Groq service mentioned in the reference, invent evidence, or add a new factual-verdict model. The current implementation uses its existing providers and discloses their actual availability.
+
+Refinement verification: `.venv/bin/python -m pytest tests -q` **97 passed, 1 optional checkpoint skipped**; `npm run test:unit` **13 passed**; production build, typecheck and `git diff --check` passed. The final production-build browser suite, `PLAYWRIGHT_BASE_URL=http://127.0.0.1:3200 npm run test:e2e -- --workers=1`, passed **52 checks** with **16 opt-in integrations skipped**. The first run exposed ambiguous URL labels and print citations hidden by the new content wrapper; both were fixed before this passing full rerun. Six README screenshots and a 390 × 844 mobile preview were captured from actual rendering and visually inspected. Publication and CI outcomes are recorded in the release pull request.
+
 ## Validation
 
 Node logic checks passed **13 tests**, including legacy history, source-only records and corrupt-browser-record handling. The first full local production-build browser run passed **48 desktop/mobile checks**, with **16 opt-in model/media integrations skipped**. The final focused rerun passed **16 desktop/mobile cases**, including cancellation of an in-flight URL extraction on Reset and the complete source-only saved-report lifecycle. Python regressions passed **97 tests**, with **1 optional checkpoint case skipped**. Production build, typecheck and diff checks passed. Actual screenshots were refreshed from the final local production build and visually inspected. CI and publication results are recorded in the corresponding GitHub pull request. No new model accuracy is claimed.

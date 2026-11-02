@@ -8,6 +8,7 @@ import DropArea from "./drop-area";
 import Investigation from "./investigation";
 import WorldNews from "./world-news";
 import { AssessmentControls, VerificationAssessment, defaultAssessment, type SourceVerification } from "./assessment";
+import InputTabs from "./input-tabs";
 import { AssessmentPreview, SavedAssessments } from "./research-workspace";
 import type { Analysis, Explanation, Saved, ReaderReview } from "./news-types";
 import { reviewLabels } from "./news-types";
@@ -120,6 +121,7 @@ export default function Home() {
     persistHistory([{ id: crypto.randomUUID(), date: new Date().toISOString(), text: analyzedText, result, verification, report: structuredReport, mediaTrace, source, options: { ...assessmentOptions }, review: currentReview }, ...history]);
   }
   function restoreAssessment(item: Saved) {
+    extractionRequest.current?.abort(); setExtracting(false); textImport.current++;
     assessmentRequest.current?.abort(); setBusy(false); setError("");
     setText(item.text); setAnalyzedText(item.text); setMediaTrace(item.mediaTrace || null); setMediaFiles(null); setStructuredReport(item.report || null); setVerification(item.verification || null); setResult(item.result); setSource(item.source || null); setEvidence(null); setMediaEvidenceContext(null); setQuery(item.verification?.claim || item.result?.claims[0]?.text || item.text.slice(0, 250));
     setAssessmentOptions(item.options || { ...defaultAssessment, mode: item.verification ? item.result ? "detect_verify" : "verify" : "detect" }); setCurrentReview(item.review || "none"); setMode("text"); navigate("analyze");
@@ -234,7 +236,8 @@ export default function Home() {
         {(view === "analyze" || view === "dashboard") && <>
           <section className="workspace-grid" aria-label="News analysis workspace">
             <div className="analysis-card card"><div className="card-header"><div><span className="step-number">01</span><h2>Enter the news</h2></div><button className="text-link reset-workspace" onClick={resetWorkspace}>Reset</button></div>
-              <div className="input-tabs" role="tablist" aria-label="Input type"><button role="tab" aria-selected={mode === "text"} className={mode === "text" ? "selected" : ""} onClick={() => setMode("text")}><FileText size={16} />Paste text</button><button role="tab" aria-selected={mode === "url"} className={mode === "url" ? "selected" : ""} onClick={() => setMode("url")}><Link2 size={16} />Article URL</button><button role="tab" aria-selected={mode === "image"} className={mode === "image" ? "selected" : ""} onClick={() => setMode("image")}><ImagePlus size={16} />Image</button><button role="tab" aria-selected={mode === "audio"} className={mode === "audio" ? "selected" : ""} onClick={() => setMode("audio")}><Mic size={16} />Audio</button><button role="tab" aria-selected={mode === "video"} className={mode === "video" ? "selected" : ""} onClick={() => setMode("video")}><Video size={16} />Video</button></div>
+              <InputTabs mode={mode} onChange={setMode} />
+              <div className="input-panel" id="news-input-panel" role="tabpanel" aria-label={`${mode} input`}>
               {mode !== "text" && <AssessmentControls value={assessmentOptions} busy={busy} onChange={next => { setAssessmentOptions(next); setVerification(null); setResult(null); setError(""); }} />}
               {mode === "image" || mode === "video" || mode === "audio" ? <MediaInput key={`${mode}-${inputRevision}`} kind={mode} analysisBusy={busy} onAnalyze={(reviewed, trace, files) => { setSource(null); void analyze(reviewed, trace, files); }} onReviewed={(reviewed, filename, trace, files) => { setMediaFiles(files); setMediaTrace(trace); setEvidenceLanguage(trace.language); resetAnalysis(reviewed); setSource(null); setMode("text"); setNotice(`Reviewed text from ${filename} is ready. Check the article editor, then select Analyze article. The assessment covers these words only.`); setTimeout(() => document.getElementById("article-text")?.focus(), 0); }} /> : mode === "url" ? <DropArea label="Article URL drop area" hint="Drag an article link here, or enter its URL below." disabled={busy || extracting} onDrop={dropURL}><form onSubmit={event => { event.preventDefault(); void extract(); }} className="url-form"><label htmlFor="article-url">Article URL</label><div className="url-row"><input id="article-url" type="url" placeholder="https://publisher.com/article" required maxLength={2048} value={url} onChange={e => setUrl(e.target.value)} /><button className="primary-button" disabled={extracting}>{extracting ? <LoaderCircle className="spin" size={17} /> : <ArrowDown size={17} />}Extract</button></div><p className="field-help">We’ll extract the article for you to review before analysis. Some publishers block automated reading.</p></form></DropArea> : <>
                 {source && <div className="source-preview"><Globe2 size={16} /><div><strong>{source.title}</strong><span>{source.publisher}{source.truncated ? " · Long article shortened for analysis" : " · Review extracted text below"}</span></div><button className="icon-button" aria-label="Remove article source" onClick={() => setSource(null)}><X size={15} /></button></div>}
@@ -249,6 +252,7 @@ export default function Home() {
                 <div className="input-controls"><div className="model-control"><label htmlFor="model">ANALYSIS MODEL</label><select id="model" value={model} onChange={event => { setModel(event.target.value); setResult(null); }}><option value="logistic">Logistic Regression</option><option value="svm">Calibrated Linear SVM</option></select></div><button className={`primary-button analyze-button ${assessmentOptions.mode !== "detect" ? "verify-action" : ""}`} onClick={() => void analyze()} disabled={busy || text.trim().length < 10}>{busy ? <><LoaderCircle size={17} className="spin" />Assessing…</> : <>{assessmentOptions.mode === "detect_verify" ? "Detect & verify news" : assessmentOptions.mode === "verify" ? "Verify news" : "Analyze article"} <ArrowRight size={17} /></>}</button></div>
                 <label className="history-opt"><input type="checkbox" disabled={busy} checked={saveHistory} onChange={e => setSaveHistory(e.target.checked)} />Save this analysis in this browser</label>{busy && <button className="secondary-button" onClick={() => { assessmentRequest.current?.abort(); setBusy(false); }}>Cancel assessment</button>}
               </>}
+              </div>
               {error && <p className="error-message" role="alert"><Info size={17} />{error}</p>}
               <div className="privacy-note"><ShieldCheck size={14} />Analysis runs on the server. History stays in your browser when enabled.</div>
             </div>
