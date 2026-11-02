@@ -6,7 +6,7 @@ The user-requested assessment selector adds three real modes to the existing inp
 
 Results keep model scores and source review separate. Verification states: `review_required`, `unavailable`, or `no_matches`; the factual assessment is `INSUFFICIENT_EVIDENCE` with no confidence. Publisher ratings are preserved without treating a related review as the app's verdict. Pasted text and reader notes are not authenticated evidence. There is no configured/evaluated LLM verdict engine in this release.
 
-Source evidence includes exact quotations, offsets, source metadata, retrieval timestamps and date-review messages. The interface supports notebook handoff and a dedicated verification JSON export. Combined reports/history include the verification result. Verification-only reports can be downloaded but are not saved to the model-result history. Media modes operate on reviewed words, never a full-image/video truth score; raw media remains in the browser.
+Source evidence includes exact quotations, offsets, source metadata, retrieval timestamps and date-review messages. The interface supports notebook handoff and a dedicated verification JSON export. Combined reports/history include the verification result. The subsequent research-workspace interface supports manual save/restore/delete of verification-only, model-only and combined reports, including reader annotations, input text, mode, notes and sources. The shared browser history retains its existing 30-report bound. Media modes operate on reviewed words, never a full-image/video truth score; raw media remains in the browser.
 
 ## Browser loading diagnosis
 

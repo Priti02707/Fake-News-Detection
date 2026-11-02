@@ -17,13 +17,6 @@ export const defaultAssessment: AssessmentOptions = { mode: "detect", claim: "",
 export function AssessmentControls({ value, onChange, busy }: { value: AssessmentOptions; onChange: (next: AssessmentOptions) => void; busy: boolean }) {
   function update(next: Partial<AssessmentOptions>) { onChange({ ...value, ...next }); }
   return <section className="assessment-controls" aria-label="Assessment options">
-    <label htmlFor="assessment-mode">Assessment mode</label>
-    <select id="assessment-mode" disabled={busy} value={value.mode} onChange={event => update({ mode: event.target.value as AssessmentOptions["mode"] })}>
-      <option value="detect">Fake news detection</option>
-      <option value="detect_verify">Fake news detection + source verification</option>
-      <option value="verify">Source verification only</option>
-    </select>
-    <p className="field-help">{value.mode === "detect" ? "Trained English article model, explanations and uncertainty." : value.mode === "verify" ? "Find published reviews and exact source passages without running the article classifier." : "Run the trained model and gather current source evidence in one action."}</p>
     {value.mode !== "detect" && <>
       <details className="assessment-source-notes"><summary>Source &amp; verification notes (optional)</summary>
         <label htmlFor="assessment-claim">Specific claim to verify</label><input id="assessment-claim" disabled={busy} minLength={8} maxLength={300} value={value.claim} onChange={event => update({ claim: event.target.value })} placeholder="Leave empty to select one candidate statement from the news text" />
@@ -32,6 +25,16 @@ export function AssessmentControls({ value, onChange, busy }: { value: Assessmen
         <label htmlFor="assessment-notes">Your context and verification notes</label><textarea id="assessment-notes" disabled={busy} maxLength={1000} value={value.notes} onChange={event => update({ notes: event.target.value })} placeholder="Event date, location, original source or details you want to check…" />
         <label htmlFor="assessment-language">Published review language</label><select id="assessment-language" disabled={busy} value={value.language} onChange={event => update({ language: event.target.value })}><option value="all">All languages</option><option value="en">English</option><option value="hi">Hindi</option></select>
       </details>
+    </>}
+    <label htmlFor="assessment-mode">Assessment mode</label>
+    <select id="assessment-mode" disabled={busy} value={value.mode} onChange={event => update({ mode: event.target.value as AssessmentOptions["mode"] })}>
+      <option value="detect">Fake news detection</option>
+      <option value="detect_verify">Fake news detection + source verification</option>
+      <option value="verify">Source verification only</option>
+    </select>
+    <p className="field-help">{value.mode === "detect" ? "Trained English article model, explanations and uncertainty." : value.mode === "verify" ? "Find published reviews and exact source passages without running the article classifier." : "Run the trained model and gather current source evidence in one action."}</p>
+    {value.mode !== "detect" && <>
+
       <p className="field-help">Verification sends the selected claim to GDELT and, when configured, Google Fact Check. Without an explicit source, up to two news leads are read. Provider failures remain visible; a match is not a factual verdict. Media files stay in your browser.</p>
     </>}
   </section>;
