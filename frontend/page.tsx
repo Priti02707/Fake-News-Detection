@@ -9,6 +9,7 @@ import Investigation from "./investigation";
 import WorldNews from "./world-news";
 import { AssessmentControls, VerificationAssessment, defaultAssessment, type SourceVerification } from "./assessment";
 import InputTabs from "./input-tabs";
+import WorkspaceIntro, { type ModelReadiness } from "./workspace-intro";
 import { AssessmentPreview, SavedAssessments } from "./research-workspace";
 import type { Analysis, Explanation, Saved, ReaderReview } from "./news-types";
 import { reviewLabels } from "./news-types";
@@ -52,6 +53,7 @@ export default function Home() {
   const [currentReview, setCurrentReview] = useState<ReaderReview>("none");
   const [inputRevision, setInputRevision] = useState(0);
   const [apiStatus, setApiStatus] = useState<"loading" | "ready" | "unavailable">("loading");
+  const [modelStatus, setModelStatus] = useState<ModelReadiness>("loading");
   const [factCheckConfigured, setFactCheckConfigured] = useState<boolean | null>(null);
   const assessmentPanelRef = useRef<HTMLDivElement>(null);
   const [assessmentOptions, setAssessmentOptions] = useState(defaultAssessment);
@@ -106,9 +108,9 @@ export default function Home() {
 
   useEffect(() => {
     const controller = new AbortController();
-    api<{ status: string; fact_check_configured: boolean }>("health", undefined, controller.signal).then(data => {
-      if (!controller.signal.aborted) { setApiStatus(data.status === "ok" ? "ready" : "unavailable"); setFactCheckConfigured(data.fact_check_configured); }
-    }).catch(() => { if (!controller.signal.aborted) setApiStatus("unavailable"); });
+    api<{ status: string; model_ready: boolean; fact_check_configured: boolean }>("health", undefined, controller.signal).then(data => {
+      if (!controller.signal.aborted) { setApiStatus(data.status === "ok" ? "ready" : "unavailable"); setModelStatus(data.status === "ok" && data.model_ready === true ? "ready" : "unavailable"); setFactCheckConfigured(data.fact_check_configured); }
+    }).catch(() => { if (!controller.signal.aborted) { setApiStatus("unavailable"); setModelStatus("unavailable"); } });
     return () => controller.abort();
   }, []);
 
@@ -230,10 +232,11 @@ export default function Home() {
       <div className="sidebar-bottom"><div className="avatar">P</div><div><strong>Priti Kumari</strong><span>Project Owner & Developer</span></div><a href="https://github.com/Priti02707" target="_blank" rel="noreferrer" aria-label="View Priti Kumari’s GitHub profile"><ArrowUpRight size={17} /></a></div>
     </aside>
     <div className="main-shell">
-      <header className="topbar"><div><span className="breadcrumb">Workspace</span><ChevronRight size={14} /><span>{nav.find(item => item.id === view)?.label}</span></div><ThemeToggle /><span className="research-badge"><span className={apiStatus === "ready" ? "api-ready" : "api-waiting"} />{apiStatus === "ready" ? "API CONNECTED" : apiStatus === "loading" ? "CONNECTING" : "API UNAVAILABLE"}</span></header>
+      <header className="topbar"><div><span className="breadcrumb">Workspace</span><ChevronRight size={14} /><span>{view === "dashboard" || view === "analyze" ? "News detector" : nav.find(item => item.id === view)?.label}</span></div><ThemeToggle /><span className="research-badge"><span className={apiStatus === "ready" ? "api-ready" : "api-waiting"} />{apiStatus === "ready" ? "API CONNECTED" : apiStatus === "loading" ? "CONNECTING" : "API UNAVAILABLE"}</span><a className="workspace-github" href="https://github.com/Priti02707/Fake-News-Detection" target="_blank" rel="noreferrer">GitHub <ArrowUpRight size={14} /></a></header>
       <main id="main" tabIndex={-1}>
         {notice && <div className="notice" role="status"><Info size={17} />{notice}<button className="icon-button" aria-label="Dismiss notice" onClick={() => setNotice("")}><X size={16} /></button></div>}
         {(view === "analyze" || view === "dashboard") && <>
+          <WorkspaceIntro modelStatus={modelStatus} />
           <section className="workspace-grid" aria-label="News analysis workspace">
             <div className="analysis-card card"><div className="card-header"><div><span className="step-number">01</span><h2>Enter the news</h2></div><button className="text-link reset-workspace" onClick={resetWorkspace}>Reset</button></div>
               <InputTabs mode={mode} onChange={setMode} />

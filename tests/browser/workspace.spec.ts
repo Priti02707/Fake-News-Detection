@@ -1,6 +1,24 @@
 import { expect, test } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 
+test("multimodal introduction reports actual model readiness separately from API health", async ({ page }) => {
+  await page.goto("/");
+  const intro = page.getByRole("region", { name: "Is this news credible? Check the claims." });
+  await expect(intro.getByRole("status")).toHaveText("Text model connected");
+  await expect(intro).toContainText("Raw images, audio and video stay in your browser.");
+  await expect(page.locator(".workspace-github")).toHaveAttribute("href", "https://github.com/Priti02707/Fake-News-Detection");
+  await page.route("**/api/health", route => route.fulfill({ json: { status: "ok", model_ready: false, fact_check_configured: false } }));
+  await page.reload();
+  await expect(intro.getByRole("status")).toHaveText("Text model unavailable");
+  await expect(page.locator(".research-badge")).toHaveText("API CONNECTED");
+  await page.unroute("**/api/health");
+  await page.route("**/api/health", route => route.abort());
+  await page.reload();
+  await expect(intro.getByRole("status")).toHaveText("Text model unavailable");
+  await expect(page.locator(".research-badge")).toHaveText("API UNAVAILABLE");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
 test("input tabs support keyboard selection and retain context notes across modes", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
