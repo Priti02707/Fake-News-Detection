@@ -2,6 +2,10 @@
 
 Baseline and file-by-file plan: [BASELINE_AUDIT.md](BASELINE_AUDIT.md). Baseline commit: `24110fc395de5581ac52eaa0a0a8130451349d5f`.
 
+## Project website address — 2026-11-02
+
+Added `https://fake-news-detection-priti.vercel.app` to the existing Vercel project and assigned it to the current production deployment. The shorter `fake-news-detection.vercel.app` was already in use. The new domain is verified and attached at project level so future production deployments update it automatically. The previous address remains attached. Updated the README, deployment instructions and public production-smoke target. The application brand and internal Vercel project are unchanged.
+
 ## Separate frontend source folder — 2026-11-02
 
 Moved the 18 interface, CSS, helper and browser-worker source files from `app/` into `frontend/`, byte-for-byte unchanged. `app/page.tsx` now re-exports `frontend/page.tsx`; the Next.js layout imports `frontend/globals.css`, and the icon stays under `app/`. Updated the unit-test import, current architecture notes and README source map; added `frontend/README.md`. Root npm commands, Python API, Docker/Vercel configuration and production models are preserved.

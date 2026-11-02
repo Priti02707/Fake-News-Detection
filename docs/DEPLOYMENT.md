@@ -1,6 +1,6 @@
 # Deployment and operations
 
-The existing project is `priti-09/verity-news`, with production alias https://verity-news-sable.vercel.app and source repository https://github.com/Priti02707/Fake-News-Detection. Preserve this project and alias rather than creating another site.
+The existing project is `priti-09/verity-news`, with production alias https://fake-news-detection-priti.vercel.app and source repository https://github.com/Priti02707/Fake-News-Detection. The former address https://verity-news-sable.vercel.app remains attached for compatibility. Preserve this existing project; both domains track future production deployments.
 
 Vercel builds Next.js and routes `/api/*` to the FastAPI Python entry point. Only lightweight runtime requirements are installed. Browser recognition models download lazily on request. Local PyTorch checkpoints, datasets, research reports/configuration and caches are excluded from function packaging. Google Fact Check uses the optional server-side `GOOGLE_FACT_CHECK_API_KEY`; no paid API is required for text/OCR/transcription/manual evidence review.
 
@@ -40,6 +40,6 @@ Visit `/api/research/docs` on that port. Health exposes `configured` and `model_
 
 ## Production browser verification
 
-`playwright.config.ts` accepts `PLAYWRIGHT_BASE_URL`; its default remains the local server. After deploying, run `PLAYWRIGHT_BASE_URL=https://verity-news-sable.vercel.app npm run test:e2e -- --workers=1`. This checks the actual public site, including new media/evidence flows. Optional model integrations remain opt-in.
+`playwright.config.ts` accepts `PLAYWRIGHT_BASE_URL`; its default remains the local server. After deploying, run `PLAYWRIGHT_BASE_URL=https://fake-news-detection-priti.vercel.app npm run test:e2e -- --workers=1`. This checks the actual public site, including new media/evidence flows. Optional model integrations remain opt-in.
 
 The manually triggered **Production smoke checks** GitHub workflow runs public desktop/mobile workflows plus actual image OCR and original local-video frame/timeline checks from a separate network. Trigger with `gh workflow run production-smoke.yml --ref main`. Add `-f research_models=true` to also execute actual CLIP, NLI and Whisper checks with large model downloads. These are functional checks, not domain accuracy benchmarks. It needs no new application secrets and does not upload raw user media. A successful Vercel build, authenticated health check and public browser smoke run are distinct results; report any failed/unavailable stage explicitly.

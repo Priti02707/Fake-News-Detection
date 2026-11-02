@@ -2,7 +2,7 @@
 
 A misinformation investigation platform by **Priti**. Inspect article-model explanations, investigate image–news mismatches, follow video speech and frame text on a timeline, and gather cited evidence with explicit uncertainty.
 
-**Live website:** https://verity-news-sable.vercel.app · [Vercel project](https://vercel.com/priti-09/verity-news)
+**Live website:** https://fake-news-detection-priti.vercel.app · [Vercel project](https://vercel.com/priti-09/verity-news)
 
 Built from the original Fake News Detection notebook, with a Next.js interface, FastAPI backend, reproducible training, and portable model parameters that require no TensorFlow or scikit-learn in production.
 

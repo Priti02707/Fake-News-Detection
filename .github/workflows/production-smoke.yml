@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
-      PLAYWRIGHT_BASE_URL: https://verity-news-sable.vercel.app
+      PLAYWRIGHT_BASE_URL: https://fake-news-detection-priti.vercel.app
     steps:
       - uses: actions/checkout@v7.0.1
       - uses: actions/setup-node@v7.1.0
