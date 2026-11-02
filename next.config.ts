@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 const config: NextConfig = {
+  deploymentId: process.env.VERCEL_DEPLOYMENT_ID || process.env.NEXT_DEPLOYMENT_ID,
   webpack(config) {
     config.resolve.alias = { ...config.resolve.alias, "sharp$": false, "onnxruntime-node$": false };
     return config;

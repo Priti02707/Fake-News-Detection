@@ -120,6 +120,22 @@ class MultimodalInput(TextV2Input):
     media: MediaObservation
 
 
+class AssessmentInput(TextV2Input):
+    mode: Literal["detect", "verify", "detect_verify"] = "detect_verify"
+    claim: str | None = Field(default=None, min_length=8, max_length=300)
+    source_url: str | None = Field(default=None, min_length=8, max_length=2048)
+    source_text: str | None = Field(default=None, min_length=40, max_length=20000)
+    notes: str = Field(default="", max_length=1000)
+    language: Literal["all", "en", "hi"] = "all"
+    media: MediaObservation | None = None
+
+    @model_validator(mode="after")
+    def readable_text(self):
+        if len(self.text.strip()) < 10:
+            raise ValueError("Enter at least 10 characters of readable news text.")
+        return self
+
+
 class VerifyInput(BaseModel):
     claim: str = Field(min_length=8, max_length=300)
     urls: list[Annotated[str, Field(min_length=8, max_length=2048)]] = Field(default_factory=list, max_length=2)
@@ -152,3 +168,26 @@ class VerificationResponse(BaseModel):
     evidence: list[dict]
     warnings: list[str]
     explanation: str
+
+
+class SourceVerificationReport(BaseModel):
+    status: Literal["review_required", "unavailable", "no_matches"]
+    assessment: Literal["INSUFFICIENT_EVIDENCE"]
+    confidence: None = None
+    claim: str
+    claim_selection: Literal["reader_selected", "heuristic_candidate"]
+    checked_at: str
+    news: dict
+    fact_checks: dict
+    evidence: list[dict]
+    warnings: list[str]
+    reader_notes: str
+    explanation: str
+
+
+class AssessmentResponse(BaseModel):
+    mode: Literal["detect", "verify", "detect_verify"]
+    analysis: dict | None
+    report: AnalysisReport | None
+    classification_error: str | None
+    verification: SourceVerificationReport | None

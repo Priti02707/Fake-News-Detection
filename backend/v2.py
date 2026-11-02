@@ -4,7 +4,8 @@ import time
 from fastapi import APIRouter, HTTPException
 from starlette.concurrency import run_in_threadpool
 
-from backend.schemas import AnalyzeInput, TextV2Input, URLInput, MultimodalInput, VerifyInput, EvidenceInput, AnalysisEnvelope, VerificationResponse
+from backend.schemas import AnalyzeInput, TextV2Input, URLInput, MultimodalInput, VerifyInput, EvidenceInput, AnalysisEnvelope, VerificationResponse, AssessmentInput, AssessmentResponse
+from backend.assessment import assess
 from backend.language import identify_language
 from backend.fusion import fuse
 from backend.registry import registry
@@ -24,6 +25,10 @@ def build_router(analyze, extract, retrieve, metrics, evaluation):
     def text_analysis(payload: TextV2Input):
         result = classify(payload)
         return {"analysis": result, "report": fuse(result, findings=payload.reader_findings)}
+
+    @router.post("/assess", response_model=AssessmentResponse)
+    async def news_assessment(payload: AssessmentInput):
+        return await assess(payload, classify, retrieve)
 
     @router.post("/analyze/url", response_model=AnalysisEnvelope)
     async def url_analysis(payload: URLInput):

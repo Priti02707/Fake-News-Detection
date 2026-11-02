@@ -58,6 +58,7 @@ flowchart LR
 - **Video Speech Extraction and Analysis:** Transcribe short clips, inspect sampled frame text, and follow timestamps.
 - **News URL Analysis:** Extract a public article and review its text before analysis.
 - **World News Check:** Search international news and published fact-checks together, with language, publisher-country, and recent-news date filters. Review publisher ratings and open sources in the evidence notebook.
+- **Detect & Verify:** Choose detection, source verification, or both from **Assessment mode**. Add an optional claim, source URL, evidence text and context notes. One action returns separate model and source-review results, with export and evidence-notebook handoff.
 - **Fake/Real Prediction:** Receive a fake-like or real-like writing-pattern result, or **Uncertain** when appropriate.
 - **Explainable Prediction Results:** Inspect influential words, phrase contributions, and reasons for uncertainty.
 - **Model Performance Dashboard:** View recorded accuracy, dataset splits, and confusion matrices.
@@ -123,6 +124,10 @@ The displayed score describes the model's prediction, not factual truth.
 
 ![Priti Kumari project attribution in the actual application](docs/screenshots/developer.png)
 
+**Combined detection and source verification** — actual dark-theme input controls, with illustrative practice text loaded.
+
+![Assessment mode and Detect & verify news action](docs/screenshots/detect-verify.png)
+
 ## Installation
 
 Prerequisites: **Node.js 22 or newer**, **npm**, and **Python 3.12**.
@@ -160,6 +165,7 @@ See [setup, testing, and deployment](docs/DEPLOYMENT.md) for optional services a
 
 ## How to Use
 
+- **Combined assessment:** Choose **Fake news detection + source verification** in **Assessment mode**, enter/review the news text, optionally expand **Source & verification notes**, then select **Detect & verify news**. The app runs the real text model and searches for related sources, reading at most two news leads when no explicit source is supplied. Published ratings and verbatim passages remain review aids; no automatic factual verdict is claimed. **Source verification only** skips the classifier and allows downloading its report; combined reports can also be saved in browser analysis history. Provider outages preserve any available model result.
 - **World news:** Open **World news check**, enter a claim or topic, choose source language, publisher country and news date window, then select **Check world news**. Worldwide/all languages searches across indexed sources; it does not translate queries or guarantee every country or story is covered. Use **Review this source** to inspect evidence. Country and date filters apply to GDELT news only; published fact-checks use the selected language across countries and dates. The classifier remains English-only, and search results do not automatically establish truth or falsehood.
 - **Text:** Select **Paste text**, type/paste an article or drop a `.txt`/`.md` file, choose a model, and select **Analyze article**.
 - **Image:** Select **Image**, upload/drop a readable screenshot, select **Extract image text**, and correct recognition errors.
@@ -218,6 +224,8 @@ reports/      Recorded research experiments and dataset audits
 
 Technical references: [architecture](docs/ARCHITECTURE.md), [models](docs/MODELS.md),
 [datasets](docs/DATASETS.md), [security](docs/SECURITY.md), and [implementation status](docs/IMPLEMENTATION_STATUS.md).
+
+See [combined assessment and loading recovery](docs/DETECT_VERIFY.md) for API behavior, verification limits and blank-screen troubleshooting.
 
 ## Future Improvements
 

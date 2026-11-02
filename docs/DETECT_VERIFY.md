@@ -1,0 +1,21 @@
+# Combined detection and source verification
+
+The user-requested assessment selector adds three real modes to the existing input workflow: Fake news detection; Fake news detection + source verification; and Source verification only. Detection remains the default for compatibility. Optional controls accept one specific claim, a public evidence URL, pasted source text, reader context notes, and a published-review language. The action label follows the selected mode.
+
+`POST /api/v2/assess` accepts `AssessmentInput` and returns `AssessmentResponse`. Detection reuses the existing calibrated classifier and coverage report. Verification selects one reader claim or heuristic candidate, runs GDELT/Google Fact Check concurrently, and retrieves exact BM25 passages from up to two explicit sources or two discovered news URLs. Search calls are bounded to 14 seconds and each parallel retrieval to 7 seconds; the browser cancels after 28 seconds. Existing SSRF, request/body and provider concurrency limits apply. The original HTTP fetch may finish after an outer coroutine timeout; cancellation is not a guarantee of terminating already-started network work.
+
+Results keep model scores and source review separate. Verification states: `review_required`, `unavailable`, or `no_matches`; the factual assessment is `INSUFFICIENT_EVIDENCE` with no confidence. Publisher ratings are preserved without treating a related review as the app's verdict. Pasted text and reader notes are not authenticated evidence. There is no configured/evaluated LLM verdict engine in this release.
+
+Source evidence includes exact quotations, offsets, source metadata, retrieval timestamps and date-review messages. The interface supports notebook handoff and a dedicated verification JSON export. Combined reports/history include the verification result. Verification-only reports can be downloaded but are not saved to the model-result history. Media modes operate on reviewed words, never a full-image/video truth score; raw media remains in the browser.
+
+## Browser loading diagnosis
+
+The reported Chrome/Edge blank screen was not reproduced: the existing public site passed six desktop/mobile loading, analysis and attribution checks. Both public aliases returned HTTP 200 and API health was ready. The deployment-specific URL redirected to Vercel authentication. These observations do not establish why the user's browser was blank.
+
+Added route/root error boundaries with a visible reload/alternate-link recovery screen for render failures, and a per-deployment Next.js deployment ID when provided by the host to reduce stale-asset mismatches. Boundaries cannot recover a browser that cannot download or execute the error UI's own JavaScript. The public site intentionally disallows iframe embedding. Open https://fake-news-detection-priti.vercel.app/ directly in Chrome/Edge; try a hard refresh or private window if cached assets/extensions are involved. Alternate public address: https://verity-news-sable.vercel.app/. Do not claim the user's exact failure is resolved without confirmation.
+
+References: installed Next.js error/deploymentId documentation; [Vercel environment variables](https://vercel.com/docs/environment-variables/system-environment-variables). No security headers or TLS checks were disabled.
+
+Local validation: `.venv/bin/python -m pytest tests -q` — **97 passed, 1 opt-in checkpoint test skipped**; production build and typecheck passed. `PLAYWRIGHT_BASE_URL=http://127.0.0.1:3100 npx playwright test tests/browser/assessment.spec.ts tests/browser/app.spec.ts tests/browser/multimodal.spec.ts tests/browser/project-identity.spec.ts --workers=1 --output=/private/tmp/fake-news-assessment-checks` — **18 passed** on desktop/mobile. The combined-case browser test uses the real classifier and a controlled evidence response; the verification-only case exercises actual pasted-source retrieval with provider failure handling. A simulated browser-environment render failure verifies recovery UI. These are functional checks, not accuracy benchmarks.
+
+PR CI and public deployment records are linked from the release's GitHub pull request; merge only after passing CI and verify the public deployment before reporting publication. This feature does not certify later master-prompt phases or independent fact-checking accuracy.

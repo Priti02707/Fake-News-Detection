@@ -36,3 +36,7 @@ These block their dependent capabilities, not Phase 0 planning or the rename. Do
 - Verification results, Git checkpoint, publication and unresolved issues recorded in [Phase 0 report](docs/PHASE_0_REPORT.md).
 
 Next: Phase 1 foundation acceptance audit, then Phase 2 design system. Open later phases one at a time using their acceptance gates. No datasets/checkpoints are downloaded automatically and no external metrics are relabeled as new experiments.
+
+## Subsequent explicit user request: combined assessment
+
+The user requested the screenshot-style detect/verify selector after Phase 0. This bounded feature adds detection, source-only and combined modes, source/context notes, independent evidence reports and browser recovery; see [implementation and checks](docs/DETECT_VERIFY.md). It does not certify the full design-system, grounded-LLM or later research phases. Provider configuration remains a dependency.
