@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { reviewVisual, buildTimeline, frameSampleTimes } from '../../app/multimodal.ts';
+import { reviewVisual, buildTimeline, frameSampleTimes } from '../../frontend/multimodal.ts';
 
 const comparison = (claimScore, alternativeScore) => ({ model: 'synthetic-unit-fixture', revision: 'fixture', claim: 'a city flood', alternative: 'a dry street', matches: [{ label: 'a dry street', score: alternativeScore }, { label: 'a city flood', score: claimScore }], scope: 'test' });
 const video = (segments = [], frames = []) => ({ filename: 'synthetic.webm', kind: 'video', language: 'en', original_text: '', segments, frames });

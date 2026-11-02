@@ -2,6 +2,12 @@
 
 Baseline and file-by-file plan: [BASELINE_AUDIT.md](BASELINE_AUDIT.md). Baseline commit: `24110fc395de5581ac52eaa0a0a8130451349d5f`.
 
+## Separate frontend source folder — 2026-11-02
+
+Moved the 18 interface, CSS, helper and browser-worker source files from `app/` into `frontend/`, byte-for-byte unchanged. `app/page.tsx` now re-exports `frontend/page.tsx`; the Next.js layout imports `frontend/globals.css`, and the icon stays under `app/`. Updated the unit-test import, current architecture notes and README source map; added `frontend/README.md`. Root npm commands, Python API, Docker/Vercel configuration and production models are preserved.
+
+Local validation: production build and TypeScript check passed; **10 Node unit tests passed**; **63 Python tests passed, 1 opt-in checkpoint test skipped**. Historical release file lists retain their original paths. Cloud CI and production verification outcomes accompany publication of this refactor.
+
 ## Connected multimodal verification
 
 Connected image-caption review, chronological video investigation, bounded automatic evidence gathering, contradiction/uncertainty presentation and contextual JSON/print reports. Code commit `60ab8ae` was deployed; the complete public production smoke workflow passed 18 desktop/mobile cases, 4 real OCR/video cases and 3 real CLIP/NLI/Whisper cases from GitHub’s runner. Added full-clip sampling, unique notebook/frame IDs and earlier image decoder checks. No production model weights, metrics or registry were changed. See [release record and changed files](MULTIMODAL_RELEASE.md) for tests, model limitations and production publication status. Verification records and the README frontend file guide were finalized on 2026-11-02.

@@ -215,7 +215,8 @@ Verify `/api/health` after deployment. Add the optional Google API key in Vercel
 ## Structure
 
 ```text
-app/                    Next.js website and responsive styles
+frontend/               React interface, styles, components and browser workers
+app/                    Next.js route entry, root layout and icon
 api/index.py            Vercel Python entry point
 backend/main.py         API endpoints and uncertainty policy
 backend/inference.py    Portable TF-IDF and calibrated linear inference
@@ -227,19 +228,19 @@ tests/                  API and browser tests
 
 ### Where is the frontend?
 
-The **`app/` folder is the frontend**. It uses Next.js, React and TypeScript.
+The **`frontend/` folder contains the website interface**, built with Next.js, React and TypeScript. The small `app/` folder connects this interface to Next.js routing.
 
 | File | What to edit |
 |---|---|
-| [`app/page.tsx`](app/page.tsx) | Main page, navigation, input tabs, results and history |
-| [`app/globals.css`](app/globals.css) | Colors, spacing, responsive layouts and print styles |
+| [`frontend/page.tsx`](frontend/page.tsx) | Main page, navigation, input tabs, results and history |
+| [`frontend/globals.css`](frontend/globals.css) | Colors, spacing, responsive layouts and print styles |
 | [`app/layout.tsx`](app/layout.tsx) | Root page layout and website metadata |
-| [`app/media-input.tsx`](app/media-input.tsx) | Image/video uploads, previews and extraction review |
-| [`app/image-context.tsx`](app/image-context.tsx) | Image–caption comparison and investigation controls |
-| [`app/video-timeline.tsx`](app/video-timeline.tsx) | Timestamped video investigation interface |
-| [`app/investigation.tsx`](app/investigation.tsx) | Evidence search, citations, reader findings and exports |
+| [`frontend/media-input.tsx`](frontend/media-input.tsx) | Image/video uploads, previews and extraction review |
+| [`frontend/image-context.tsx`](frontend/image-context.tsx) | Image–caption comparison and investigation controls |
+| [`frontend/video-timeline.tsx`](frontend/video-timeline.tsx) | Timestamped video investigation interface |
+| [`frontend/investigation.tsx`](frontend/investigation.tsx) | Evidence search, citations, reader findings and exports |
 
-Files ending in `.worker.ts` run model tasks in browser workers. `backend/` contains the Python API. `.next/` contains generated build output; edit the source files in `app/` to change the website. Run `npm run dev` to open the frontend at http://localhost:3000; start FastAPI as described above for API-backed workflows.
+Files ending in `.worker.ts` run model tasks in browser workers. `backend/` contains the Python API. `.next/` contains generated build output; edit the source files in `frontend/` to change the website. Root `package.json`, Next.js configuration and the API deployment stay in place, so existing commands continue to work. Run `npm run dev` to open the frontend at http://localhost:3000; start FastAPI as described above for API-backed workflows.
 
 ## Data handling and limitations
 

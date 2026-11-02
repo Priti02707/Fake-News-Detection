@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "./globals.css";
+import "../frontend/globals.css";
 
 export const metadata: Metadata = {
   title: "Verity AI 2.0 — Multimodal evidence verification",
