@@ -6,7 +6,9 @@ Baseline and file-by-file plan: [BASELINE_AUDIT.md](BASELINE_AUDIT.md). Baseline
 
 Moved the 18 interface, CSS, helper and browser-worker source files from `app/` into `frontend/`, byte-for-byte unchanged. `app/page.tsx` now re-exports `frontend/page.tsx`; the Next.js layout imports `frontend/globals.css`, and the icon stays under `app/`. Updated the unit-test import, current architecture notes and README source map; added `frontend/README.md`. Root npm commands, Python API, Docker/Vercel configuration and production models are preserved.
 
-Local validation: production build and TypeScript check passed; **10 Node unit tests passed**; **63 Python tests passed, 1 opt-in checkpoint test skipped**. Historical release file lists retain their original paths. Cloud CI and production verification outcomes accompany publication of this refactor.
+Local validation: production build and TypeScript check passed; **10 Node unit tests passed**; **63 Python tests passed, 1 opt-in checkpoint test skipped**. Historical release file lists retain their original paths.
+
+Published code commit `1667153` to `main` and deployed it to the existing Vercel project: deployment `dpl_9qmeEyc8WfYxBGe7GQYijSEJ3nbm` reached READY at https://verity-news-sable.vercel.app. [GitHub CI](https://github.com/Priti02707/Fake-News-Detection/actions/runs/41385637216) passed. [Production smoke checks](https://github.com/Priti02707/Fake-News-Detection/actions/runs/41385764925) passed all three groups: desktop/mobile workflows, real image OCR/video frames, and actual CLIP/NLI/Whisper execution. This checks the relocated browser workers as well as the Next.js route entry; it does not establish new model accuracy.
 
 ## Connected multimodal verification
 
