@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
+.world-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.world-filters label{display:block;margin-bottom:8px}
+.world-filters select{width:100%;margin:0}
+.world-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin:20px 0}
+.world-result-group{min-width:0;padding-bottom:24px}
+.world-result-group>.field-help,.world-result-group>.text-link,.world-result-group>.coverage-result{margin-left:24px;margin-right:24px}
+.world-result-group .coverage-result p{font-size:12px;line-height:1.7;overflow-wrap:anywhere}
+.world-result-group button{margin-top:12px}
+.world-summary{margin-top:24px;font-size:13px;line-height:1.8}
+@media(max-width:750px){.world-filters,.world-results{grid-template-columns:1fr}}
+
 .print-only{display:none}
 @media print{.print-only{display:block;white-space:pre-wrap;overflow-wrap:anywhere}.citation textarea,.citation select{display:none}}
 

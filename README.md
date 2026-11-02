@@ -29,6 +29,7 @@ The project encourages careful review and returns an uncertain result when the a
 - **Image Text Extraction and Analysis:** Read screenshot/photo text with OCR, correct it, and classify the reviewed words.
 - **Video Speech Extraction and Analysis:** Transcribe short clips, inspect sampled frame text, and follow timestamps.
 - **News URL Analysis:** Extract a public article and review its text before analysis.
+- **World News Check:** Search international news and published fact-checks together, with language, publisher-country, and recent-news date filters. Review publisher ratings and open sources in the evidence notebook.
 - **Fake/Real Prediction:** Receive a fake-like or real-like writing-pattern result, or **Uncertain** when appropriate.
 - **Explainable Prediction Results:** Inspect influential words, phrase contributions, and reasons for uncertainty.
 - **Model Performance Dashboard:** View recorded accuracy, dataset splits, and confusion matrices.
@@ -126,6 +127,7 @@ See [setup, testing, and deployment](docs/DEPLOYMENT.md) for optional services a
 
 ## How to Use
 
+- **World news:** Open **World news check**, enter a claim or topic, choose source language, publisher country and news date window, then select **Check world news**. Worldwide/all languages searches across indexed sources; it does not translate queries or guarantee every country or story is covered. Use **Review this source** to inspect evidence. Country and date filters apply to GDELT news only; published fact-checks use the selected language across countries and dates. The classifier remains English-only, and search results do not automatically establish truth or falsehood.
 - **Text:** Select **Paste text**, type/paste an article or drop a `.txt`/`.md` file, choose a model, and select **Analyze article**.
 - **Image:** Select **Image**, upload/drop a readable screenshot, select **Extract image text**, and correct recognition errors.
 - **Video:** Select **Video**, upload/drop a short clip, select **Transcribe video**, and review the transcript. Use **Inspect video frames** for on-screen text.
@@ -139,6 +141,15 @@ Dropping content does not automatically analyze it. Some publishers block articl
 Images support PNG/JPEG/WebP up to **10 MB** and **20 megapixels**.
 Video supports MP4/WebM/MOV up to **25 MB / 60 seconds**; audio supports common formats up to **20 MB / 60 seconds**.
 Text is limited to **20,000 characters**. See the [user guide](docs/USER_GUIDE.md) for formats and troubleshooting.
+
+World news discovery uses GDELT without an API key. Published reviews require
+`GOOGLE_FACT_CHECK_API_KEY` in the backend environment; see [.env.example](.env.example).
+Missing configuration, provider outages and empty results appear separately, and an unavailable
+provider does not discard the other provider's results. The combined endpoint is
+`POST /api/world-news` with `query`, `language` (default `all`), `country` (default `all`),
+and `timespan` (`1d`, `7d`, `1month`, or `3months`). Provider contracts:
+[GDELT DOC API](https://blog.gdeltproject.org/gdelt-doc-2-0-api-debuts/) and
+[Google claims search](https://developers.google.com/fact-check/tools/api/reference/rest/v1alpha1/claims/search).
 
 ## Model Performance
 
