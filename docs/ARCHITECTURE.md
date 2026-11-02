@@ -1,5 +1,7 @@
 # Architecture
 
+Project: **Fake News Detection**. Owner and primary developer: **Priti Kumari**. This describes implemented behavior; the master-prompt expansion below is planned. Keep the existing app/, frontend/, backend/, scripts/, models/, tests/ and docs/ structure rather than scaffolding duplicate applications.
+
 ```mermaid
 flowchart LR
   Inputs[Article / URL / image / video] --> Review[Browser preview and editable review]
@@ -37,3 +39,28 @@ API v2 image/video routes accept reviewed extraction metadata, not raw media upl
 ## Classification upgrade — 2026-11-02
 
 The classification dashboard reads `/api/v2/capabilities`. Standalone audio shares bounded browser decoding/resampling and the existing Whisper worker with video. `POST /api/v2/analyze/audio` accepts reviewed words/metadata, never raw audio. Reports distinguish `prediction_scope=reviewed_media_text` from an uncertain, unevaluated full-media classification. `backend/learned_fusion.py` is imported only by the offline research commands; ordinary API startup never imports PyTorch.
+
+## Master-prompt target architecture — planned
+
+```mermaid
+flowchart TD
+  UI[React workspace] --> API[FastAPI validation and authorization]
+  API --> Inference[Versioned modality inference]
+  API --> Claims[Entities and atomic claims]
+  Claims --> Retrieval[Configured search and public-source retrieval]
+  Retrieval --> Assessment[Grounded evidence assessment]
+  Assessment --> Report[Claims, exact citations and uncertainty]
+  Inference --> Report
+  API --> Records[Owner-scoped records and retention]
+  Records --> DB[(PostgreSQL)]
+  API --> Queue[Durable media job queue]
+  Queue --> Workers[Isolated FFmpeg and model workers]
+  Workers --> Objects[Private expiring media storage]
+  Workers --> Report
+```
+
+Authentication/records/database, atomic-claim NLP, grounded automatic assessment, durable queue and server FFmpeg workers in this diagram are **planned**, not deployed services. Current production uses the diagram at the top: browser-local media, portable English models, exact retrieval and reader review. Long-running work needs durable job IDs/status, idempotency, cancellation, isolation and object expiry before routes are advertised. Database rows require authenticated owner IDs and authorization on reads/exports/deletion.
+
+Preserve original source URLs, retrieved timestamps, source-language text and quote offsets. Keep a factual verdict separate from the classifier prediction even when they disagree. Planned verdicts include Supported, Contradicted, Misleading Context, Mixed Evidence, Unverified and Insufficient Evidence; the current API automatically returns only insufficient evidence, while notebook assessments are reader-authored. Retrieved documents never become trusted execution instructions.
+
+Lifecycle: licensed data manifest → disjoint preprocessing/splits → training/validation/calibration → independent evaluation and ablations → checksummed registry entry → reviewed promotion → monitored inference. A missing checkpoint or failed provider must remain unavailable. See [phase gates](../PHASES.md) and [API contract](API_CONTRACT.md).

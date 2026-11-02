@@ -11,7 +11,7 @@ test("analyze, explain, save, download, and evaluate", async ({ page }) => {
   await expect(page.locator(".contribution-row").first()).toBeVisible();
   const download = page.waitForEvent("download");
   await page.getByRole("button", { name: "Download report" }).click();
-  expect((await download).suggestedFilename()).toBe("verity-analysis.json");
+  expect((await download).suggestedFilename()).toBe("fake-news-detection-analysis.json");
   await page.getByRole("button", { name: "Search", exact: true }).click();
   await expect(page.getByText(/Published fact-check search is not configured/)).toBeVisible();
   if (await page.getByRole("button", { name: "Open navigation" }).isVisible()) await page.getByRole("button", { name: "Open navigation" }).click();

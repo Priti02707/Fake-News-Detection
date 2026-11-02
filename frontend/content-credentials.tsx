@@ -38,7 +38,7 @@ export default function ContentCredentials({ file, onObserved }: { file: File; o
   }
   function download() {
     const url = URL.createObjectURL(new Blob([JSON.stringify({ filename: file.name, checked_at: new Date().toISOString(), signer_trust: "not_checked", remote_manifest_fetch: false, manifest }, null, 2)], { type: "application/json" }));
-    const a = document.createElement("a"); a.href = url; a.download = "verity-content-credentials.json"; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+    const a = document.createElement("a"); a.href = url; a.download = "fake-news-detection-content-credentials.json"; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
   return <section className="credentials-panel" aria-label="Content Credentials"><h4><ShieldCheck size={17} />Content Credentials</h4><p className="field-help">Inspect embedded C2PA provenance locally. This downloads the reader from jsDelivr. Remote manifests are not fetched, and signer trust is not checked.</p><button className="secondary-button" disabled={busy} onClick={() => void inspect()}>{busy ? <LoaderCircle className="spin" size={16} /> : <ShieldCheck size={16} />}Inspect Content Credentials</button>{message && <p role="status" className="field-help">{message}</p>}{manifest && <><button className="text-link" onClick={download}><Download size={14} />Download credential report</button><details><summary>Inspect manifest data</summary><pre>{JSON.stringify(manifest, null, 2)}</pre></details></>}</section>;
 }

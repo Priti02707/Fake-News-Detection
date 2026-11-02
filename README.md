@@ -1,27 +1,55 @@
-# Verity AI — Fake News Detection System
+# Fake News Detection
 
 [![Next.js](https://img.shields.io/badge/Next.js-000000?logo=nextdotjs&logoColor=white)](https://nextjs.org/)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![Vercel](https://img.shields.io/badge/Deployed_on-Vercel-000000?logo=vercel&logoColor=white)](https://fake-news-detection-priti.vercel.app/)
 
-Verity AI helps you assess news using machine learning and understandable explanations.
+Fake News Detection helps you assess news using machine learning and understandable explanations.
 Analyze English articles, review text extracted from media, and see which words influenced the prediction.
+
+**Project Owner & Primary Developer:** [Priti Kumari](https://github.com/Priti02707).
 
 > A prediction identifies learned writing patterns. It does not independently verify factual truth.
 
 ## Live Demo
 
-- **Website:** [Try Verity AI](https://fake-news-detection-priti.vercel.app/)
+- **Website:** [Try Fake News Detection](https://fake-news-detection-priti.vercel.app/)
 - **Repository:** [Priti02707/Fake-News-Detection](https://github.com/Priti02707/Fake-News-Detection)
 
 ## About the Project
 
 Misleading news can spread quickly and make reliable information harder to identify.
-Verity AI helps readers examine articles using models trained on fake-labeled and real-labeled news.
+Fake News Detection helps readers examine articles using models trained on fake-labeled and real-labeled news.
 It explains the words and phrases that influenced each prediction.
 Readers can also extract text from images, audio, and videos before analyzing it.
 The project encourages careful review and returns an uncertain result when the available text is unsuitable for a confident classification.
+
+## Development status and master plan
+
+The supplied master prompt is tracked in [MASTER_REQUIREMENTS.md](docs/MASTER_REQUIREMENTS.md), with the requested **Fake News Detection** identity and the existing repository. This update completes **Phase 0: reference research, architecture and project planning**, plus the requested rename. Later phase completion is not claimed.
+
+- [Reference source comparison](docs/REFERENCE_COMPARISON.md), [implementation plan](PLAN.md), [phase acceptance gates](PHASES.md), [roadmap](ROADMAP.md), and [orchestrator](MASTER_ORCHESTRATOR.md).
+- [Architecture](docs/ARCHITECTURE.md), [API contract](docs/API_CONTRACT.md), [evaluation register](docs/MODEL_EVALUATION.md), and [Phase 0 verification report](docs/PHASE_0_REPORT.md).
+
+| Capability | Status |
+| --- | --- |
+| English article classifier, explanations, uncertainty, URL extraction | Implemented |
+| OCR, short audio/video transcription, sampled frames, evidence notebook and browser history | Implemented; browser model downloads and codec support required |
+| World-news discovery / published fact-check search | Implemented; provider availability / server API key required |
+| CLIP, NLI wording assistance, Hindi extraction, Content Credentials inspection | Experimental; no forensic or factual verdict implied |
+| Grounded automatic factual verdicts, Hindi veracity classifier, full-media/deepfake classifier | Unavailable pending configuration, artifacts and independent evaluation |
+| Authenticated durable history, long-video server jobs, new design system/pages | Planned in sequential phases |
+
+```mermaid
+flowchart LR
+  Input[Text / URL / media] --> Review[Extraction and reader review]
+  Review --> Model[English writing-pattern classifier]
+  Review --> Sources[Source search and exact passages]
+  Model --> Report[Separate model and evidence report]
+  Sources --> Notebook[Reader evidence assessment]
+  Notebook --> Report
+```
 
 ## Key Features
 
@@ -69,12 +97,13 @@ The report keeps full-media uncertainty separate from the text prediction.
 
 ## Project Screenshots
 
-Real screenshots captured from the [deployed website](https://fake-news-detection-priti.vercel.app/).
+Real screenshots captured from the renamed application running as a local production build.
+The public application is at [Fake News Detection](https://fake-news-detection-priti.vercel.app/).
 Capture details are recorded in [docs/screenshots/README.md](docs/screenshots/README.md).
 
 **Dashboard and input options**
 
-![Verity AI dashboard with text, image, video, audio, and URL input options](docs/screenshots/dashboard.png)
+![Fake News Detection dashboard with text, image, video, audio, and URL input options](docs/screenshots/dashboard.png)
 
 <details>
 <summary>View text analysis and model performance</summary>
@@ -89,6 +118,10 @@ The displayed score describes the model's prediction, not factual truth.
 ![Model performance dashboard showing dataset splits, evaluation metrics, and confusion matrices](docs/screenshots/model-performance.png)
 
 </details>
+
+**Project owner and developer**
+
+![Priti Kumari project attribution in the actual application](docs/screenshots/developer.png)
 
 ## Installation
 
@@ -201,8 +234,10 @@ No validated deepfake detector or full-media accuracy is claimed.
 
 ## Author
 
-**Priti** — [@Priti02707](https://github.com/Priti02707)
+**Priti Kumari — Project Owner & Primary Developer** — [@Priti02707](https://github.com/Priti02707)
 
 ## License
 
-No license file is currently included in this repository.
+No software license has been selected by the repository owner. No LICENSE is added automatically. External code, models and datasets retain their own terms and attribution. Reference repositories were reviewed without copying their code; see the [reuse review](docs/REFERENCE_COMPARISON.md).
+
+Development is AI-assisted. Git history preserves actual commit authorship; third-party work and historical benchmark results are not presented as newly authored or newly executed experiments.

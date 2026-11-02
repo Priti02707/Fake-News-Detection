@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import "../frontend/globals.css";
 
 export const metadata: Metadata = {
-  title: "Verity AI — Explainable Fake News Detection",
-  description: "Classify English news with calibrated models and clear explanations. Review image, video and audio text, inspect media context, and explore optional evidence. A project by Priti.",
+  title: "Fake News Detection — News Analysis & Evidence",
+  description: "Classify English news with calibrated models, review media text and investigate claims with sources. Fake News Detection, a project by Priti Kumari.",
+  applicationName: "Fake News Detection",
+  authors: [{ name: "Priti Kumari", url: "https://github.com/Priti02707" }],
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

@@ -59,7 +59,7 @@ class ResearchService:
 
 
 def create_app(service=None):
-    application = FastAPI(title="Verity local research API", version="1.0.0", docs_url="/api/research/docs")
+    application = FastAPI(title="Fake News Detection local research API", version="1.0.0", docs_url="/api/research/docs")
     application.middleware("http")(limit_body)
     service = service if service is not None else ResearchService(os.getenv("VERITY_RESEARCH_MODEL_DIR"))
 

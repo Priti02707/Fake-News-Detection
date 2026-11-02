@@ -1,4 +1,4 @@
-# Verity frontend
+# Fake News Detection frontend
 
 This folder contains the existing website's React/TypeScript interface, styles and browser workers.
 

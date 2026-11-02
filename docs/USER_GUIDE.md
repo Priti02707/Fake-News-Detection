@@ -1,4 +1,4 @@
-# Verity AI user guide
+# Fake News Detection user guide
 
 Start with the [project README](../README.md) for installation, the live demo, and model results.
 This guide covers input limits, optional tools, privacy, and common problems.

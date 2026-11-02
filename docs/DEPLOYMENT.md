@@ -47,3 +47,9 @@ The manually triggered **Production smoke checks** GitHub workflow runs public d
 ## Classification upgrade — 2026-11-02
 
 The audio route adds no server-side decoder or heavyweight runtime dependency. Keep `requirements-ml.txt` and optional `requirements-tracking.txt` outside Vercel. Training outputs belong under ignored `.artifacts/`, with paired inputs under ignored `data/multimodal/`; neither is a production model. The classification upgrade is published to the existing project. Both public addresses and live regression/media/API checks passed; see [the publication record](IMPLEMENTATION_STATUS.md#publication-record).
+
+## Fake News Detection identity and master-prompt work
+
+The public product name is **Fake News Detection**, owned and primarily developed by **Priti Kumari**. The existing `priti-09/verity-news` internal hosting identifier, compatibility aliases and historical release records are retained. Do not create a second Vercel project or a Veritas-AI repository for this rename. Legacy browser history/theme storage keys remain compatible. Current master-prompt phase readiness is tracked in [PHASES.md](../PHASES.md), not inferred from older release totals.
+
+Production `GOOGLE_FACT_CHECK_API_KEY` was absent in the last verified health response; GDELT returned unavailable during the last real search. A successful deployment does not prove provider connectivity. Add approved credentials through the hosting secret configuration before claiming published-review availability; never place keys in this document or client code. No auth database or server media worker is provisioned by Phase 0.

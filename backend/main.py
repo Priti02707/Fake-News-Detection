@@ -20,7 +20,7 @@ from backend.schemas import AnalyzeInput, URLInput, ClaimInput, EvidenceInput, W
 from backend.investigation import select_claims, retrieve_passages, publication_context
 
 ROOT = Path(__file__).resolve().parents[1]
-app = FastAPI(title="Verity News API", version="2.0.0", docs_url="/api/docs", openapi_url="/api/openapi.json")
+app = FastAPI(title="Fake News Detection API", version="2.0.0", docs_url="/api/docs", openapi_url="/api/openapi.json")
 
 
 @app.middleware("http")
