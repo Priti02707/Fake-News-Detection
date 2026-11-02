@@ -1,6 +1,6 @@
 # Actual application screenshots
 
-Captured on **2026-11-02** from the local production build of `feature/research-workspace-interface`, at http://127.0.0.1:3100 with the current FastAPI backend on port 8100. Public application: https://fake-news-detection-priti.vercel.app/.
+Captured on **2026-11-02** from the local production build of `feature/reference-workspace-refinement`, at http://127.0.0.1:3200 with the current FastAPI backend on port 8100. Public application: https://fake-news-detection-priti.vercel.app/; alternate production address: https://verity-news-sable.vercel.app/.
 
 - Chromium through installed Playwright; desktop viewport **1440 × 1320**, device scale factor 1; the app's default dark theme.
 - Build: `API_ORIGIN=http://127.0.0.1:8100 npm run build`, followed by the matching production frontend/backend servers.

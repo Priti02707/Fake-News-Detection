@@ -17,15 +17,14 @@ export const defaultAssessment: AssessmentOptions = { mode: "detect", claim: "",
 export function AssessmentControls({ value, onChange, busy }: { value: AssessmentOptions; onChange: (next: AssessmentOptions) => void; busy: boolean }) {
   function update(next: Partial<AssessmentOptions>) { onChange({ ...value, ...next }); }
   return <section className="assessment-controls" aria-label="Assessment options">
-    {value.mode !== "detect" && <>
-      <details className="assessment-source-notes"><summary>Source &amp; verification notes (optional)</summary>
+      <details key={value.mode} className="assessment-source-notes"><summary>Source &amp; verification notes (optional)</summary>
+        {value.mode === "detect" && <p className="field-help">Notes are retained with your report. Select a source verification mode to retrieve evidence.</p>}
         <label htmlFor="assessment-claim">Specific claim to verify</label><input id="assessment-claim" disabled={busy} minLength={8} maxLength={300} value={value.claim} onChange={event => update({ claim: event.target.value })} placeholder="Leave empty to select one candidate statement from the news text" />
         <label htmlFor="assessment-source-url">Evidence source URL</label><input id="assessment-source-url" disabled={busy} type="url" maxLength={2048} value={value.sourceUrl} onChange={event => update({ sourceUrl: event.target.value })} placeholder="https://original-source.example/report" />
         <label htmlFor="assessment-source-text">Evidence text to review</label><textarea id="assessment-source-text" disabled={busy} maxLength={20000} value={value.sourceText} onChange={event => update({ sourceText: event.target.value })} placeholder="Optional source passage (at least 40 characters). Pasted evidence is not authenticated." />
         <label htmlFor="assessment-notes">Your context and verification notes</label><textarea id="assessment-notes" disabled={busy} maxLength={1000} value={value.notes} onChange={event => update({ notes: event.target.value })} placeholder="Event date, location, original source or details you want to check…" />
         <label htmlFor="assessment-language">Published review language</label><select id="assessment-language" disabled={busy} value={value.language} onChange={event => update({ language: event.target.value })}><option value="all">All languages</option><option value="en">English</option><option value="hi">Hindi</option></select>
       </details>
-    </>}
     <label htmlFor="assessment-mode">Assessment mode</label>
     <select id="assessment-mode" disabled={busy} value={value.mode} onChange={event => update({ mode: event.target.value as AssessmentOptions["mode"] })}>
       <option value="detect">Fake news detection</option>

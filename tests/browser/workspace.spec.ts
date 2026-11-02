@@ -1,6 +1,28 @@
 import { expect, test } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 
+test("input tabs support keyboard selection and retain context notes across modes", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  const textTab = page.getByRole("tab", { name: "Paste text", exact: true });
+  await textTab.focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(page.getByRole("tab", { name: "Image", exact: true })).toBeFocused();
+  await expect(page.getByRole("tabpanel", { name: "image input", exact: true })).toBeVisible();
+  await page.keyboard.press("End");
+  await expect(page.getByRole("tab", { name: "Audio", exact: true })).toBeFocused();
+  await page.keyboard.press("Home");
+  await expect(textTab).toBeFocused();
+  await page.getByText("Source & verification notes (optional)", { exact: true }).click();
+  await page.getByLabel("Your context and verification notes").fill("Check the event date and original publisher.");
+  await page.getByLabel("Assessment mode", { exact: true }).selectOption("detect_verify");
+  await page.getByText("Source & verification notes (optional)", { exact: true }).click();
+  await expect(page.getByLabel("Your context and verification notes")).toHaveValue("Check the event date and original publisher.");
+  await page.getByRole("button", { name: "Reset", exact: true }).click();
+  await page.getByText("Source & verification notes (optional)", { exact: true }).click();
+  await expect(page.getByLabel("Your context and verification notes")).toHaveValue("");
+});
+
 test("reset cancels article extraction and preserves an empty editor", async ({ page }) => {
   let notifyRequest!: () => void;
   let releaseResponse!: () => void;
