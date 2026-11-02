@@ -42,6 +42,7 @@ class PinnedHTTPSConnection(http.client.HTTPSConnection):
 
 
 def _fetch_article(url):
+    requested_url = url
     for _ in range(4):
         parsed, host, port, address = resolve_public(url)
         if parsed.scheme == "https":
@@ -73,7 +74,7 @@ def _fetch_article(url):
         text = document.text if document else ""
         if not text or len(text.strip()) < 80:
             raise ValueError("We could not extract enough article text. Paste it manually; paywalls are not bypassed.")
-        return {"title": document.title or "Untitled article", "text": text[:20000], "url": url, "publisher": host, "published_date": document.date or None, "truncated": len(text) > 20000}
+        return {"requested_url": requested_url, "extraction_status": "fetched", "title": document.title or "Untitled article", "text": text[:20000], "url": url, "publisher": host, "published_date": document.date or None, "truncated": len(text) > 20000}
     raise ValueError("The page redirected too many times. Paste the article text instead.")
 
 

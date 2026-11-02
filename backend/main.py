@@ -1,4 +1,5 @@
 import asyncio
+import hashlib
 import json
 import os
 import re
@@ -10,6 +11,9 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from starlette.concurrency import run_in_threadpool
+
+from backend import settings
+from backend.registry import selected_model
 
 from backend.extraction import fetch_article, SourceBusyError
 from backend.inference import Classifier
@@ -80,8 +84,8 @@ async def evidence_passages(payload: EvidenceInput):
             raise HTTPException(502, "The source could not be read. Paste its text instead.") from error
     else:
         source = {"text": payload.text, "title": "Reader-provided source", "url": None, "publisher": "Not independently authenticated", "truncated": False, "published_date": None}
-    passages = retrieve_passages(payload.query, source["text"])
-    return {"query": payload.query, "source": {key: value for key, value in source.items() if key != "text"}, "passages": passages, "date_context": publication_context(source.get("published_date")), "retrieval_method": "BM25 lexical relevance; repeated passages deduplicated within this source", "retrieved_at": datetime.now(timezone.utc).isoformat(), "note": "Verbatim source passages ranked by word overlap, not verified facts. Review dates, context, and source independence."}
+    passages = list({item["id"]: item for query in (payload.queries or [payload.query]) for item in retrieve_passages(query, source["text"], limit=6)}.values())[:18]
+    return {"query": payload.query, "content_fingerprint": hashlib.sha256(" ".join(source["text"].split()).encode()).hexdigest()[:16], "source": {key: value for key, value in source.items() if key != "text"}, "passages": passages, "date_context": publication_context(source.get("published_date")), "retrieval_method": "BM25 lexical relevance; repeated passages deduplicated within this source", "retrieved_at": datetime.now(timezone.utc).isoformat(), "note": "Verbatim source passages ranked by word overlap, not verified facts. Review dates, context, and source independence."}
 
 
 @app.get("/api/evaluation")
@@ -120,7 +124,7 @@ async def world_news(payload: WorldNewsInput):
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "model_ready": (ROOT / "models/classifier.json").exists(), "fact_check_configured": bool(os.getenv("GOOGLE_FACT_CHECK_API_KEY"))}
+    return {"status": "ok", "model_ready": (ROOT / "models/classifier.json").exists(), "fact_check_configured": bool(os.getenv("GOOGLE_FACT_CHECK_API_KEY")), "evidence_assessor_configured": bool(os.getenv("GROQ_API_KEY")), "automatic_model_selection": selected_model(classifier().bundle)[1] if (ROOT / "models/classifier.json").exists() else None}
 
 
 @app.get("/api/metrics")
@@ -139,8 +143,12 @@ def analyze(payload: AnalyzeInput):
     non_latin_ratio = sum(ord(char) > 591 for char in letters) / max(1, len(letters))
     language = identify_language(text)
     supported = non_latin_ratio < .1 and language["code"] == "en"
-    selected = classifier().predict(text, payload.model)
-    other = classifier().predict(text, "svm" if payload.model == "logistic" else "logistic")
+    model_id, selection = selected_model(classifier().bundle)
+    if payload.model != "auto":
+        model_id = payload.model
+        selection = {"status": "explicit_legacy_request", "reason": "Explicit research/legacy API choice."}
+    selected = classifier().predict(text, model_id)
+    other = classifier().predict(text, "svm" if model_id == "logistic" else "logistic")
     probability = selected["real_probability"]
     confidence = max(probability, 1 - probability)
     reasons = []
@@ -155,7 +163,7 @@ def analyze(payload: AnalyzeInput):
     if (probability >= .5) != (other["real_probability"] >= .5):
         reasons.append("The two classifiers disagree on this article.")
     verdict = "uncertain" if reasons else ("real" if probability >= .5 else "fake")
-    return {"verdict": verdict, "language": language, "model": payload.model, "model_name": classifier().bundle["models"][payload.model]["name"], "confidence": round(confidence, 5) if supported else None, "real_probability": round(probability, 5) if supported else None, "explanations": selected["explanations"] if supported else [], "reasons": reasons, "word_count": len(words), "elapsed_ms": round((time.perf_counter() - start) * 1000, 2), "claims": select_claims(payload.text), "note": "This is a learned writing-pattern classification, not a verification of factual truth. Candidate statements are selected heuristically across the article and remain unverified."}
+    return {"verdict": verdict, "language": language, "model": model_id, "model_selection": selection, "model_name": classifier().bundle["models"][model_id]["name"], "confidence": round(confidence, 5) if supported else None, "real_probability": round(probability, 5) if supported else None, "explanations": selected["explanations"] if supported else [], "reasons": reasons, "word_count": len(words), "elapsed_ms": round((time.perf_counter() - start) * 1000, 2), "claims": select_claims(payload.text), "note": "This is a learned writing-pattern classification, not a verification of factual truth. Candidate statements are selected heuristically across the article and remain unverified."}
 
 
 @app.post("/api/extract")

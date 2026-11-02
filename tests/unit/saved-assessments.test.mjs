@@ -26,3 +26,12 @@ test("corrupt browser records cannot create empty or executable saved reports", 
   assert.equal(reports[0].verification, null);
   assert.equal(reports[0].options, undefined);
 });
+
+test("new claim reports restore safely and reject executable citation URLs", () => {
+  const finding = { claim: "The council approved the budget.", assessment: "SUPPORTED", explanation: "Fixture only.", assessor_status: "assessed", citations: [{ passage_id: "p1", quote: "Fixture quotation.", stance: "supports", source_url: "https://example.org/report" }] };
+  const updated = { ...verification, status: "assessed", assessment: "SUPPORTED", claims: [finding], scores: { evidence_relevance: 80, evidence_coverage: 100, assessed_claims: 1, scope: "Selected claim.", source_credibility: { status: "unassessed", score: null, rationale: "Unknown source." } } };
+  assert.equal(readSavedAssessments([{ ...saved, result: null, verification: updated }])[0].verification.assessment, "SUPPORTED");
+  for (const bad of [{ ...updated, claims: {} }, { ...updated, claims: [{ ...finding, citations: [{ ...finding.citations[0], source_url: "javascript:alert(1)" }] }] }, { ...updated, scores: { ...updated.scores, evidence_coverage: 900 } }]) {
+    assert.equal(readSavedAssessments([{ ...saved, verification: bad }])[0].verification, null);
+  }
+});

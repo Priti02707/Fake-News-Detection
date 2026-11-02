@@ -44,3 +44,7 @@ The user requested the screenshot-style detect/verify selector after Phase 0. Th
 ## Subsequent explicit user request: research-workspace interface
 
 Implemented the user-supplied dark/violet editor-and-assessment layout with preserved Fake News Detection identity. Manual saved assessments now include verification-only reports, original input, mode, notes, source metadata and reader reviews; reset, restoration, download, deletion and clear actions are connected. Existing routes, models and browser-local media remain available. This is a bounded interface/history release, not certification of all remaining master-prompt phases. See [workspace behavior and verification](docs/RESEARCH_WORKSPACE.md).
+
+## Approved light refactor: automatic evidence assessment
+
+User approved the source-backed assessment plan and a local secret environment. This bounded release adds automatic selection policy, an offline nested group-CV selector, source provenance/publisher registry, optional Groq assessment, separate scores and compatible saved reports. See [implementation](docs/AUTOMATIC_ASSESSMENT.md) and [actual validation](docs/AUTOMATIC_ASSESSMENT_VALIDATION.md). Original CSVs and provider credentials remain prerequisites; baseline selection and provisional conclusions are explicitly labeled. Broader phases retain their existing gates.

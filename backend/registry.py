@@ -27,3 +27,21 @@ def promotion_decision(candidate, baseline):
     if candidate.get("brier_score", 1) > baseline.get("brier_score", 0): reasons.append("Calibration must not regress against the baseline.")
     if candidate.get("p95_latency_ms", float("inf")) > 1000: reasons.append("P95 local inference must be at most 1000 ms on the target device.")
     return {"eligible": not reasons, "reasons": reasons, "automatic_promotion": False}
+
+
+def selected_model(bundle, root=None):
+    """Use a checksummed release manifest; never select by article confidence."""
+    root = Path(root) if root else ROOT
+    try:
+        manifest = json.loads((root / 'models/selection.json').read_text())
+        if manifest['artifact_sha256'] != file_sha256(root / 'models/classifier.json'):
+            raise ValueError('Artifact checksum mismatch')
+        winner = manifest['selected_model']
+        if winner not in bundle['models']:
+            raise ValueError('Missing selected model')
+        return winner, manifest
+    except (OSError, ValueError, KeyError):
+        # Preserve the existing production baseline when a selection release is
+        # unavailable. Never reinterpret historical test scores as selection data.
+        return 'logistic', {'status': 'baseline_fallback', 'selected_model': 'logistic',
+                            'reason': 'Selection manifest unavailable or invalid; retaining the existing production baseline.'}

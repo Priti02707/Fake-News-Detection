@@ -254,3 +254,7 @@ No validated deepfake detector or full-media accuracy is claimed.
 No software license has been selected by the repository owner. No LICENSE is added automatically. External code, models and datasets retain their own terms and attribution. Reference repositories were reviewed without copying their code; see the [reuse review](docs/REFERENCE_COMPARISON.md).
 
 Development is AI-assisted. Git history preserves actual commit authorship; third-party work and historical benchmark results are not presented as newly authored or newly executed experiments.
+
+## Automatic evidence assessment
+
+The main workflow now uses automatic article-model selection and defaults to detection plus source verification. Add server-only keys to a gitignored `.env` using `.env.example`, then run `python scripts/check_connections.py`. See [setup, scoring and limitations](docs/AUTOMATIC_ASSESSMENT.md). Grounded Groq results are provisional and cited; publisher credibility is separate from factual support. The bundled release retains its existing article-model baseline pending training-only cross-validation on the original data.

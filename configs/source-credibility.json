@@ -1,0 +1,24 @@
+{
+  "version": "2026-11-02.1",
+  "policy": "Editorial-policy index, not a probability of truth. Unknown publishers are unassessed. Verified domain and unchanged fetched article text are required for original-source attribution.",
+  "publishers": [
+    {
+      "name": "Reuters",
+      "domains": ["reuters.com"],
+      "permitted_subdomains": ["www.reuters.com"],
+      "score": 90,
+      "reviewed_at": "2026-11-02",
+      "policy_url": "https://reutersagency.com/about/standards-values/",
+      "rationale": "Published accuracy, independence, corrections and conflict-of-interest standards. Score is a project policy choice, not empirical article accuracy."
+    },
+    {
+      "name": "Associated Press",
+      "domains": ["apnews.com"],
+      "permitted_subdomains": ["www.apnews.com"],
+      "score": 90,
+      "reviewed_at": "2026-11-02",
+      "policy_url": "https://www.ap.org/about/news-values-and-principles/",
+      "rationale": "Published sourcing, accuracy, impartiality and corrections standards. Score is a project policy choice, not empirical article accuracy."
+    }
+  ]
+}

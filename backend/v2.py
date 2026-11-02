@@ -17,8 +17,14 @@ def build_router(analyze, extract, retrieve, metrics, evaluation):
     def classify(payload):
         started = time.perf_counter()
         words = re.findall(r"\b\w+\b", payload.text)
-        if len(payload.text.strip()) < 40 or len(words) < 40:
-            return {"verdict": "uncertain", "model": payload.model, "model_name": "Linear SVM" if payload.model == "svm" else "Logistic Regression", "confidence": None, "real_probability": None, "explanations": [], "reasons": ["Headline or short text: the article classifiers were evaluated on full articles. Provide more context or investigate this claim with sources."], "word_count": len(words), "elapsed_ms": round((time.perf_counter() - started) * 1000, 2), "language": identify_language(payload.text), "claims": [{"text": payload.text.strip()[:300], "status": "unverified", "selection_method": "short_input_for_reader_review"}], "note": "No factual or calibrated classification score is established for this short input."}
+        language = identify_language(payload.text)
+        unsupported = language["code"] != "en"
+        if len(payload.text.strip()) < 40 or len(words) < 40 or unsupported:
+            model_id = payload.model
+            selection = {"status": "not_run_unsupported_language" if unsupported else "not_run_short_input", "reason": "Article inference skipped for unsupported language." if unsupported else "Article inference skipped for short input."}
+            if model_id == "auto":
+                model_id = "logistic"
+            return {"verdict": "uncertain", "model": model_id, "model_selection": selection, "model_name": "Automatic selection · article model not run" if payload.model == "auto" else "Linear SVM" if model_id == "svm" else "Logistic Regression", "confidence": None, "real_probability": None, "explanations": [], "reasons": ["The article classifiers were evaluated on English only. Investigate the claim with sources." if unsupported else "Headline or short text: the article classifiers were evaluated on full articles. Provide more context or investigate this claim with sources."], "word_count": len(words), "elapsed_ms": round((time.perf_counter() - started) * 1000, 2), "language": language, "claims": [{"text": payload.text.strip()[:300], "status": "unverified", "selection_method": "short_input_for_reader_review"}], "note": "No factual or calibrated classification score is established for this short input."}
         return analyze(AnalyzeInput(text=payload.text, model=payload.model))
 
     @router.post("/analyze/text", response_model=AnalysisEnvelope)
@@ -33,7 +39,7 @@ def build_router(analyze, extract, retrieve, metrics, evaluation):
     @router.post("/analyze/url", response_model=AnalysisEnvelope)
     async def url_analysis(payload: URLInput):
         source = await extract(payload)
-        result = await run_in_threadpool(classify, TextV2Input(text=source["text"], model="logistic"))
+        result = await run_in_threadpool(classify, TextV2Input(text=source["text"]))
         return {"source": source, "analysis": result, "report": fuse(result)}
 
     def reviewed_media(payload, expected):
@@ -55,15 +61,9 @@ def build_router(analyze, extract, retrieve, metrics, evaluation):
 
     @router.post("/verify/claims", response_model=VerificationResponse)
     async def verify(payload: VerifyInput):
-        evidence, warnings = [], []
-        if payload.source_text:
-            evidence.append(await retrieve(EvidenceInput(query=payload.claim, text=payload.source_text)))
-        for url in payload.urls:
-            try:
-                evidence.append(await asyncio.wait_for(retrieve(EvidenceInput(query=payload.claim, url=url)), timeout=10))
-            except (HTTPException, TimeoutError) as error:
-                warnings.append(error.detail if isinstance(error, HTTPException) else "Source retrieval timed out.")
-        return {"claim": payload.claim, "assessment": "INSUFFICIENT_EVIDENCE", "confidence": None, "evidence": evidence, "warnings": warnings, "explanation": "Retrieved passages are available for review. No server-side factual-verification model has passed domain validation. Optional browser NLI compares wording; reader annotations remain explicitly reader-authored."}
+        result = await assess(AssessmentInput(text=payload.claim, claim=payload.claim, mode="verify", evidence_urls=payload.urls, source_text=payload.source_text), None, retrieve)
+        verification = result['verification']
+        return {**verification, 'warnings': verification['warnings'] + ['Provisional automated assessment; inspect exact quotations and context.']}
 
     @router.get("/models/metrics")
     def model_metrics():
@@ -71,6 +71,6 @@ def build_router(analyze, extract, retrieve, metrics, evaluation):
 
     @router.get("/capabilities")
     def capabilities():
-        return {"media_execution": "asynchronous browser workers", "raw_media_uploads": False, "server_media_jobs": False, "maximum_video_seconds": 60, "maximum_video_bytes": 25 * 1024 * 1024, "maximum_audio_seconds": 60, "maximum_audio_bytes": 20 * 1024 * 1024, "maximum_frames": 6, "production_text_models": ["logistic", "svm"], "transformer_challengers": "local research only", "deepfake_detection": "unavailable", "claim_verification": "cited retrieval plus reader review; browser textual-entailment assistance is experimental", "classification": {"text": "evaluated English article models", "url": "reviewed article text", "image": "reviewed text only; full-image classifier not evaluated", "video": "reviewed text only; full-video classifier not evaluated", "audio": "reviewed speech text only; acoustic classifier not evaluated", "multimodal_fusion": "research training only; no production checkpoint", "hindi": "extraction only; veracity classifier unavailable"}}
+        return {"media_execution": "asynchronous browser workers", "raw_media_uploads": False, "server_media_jobs": False, "maximum_video_seconds": 60, "maximum_video_bytes": 25 * 1024 * 1024, "maximum_audio_seconds": 60, "maximum_audio_bytes": 20 * 1024 * 1024, "maximum_frames": 6, "production_text_models": ["logistic", "svm"], "transformer_challengers": "local research only", "deepfake_detection": "unavailable", "claim_verification": "optional Groq grounded assessment with validated citations; provisional and not independently benchmarked", "classification": {"text": "evaluated English article models", "url": "reviewed article text", "image": "reviewed text only; full-image classifier not evaluated", "video": "reviewed text only; full-video classifier not evaluated", "audio": "reviewed speech text only; acoustic classifier not evaluated", "multimodal_fusion": "research training only; no production checkpoint", "hindi": "extraction only; veracity classifier unavailable"}}
 
     return router

@@ -44,7 +44,7 @@ def test_verification_only_never_runs_classifier_and_retains_exact_pasted_eviden
         assert TEXT[passage["start"]:passage["end"]] == passage["text"]
 
 
-def test_only_two_discovered_sources_are_read_and_publisher_rating_is_preserved():
+def test_only_four_discovered_sources_are_read_and_publisher_rating_is_preserved():
     calls = []
     async def news(*args):
         return {"status": "matches", "message": "News leads", "results": [{"url": f"https://example.com/{index}", "title": f"Source {index}"} for index in range(5)]}
@@ -60,7 +60,8 @@ def test_only_two_discovered_sources_are_read_and_publisher_rating_is_preserved(
         from backend.assessment import assess
         from backend.schemas import AssessmentInput
         data = asyncio.run(assess(AssessmentInput(text=TEXT, mode="verify"), None, retrieve))
-    assert calls == ["https://example.com/0", "https://example.com/1"]
+    assert len(calls) == 4 and len(set(calls)) == 4
+    assert "https://example.org/review" in calls
     assert data["verification"]["fact_checks"]["results"][0]["rating"] == "Misleading"
     assert data["verification"]["assessment"] == "INSUFFICIENT_EVIDENCE"
 

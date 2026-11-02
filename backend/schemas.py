@@ -5,7 +5,7 @@ from pydantic import model_validator
 
 class AnalyzeInput(BaseModel):
     text: str = Field(min_length=40, max_length=20000)
-    model: Literal["logistic", "svm"] = "logistic"
+    model: Literal["auto", "logistic", "svm"] = "auto"
 
 
 class URLInput(BaseModel):
@@ -31,6 +31,7 @@ class WorldNewsInput(ClaimInput):
 
 
 class EvidenceInput(BaseModel):
+    queries: list[Annotated[str, Field(min_length=8, max_length=300)]] = Field(default_factory=list, max_length=3)
     query: str = Field(min_length=8, max_length=300)
     text: str | None = Field(default=None, min_length=40, max_length=20000)
     url: str | None = Field(default=None, min_length=8, max_length=2048)
@@ -112,7 +113,7 @@ class ReaderFinding(BaseModel):
 
 class TextV2Input(BaseModel):
     text: str = Field(min_length=10, max_length=20000)
-    model: Literal["logistic", "svm"] = "logistic"
+    model: Literal["auto", "logistic", "svm"] = "auto"
     reader_findings: list[ReaderFinding] = Field(default_factory=list, max_length=6)
 
 
@@ -121,8 +122,11 @@ class MultimodalInput(TextV2Input):
 
 
 class AssessmentInput(TextV2Input):
+    text: str = Field(min_length=8, max_length=20000)
     mode: Literal["detect", "verify", "detect_verify"] = "detect_verify"
     claim: str | None = Field(default=None, min_length=8, max_length=300)
+    article_url: str | None = Field(default=None, min_length=8, max_length=2048)
+    evidence_urls: list[Annotated[str, Field(min_length=8, max_length=2048)]] = Field(default_factory=list, max_length=2)
     source_url: str | None = Field(default=None, min_length=8, max_length=2048)
     source_text: str | None = Field(default=None, min_length=40, max_length=20000)
     notes: str = Field(default="", max_length=1000)
@@ -131,8 +135,8 @@ class AssessmentInput(TextV2Input):
 
     @model_validator(mode="after")
     def readable_text(self):
-        if len(self.text.strip()) < 10:
-            raise ValueError("Enter at least 10 characters of readable news text.")
+        if len(self.text.strip()) < 8:
+            raise ValueError("Enter at least 8 characters of readable news text.")
         return self
 
 
@@ -162,6 +166,10 @@ class AnalysisEnvelope(BaseModel):
 
 
 class VerificationResponse(BaseModel):
+    claims: list[dict] = Field(default_factory=list)
+    scores: dict = Field(default_factory=dict)
+    assessor_status: str = "unavailable"
+    provisional: bool = True
     claim: str
     assessment: Literal["SUPPORTED", "REFUTED", "MIXED", "INSUFFICIENT_EVIDENCE"]
     confidence: float | None = None
@@ -171,8 +179,14 @@ class VerificationResponse(BaseModel):
 
 
 class SourceVerificationReport(BaseModel):
-    status: Literal["review_required", "unavailable", "no_matches"]
-    assessment: Literal["INSUFFICIENT_EVIDENCE"]
+    schema_version: int = 2
+    provisional: bool = True
+    claims: list[dict] = Field(default_factory=list)
+    scores: dict = Field(default_factory=dict)
+    original_source: dict | None = None
+    assessor_status: str = "unavailable"
+    status: Literal["review_required", "unavailable", "no_matches", "assessed"]
+    assessment: Literal["SUPPORTED", "REFUTED", "MIXED", "INSUFFICIENT_EVIDENCE"]
     confidence: None = None
     claim: str
     claim_selection: Literal["reader_selected", "heuristic_candidate"]
