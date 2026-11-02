@@ -4,13 +4,13 @@ Baseline and file-by-file plan: [BASELINE_AUDIT.md](BASELINE_AUDIT.md). Baseline
 
 ## Connected multimodal verification
 
-Connected image-caption review, chronological video investigation, bounded automatic evidence gathering, contradiction/uncertainty presentation and contextual JSON/print reports. Added full-clip sampling, unique notebook/frame IDs and earlier image decoder checks. No production model weights, metrics or registry were changed. See [release record and changed files](MULTIMODAL_RELEASE.md) for tests, real-model availability limits and production publication status.
+Connected image-caption review, chronological video investigation, bounded automatic evidence gathering, contradiction/uncertainty presentation and contextual JSON/print reports. Code commit `60ab8ae` was deployed; the complete public production smoke workflow passed 18 desktop/mobile cases, 4 real OCR/video cases and 3 real CLIP/NLI/Whisper cases from GitHub’s runner. Added full-clip sampling, unique notebook/frame IDs and earlier image decoder checks. No production model weights, metrics or registry were changed. See [release record and changed files](MULTIMODAL_RELEASE.md) for tests, model limitations and production publication status. Verification records and the README frontend file guide were finalized on 2026-11-02.
 
 ## Phase 1 continuation
 
 Continued from `0bc7a38` on `feature/phase1-research-inference`: added a separate optional local transformer research API, lazy single-slot loading, artifact verification, safe configuration/failure states, and real saved-DistilBERT inference validation. Fixed the benchmark report self-hash bug without changing model weights or metrics. Added within-source evidence passage deduplication and publication-date review metadata displayed/exported by the notebook. Production linear inference and legacy routes remain intact.
 
-Validation: **62 Python tests passed, 1 opt-in case skipped**; the real saved-checkpoint opt-in case separately **passed**. Build/type checks passed; local desktop/mobile production-build browser checks **12 passed, 12 skipped**. Heavy media/model browser integrations were not rerun. See [continuation audit, file list and limitations](PHASE1_CONTINUATION.md). No production publication is claimed for this branch.
+Validation at the Phase 1 checkpoint: **62 Python tests passed, 1 opt-in case skipped**; the real saved-checkpoint opt-in case separately **passed**. Build/type checks passed; local desktop/mobile production-build browser checks **12 passed, 12 skipped**. Heavy media/model browser integrations were not rerun at that checkpoint. See [continuation audit, file list and limitations](PHASE1_CONTINUATION.md). This work was subsequently included in the connected multimodal production release above; the separate local research service remains outside Vercel.
 
 ## Follow-up correctness check — 2026-11-01
 

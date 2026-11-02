@@ -225,6 +225,22 @@ scripts/                Dataset recovery and training
 tests/                  API and browser tests
 ```
 
+### Where is the frontend?
+
+The **`app/` folder is the frontend**. It uses Next.js, React and TypeScript.
+
+| File | What to edit |
+|---|---|
+| [`app/page.tsx`](app/page.tsx) | Main page, navigation, input tabs, results and history |
+| [`app/globals.css`](app/globals.css) | Colors, spacing, responsive layouts and print styles |
+| [`app/layout.tsx`](app/layout.tsx) | Root page layout and website metadata |
+| [`app/media-input.tsx`](app/media-input.tsx) | Image/video uploads, previews and extraction review |
+| [`app/image-context.tsx`](app/image-context.tsx) | Image–caption comparison and investigation controls |
+| [`app/video-timeline.tsx`](app/video-timeline.tsx) | Timestamped video investigation interface |
+| [`app/investigation.tsx`](app/investigation.tsx) | Evidence search, citations, reader findings and exports |
+
+Files ending in `.worker.ts` run model tasks in browser workers. `backend/` contains the Python API. `.next/` contains generated build output; edit the source files in `app/` to change the website. Run `npm run dev` to open the frontend at http://localhost:3000; start FastAPI as described above for API-backed workflows.
+
 ## Data handling and limitations
 
 Article text is processed without database storage. Optional history stays in the browser. Hosting providers can retain standard request metadata. Fact-check search sends the chosen query to Google. URL extraction checks resolved addresses and redirect targets, pins connections to public IPs, verifies HTTPS certificates, and limits response size. It cannot bypass paywalls or publisher restrictions.
