@@ -6,6 +6,8 @@ Baseline and file-by-file plan: [BASELINE_AUDIT.md](BASELINE_AUDIT.md). Baseline
 
 Added `https://fake-news-detection-priti.vercel.app` to the existing Vercel project and assigned it to the current production deployment. The shorter `fake-news-detection.vercel.app` was already in use. The new domain is verified and attached at project level so future production deployments update it automatically. The previous address remains attached. Updated the README, deployment instructions and public production-smoke target. The application brand and internal Vercel project are unchanged.
 
+GitHub's About homepage setting was updated and read back as the new URL. [Cloud production checks against the new address](https://github.com/Priti02707/Fake-News-Detection/actions/runs/41386956873) passed the desktop/mobile workflows and real OCR/video-frame checks. The optional CLIP/NLI/Whisper group was not requested for this URL-only change. A direct local TCP check timed out; the successful independent cloud run verified public access instead. No application rebuild or model changes were needed.
+
 ## Separate frontend source folder — 2026-11-02
 
 Moved the 18 interface, CSS, helper and browser-worker source files from `app/` into `frontend/`, byte-for-byte unchanged. `app/page.tsx` now re-exports `frontend/page.tsx`; the Next.js layout imports `frontend/globals.css`, and the icon stays under `app/`. Updated the unit-test import, current architecture notes and README source map; added `frontend/README.md`. Root npm commands, Python API, Docker/Vercel configuration and production models are preserved.
