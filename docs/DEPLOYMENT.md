@@ -46,4 +46,4 @@ The manually triggered **Production smoke checks** GitHub workflow runs public d
 
 ## Classification upgrade — 2026-11-02
 
-The audio route adds no server-side decoder or heavyweight runtime dependency. Keep `requirements-ml.txt` and optional `requirements-tracking.txt` outside Vercel. Training outputs belong under ignored `.artifacts/`, with paired inputs under ignored `data/multimodal/`; neither is a production model. This continuation is validated locally and has not been published. Existing production remains on its previous release.
+The audio route adds no server-side decoder or heavyweight runtime dependency. Keep `requirements-ml.txt` and optional `requirements-tracking.txt` outside Vercel. Training outputs belong under ignored `.artifacts/`, with paired inputs under ignored `data/multimodal/`; neither is a production model. The classification upgrade is published to the existing project. Both public addresses and live regression/media/API checks passed; see [the publication record](IMPLEMENTATION_STATUS.md#publication-record).

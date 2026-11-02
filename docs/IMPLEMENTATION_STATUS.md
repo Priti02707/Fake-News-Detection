@@ -32,4 +32,17 @@ Validation before publication: **81 Python tests passed, 1 opt-in checkpoint cas
 
 ## Publication record
 
-Pending publication of the validated working tree to the existing GitHub repository and `priti-09/verity-news` Vercel project. No heavy model, dataset or private credentials are included. The production app must continue to report uncertain/unavailable full-media, Hindi-veracity and deepfake models.
+Published the tested code as commit [`ca488ae222fd5c6bf6cc275b4a4991c1fc9399bd`](https://github.com/Priti02707/Fake-News-Detection/commit/ca488ae222fd5c6bf6cc275b4a4991c1fc9399bd) on `main` and `feature/advanced-classification`. Main-branch [GitHub CI](https://github.com/Priti02707/Fake-News-Detection/actions/runs/41389021522) passed, including API/logic tests, build/type checks and desktop/mobile browsers.
+
+Vercel deployment [`dpl_CWnvhgtc9PXa4b87goNjZipVMzKP`](https://vercel.com/priti-09/verity-news/CWnvhgtc9PXa4b87goNjZipVMzKP) reached **READY** in the existing project. Both [the public website](https://fake-news-detection-priti.vercel.app) and [the compatibility address](https://verity-news-sable.vercel.app) serve the new audio capabilities. No heavy model, dataset or credentials were published.
+
+Verified against the public production address:
+
+- **22 desktop/mobile regression cases passed, 16 opt-in skipped**, using `PLAYWRIGHT_BASE_URL=https://fake-news-detection-priti.vercel.app npm run test:e2e -- --workers=1 --output=/private/tmp/verity-production-regression`.
+- **3 actual model/media cases passed**: standalone Whisper speech transcription and reviewed-word report export, screenshot OCR/review/classification, and real video-frame OCR/timeline seeking. Command: `MEDIA_INTEGRATION=1 PLAYWRIGHT_BASE_URL=https://fake-news-detection-priti.vercel.app npm run test:e2e -- --workers=1 --project=desktop --grep 'actual audio transcription|video frames create a real|image extraction requires'`.
+- Production API smoke checks passed: model readiness, capabilities, legacy/v2 text parity, short-input abstention, audio text-only scope/full-media uncertainty, endpoint-kind validation, private URL rejection, pasted-source verbatim retrieval without invented URLs/verdicts, and metrics/registry.
+- Separately, actual local saved DistilBERT loading/inference passed: `VERITY_TEST_RESEARCH_MODEL_DIR=.artifacts/distilbert-base-uncased .venv/bin/python -m pytest tests/test_research.py -q -k actual_local` (**1 passed, 11 deselected**).
+
+The first overlapping browser runs shared Playwright's default output folder and one failed during trace cleanup with ENOENT. This was a test-run coordination error; the isolated complete rerun above passed. Synthetic browser worker/source fixtures validate orchestration, not real CLIP accuracy or source availability. The three actual extraction checks are reported separately. Hindi, CLIP, NLI, C2PA and video-speech integrations were not rerun for this release.
+
+Google Fact Check remains unconfigured and is visibly disabled. Full-media, acoustic, Hindi-veracity and deepfake predictions remain uncertain/unavailable. The README and page metadata were aligned with the primary classification workflow in a subsequent release-record update; processing/model weights were unchanged.

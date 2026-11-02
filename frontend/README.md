@@ -5,8 +5,11 @@ This folder contains the existing website's React/TypeScript interface, styles a
 | File | Purpose |
 |---|---|
 | `page.tsx` | Main interface, navigation, article analysis and history |
+| `classification-dashboard.tsx` | Current model capabilities and input selection |
+| `theme-toggle.tsx` | Locally saved light/dark preference |
 | `globals.css` | Styling, responsive layouts and print presentation |
-| `media-input.tsx` | Image/video uploads, local extraction and review |
+| `media-input.tsx` | Image/video/audio uploads, local extraction and review |
+| `speech-audio.ts` | Bounded audio decoding, silence checks and speech resampling |
 | `image-context.tsx` | Image–caption comparison and investigation |
 | `video-timeline.tsx` | Timestamped media observations and evidence links |
 | `investigation.tsx` | Evidence retrieval, citations, reader findings and exports |

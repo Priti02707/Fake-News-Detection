@@ -78,7 +78,7 @@ The fusion execution fixture contains 36 seeded synthetic rows: 12 train, 12 val
 
 The existing SSRF and request guards remain active. New audio checks cover MIME/container mismatch, file size, real silent decoding, duration/timestamp bounds and text-only prediction scope. Research checkpoints use safe tensors, hashes and contained paths; no Python pickle loading is introduced. Data and artifacts remain ignored/excluded from deployment.
 
-Use the README's existing local/Vercel setup; heavy optional dependencies stay in the local research environment. No commit, push, production deployment or live-production validation was performed in this continuation. Previously published production behavior remains separate from these local results. Heavy OCR/CLIP/NLI/C2PA/Hindi integrations were not rerun; the actual audio check was desktop-only. External generalization and model promotion require reviewed data and separate evaluation.
+Use the README's existing local/Vercel setup; heavy optional dependencies stay in the local research environment. At the earlier local checkpoint, publication had not been performed. The subsequent GitHub/Vercel release and production verification are recorded in [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md#publication-record). Heavy OCR/CLIP/NLI/C2PA/Hindi integrations were not rerun; the actual audio check was desktop-only. External generalization and model promotion require reviewed data and separate evaluation.
 
 ## Exact working-tree file list
 
@@ -124,3 +124,12 @@ Includes the pre-existing unfinished upgrade plus this continuation's fixes/test
 ## Publication preparation
 
 The resumed release audit, eleven-phase completion counts, numerical model results and production publication record are maintained in [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md). Additional dataset validation now rejects malformed records/encoders/archives and screens huge finite embeddings using float64 to prevent norm-overflow overlap bypass. Ten regression cases were added; the updated complete Python suite passed 81 tests with one opt-in checkpoint skip.
+
+## Additional publication files
+
+- `.github/workflows/production-smoke.yml`: include standalone real audio in optional model checks.
+- `app/layout.tsx`: classify-first browser title/description.
+- `frontend/README.md`: document dashboard, audio decoding and theme components.
+- `docs/IMPLEMENTATION_STATUS.md`: eleven-phase audit, actual metrics and verified release record.
+
+Production verification: 22 desktop/mobile regressions passed with 16 opt-in skips, plus three actual audio/OCR/video-frame integrations passed. GitHub main CI passed. See the publication record for commands, deployment identifier, source commit and limitations.

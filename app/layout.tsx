@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "../frontend/globals.css";
 
 export const metadata: Metadata = {
-  title: "Verity AI 2.0 — Multimodal evidence verification",
-  description: "Investigate image–news mismatches, video timelines and factual claims with explainable models, cited evidence and transparent uncertainty. A project by Priti.",
+  title: "Verity AI — Explainable Fake News Detection",
+  description: "Classify English news with calibrated models and clear explanations. Review image, video and audio text, inspect media context, and explore optional evidence. A project by Priti.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

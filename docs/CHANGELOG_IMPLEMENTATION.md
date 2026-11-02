@@ -68,3 +68,5 @@ Executed experiment artifacts are in `reports/`; baseline and robustness metrics
 ## Classification upgrade — 2026-11-02
 
 Continued the unfinished classification upgrade on `feature/advanced-classification`: dashboard availability, audio upload/preview/Whisper review, direct reviewed-word classification, full-media abstention, saved light/dark preference, drag-and-drop, and offline paired-feature fusion research. Added audio contract/signature/browser checks and bounded research overlap matrices in both dimensions. Original classifiers and legacy routes remain intact. Full commands, exact changed files, validation outcomes and outstanding limits are recorded in [the classification audit](ADVANCED_CLASSIFICATION_AUDIT.md).
+
+The classification release was published on GitHub main and Vercel. Live desktop/mobile regressions (22) and actual Whisper/OCR/video-frame integrations (3) passed, along with production API smoke checks. The real saved DistilBERT inference check also passed locally. See [the release status](IMPLEMENTATION_STATUS.md#publication-record).

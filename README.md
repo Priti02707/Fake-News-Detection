@@ -1,6 +1,6 @@
-# Verity AI 2.0 · Explainable Multimodal Evidence Verification
+# Verity AI · Explainable Fake News Detection
 
-A misinformation investigation platform by **Priti**. Inspect article-model explanations, investigate image–news mismatches, follow video speech and frame text on a timeline, and gather cited evidence with explicit uncertainty.
+A fake news classification application by **Priti**. Analyze English articles and URLs with calibrated models and influential-word explanations. Extract and review words from images, video and audio, inspect media context, and optionally investigate claims with cited evidence. Full-media classification remains uncertain until independently evaluated models are available.
 
 **Live website:** https://fake-news-detection-priti.vercel.app · [Vercel project](https://vercel.com/priti-09/verity-news)
 
