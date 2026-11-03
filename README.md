@@ -6,7 +6,7 @@
 [![Vercel](https://img.shields.io/badge/Deployed_on-Vercel-000000?logo=vercel&logoColor=white)](https://fake-news-detection-priti.vercel.app/)
 
 Fake News Detection helps you assess news using machine learning and understandable explanations.
-Analyze English articles, review text extracted from media, and see which words influenced the prediction.
+Analyze English articles, review text extracted from media, and check claims against retrieved sources. The default workflow combines automatic article-model selection with source verification.
 
 **Project Owner & Primary Developer:** [Priti Kumari](https://github.com/Priti02707).
 
@@ -27,7 +27,7 @@ The project encourages careful review and returns an uncertain result when the a
 
 ## Development status and master plan
 
-The supplied master prompt is tracked in [MASTER_REQUIREMENTS.md](docs/MASTER_REQUIREMENTS.md), with the requested **Fake News Detection** identity and the existing repository. This update completes **Phase 0: reference research, architecture and project planning**, plus the requested rename. Later phase completion is not claimed.
+The current release combines English article classification, source provenance checks, and optional cited claim assessment. Research plans and evaluation records are linked below.
 
 - [Reference source comparison](docs/REFERENCE_COMPARISON.md), [implementation plan](PLAN.md), [phase acceptance gates](PHASES.md), [roadmap](ROADMAP.md), and [orchestrator](MASTER_ORCHESTRATOR.md).
 - [Architecture](docs/ARCHITECTURE.md), [API contract](docs/API_CONTRACT.md), [evaluation register](docs/MODEL_EVALUATION.md), and [Phase 0 verification report](docs/PHASE_0_REPORT.md).
@@ -38,7 +38,8 @@ The supplied master prompt is tracked in [MASTER_REQUIREMENTS.md](docs/MASTER_RE
 | OCR, short audio/video transcription, sampled frames, evidence notebook and browser history | Implemented; browser model downloads and codec support required |
 | World-news discovery / published fact-check search | Implemented; provider availability / server API key required |
 | CLIP, NLI wording assistance, Hindi extraction, Content Credentials inspection | Experimental; no forensic or factual verdict implied |
-| Grounded automatic factual verdicts, Hindi veracity classifier, full-media/deepfake classifier | Unavailable pending configuration, artifacts and independent evaluation |
+| Cited claim assessment | Optional Groq assessment over retrieved passages, with provisional conclusions and citation checks |
+| Hindi veracity classifier and full-media/deepfake classifier | Research pending suitable artifacts and independent evaluation |
 | Authenticated durable history, long-video server jobs, new design system/pages | Planned in sequential phases |
 
 ```mermaid
@@ -53,7 +54,7 @@ flowchart LR
 
 ## Key Features
 
-- **Text Fake News Detection:** Analyze English articles using Logistic Regression or calibrated Linear SVM.
+- **Text Fake News Detection:** Analyze English articles with automatic release-based model selection. The bundled release retains the existing baseline pending grouped cross-validation on the original training data.
 - **Image Text Extraction and Analysis:** Read screenshot/photo text with OCR, correct it, and classify the reviewed words.
 - **Video Speech Extraction and Analysis:** Transcribe short clips, inspect sampled frame text, and follow timestamps.
 - **News URL Analysis:** Extract a public article and review its text before analysis.
@@ -168,11 +169,27 @@ and sufficient device memory. Your raw media stays in the browser; reviewed text
 
 See [setup, testing, and deployment](docs/DEPLOYMENT.md) for optional services and additional checks.
 
+## Server configuration and deployment
+
+Copy [.env.example](.env.example) to `.env` for local setup, or set these variables in the environment that runs FastAPI.
+
+| Variable | Purpose |
+| --- | --- |
+| `GROQ_API_KEY` | Enables provisional claim assessment with citations to retrieved passages. |
+| `GROQ_MODEL` | Optional model override for the assessor. |
+| `GOOGLE_FACT_CHECK_API_KEY` | Enables search for published reviews through Google Fact Check Tools API. |
+
+Keep keys server-side. Restart the local backend after changing `.env` and redeploy after changing hosted settings. Run `.venv/bin/python scripts/check_connections.py` locally to check provider connections.
+
+On Vercel, keep `configs/source-credibility.json` in the Python function bundle. The exclusion rule in [vercel.json](vercel.json) skips transformer research configs while retaining the publisher policy. After deploying, check `/api/health` and `/api/v2/capabilities`. If either returns HTTP 500, inspect the function runtime logs for that deployment.
+
+See the [assessment setup and limitations](docs/AUTOMATIC_ASSESSMENT.md).
+
 ## How to Use
 
-- **Combined assessment:** Choose **Fake news detection + source verification** in **Assessment mode**, enter/review the news text, optionally expand **Source & verification notes**, then select **Detect & verify news**. The app runs the real text model and searches for related sources, reading at most two news leads when no explicit source is supplied. Published ratings and verbatim passages remain review aids; no automatic factual verdict is claimed. **Source verification only** skips the classifier. All assessment modes support manual **Save current report**, JSON download and restoration from this browser, with reader reviews kept separate from factual verdicts. Provider outages preserve any available model result.
+- **Combined assessment** is the default. Enter reviewed article text, optionally specify a claim or supporting source, then select **Detect & verify news**. The report separates the classifier result, publisher credibility, evidence relevance and coverage, and any provisional cited claim assessment. The backend checks up to three claims and fetches up to four source documents per request. **Source verification only** skips the classifier. You can save or restore reports in your browser and download them as JSON.
 - **World news:** Open **World news check**, enter a claim or topic, choose source language, publisher country and news date window, then select **Check world news**. Worldwide/all languages searches across indexed sources; it does not translate queries or guarantee every country or story is covered. Use **Review this source** to inspect evidence. Country and date filters apply to GDELT news only; published fact-checks use the selected language across countries and dates. The classifier remains English-only, and search results do not automatically establish truth or falsehood.
-- **Text:** Select **Paste text**, type/paste an article or drop a `.txt`/`.md` file, choose a model, and select **Analyze article**.
+- **Text:** Select **Paste text**, type/paste an article or drop a `.txt`/`.md` file, and run the selected assessment mode.
 - **Image:** Select **Image**, upload/drop a readable screenshot, select **Extract image text**, and correct recognition errors.
 - **Video:** Select **Video**, upload/drop a short clip, select **Transcribe video**, and review the transcript. Use **Inspect video frames** for on-screen text.
 - **Audio:** Select **Audio**, upload/drop a short speech recording, select **Transcribe audio**, and review the words.
@@ -254,7 +271,3 @@ No validated deepfake detector or full-media accuracy is claimed.
 No software license has been selected by the repository owner. No LICENSE is added automatically. External code, models and datasets retain their own terms and attribution. Reference repositories were reviewed without copying their code; see the [reuse review](docs/REFERENCE_COMPARISON.md).
 
 Development is AI-assisted. Git history preserves actual commit authorship; third-party work and historical benchmark results are not presented as newly authored or newly executed experiments.
-
-## Automatic evidence assessment
-
-The main workflow now uses automatic article-model selection and defaults to detection plus source verification. Add server-only keys to a gitignored `.env` using `.env.example`, then run `python scripts/check_connections.py`. See [setup, scoring and limitations](docs/AUTOMATIC_ASSESSMENT.md). Grounded Groq results are provisional and cited; publisher credibility is separate from factual support. The bundled release retains its existing article-model baseline pending training-only cross-validation on the original data.
