@@ -27,6 +27,10 @@ After deployment, check `/api/health`, `/api/v2/capabilities`, `/api/v2/models/m
 
 Docker Compose configuration was validated locally. A container image build/run was not verified because the installed Docker daemon was stopped (its socket was absent). This does not block the separately verified Vercel deployment.
 
+## Diagnose API HTTP 500 responses
+
+Check that the public alias points to the intended deployment. Record the request time and the `X-Request-ID` response header if present, then filter Runtime Logs for the Python function around that time. An application-generated error emits a `request_error` event with the same ID and the exception type. The event excludes request bodies, exception messages, and environment variables. If the response has no request ID, inspect the platform's function startup and routing logs before changing provider keys.
+
 ## Separate local research service
 
 After installing `requirements-ml.txt` and producing a benchmark checkpoint:

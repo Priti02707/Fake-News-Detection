@@ -45,9 +45,16 @@ async def limit_body(request: Request, call_next):
                     break
             request._body = bytes(content)
     if response is None:
-        try: response = await call_next(request)
-        except Exception:
-            logger.error(json.dumps({"event": "request_error", "request_id": request_id, "path": request.url.path}))
+        try:
+            response = await call_next(request)
+        except Exception as error:
+            logger.error(json.dumps({
+                "event": "request_error",
+                "request_id": request_id,
+                "method": request.method,
+                "path": request.url.path,
+                "error_type": type(error).__name__,
+            }))
             response = JSONResponse(status_code=500, content={"detail": "The service could not complete this request.", "request_id": request_id})
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["Cache-Control"] = "no-store"
